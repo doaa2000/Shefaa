@@ -4,7 +4,41 @@
     "your_next_appointment": "Your Next Appointment",
     "home": "Home",
     "appointments": "Appointments",
-    "profile": "Profile"
+    "profile": "Profile",
+    "doctors": "Doctors",
+    "book_now": "Book Now",
+    "select_appointment": "Select Appointment",
+    "available_days": "Available Days",
+    "available_time": "Available Time",
+    "morning": "Morning",
+    "evening": "Evening",
+    "confirm_booking": "Confirm Booking",
+    "payment": "Payment",
+    "payment_summary": "Payment Summary",
+    "consultation_fee": "Consultation Fee",
+    "total_amount": "Total Amount",
+    "select_payment_method": "Select Payment Method",
+    "pay_cash": "Pay Cash",
+    "vodafone_cash": "Vodafone Cash",
+    "instapay": "InstaPay",
+    "confirm_booking_payment": "Confirm Booking & Payment",
+    "discount": "Discount"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -23,10 +23,36 @@ class MessageLookup extends MessageLookupByLibrary {
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
     "appointments": MessageLookupByLibrary.simpleMessage("Appointments"),
+    "available_days": MessageLookupByLibrary.simpleMessage("Available Days"),
+    "available_time": MessageLookupByLibrary.simpleMessage("Available Time"),
+    "book_now": MessageLookupByLibrary.simpleMessage("Book Now"),
+    "confirm_booking": MessageLookupByLibrary.simpleMessage("Confirm Booking"),
+    "confirm_booking_payment": MessageLookupByLibrary.simpleMessage(
+      "Confirm Booking & Payment",
+    ),
+    "consultation_fee": MessageLookupByLibrary.simpleMessage(
+      "Consultation Fee",
+    ),
+    "discount": MessageLookupByLibrary.simpleMessage("Discount"),
+    "doctors": MessageLookupByLibrary.simpleMessage("Doctors"),
+    "evening": MessageLookupByLibrary.simpleMessage("Evening"),
     "home": MessageLookupByLibrary.simpleMessage("Home"),
+    "instapay": MessageLookupByLibrary.simpleMessage("InstaPay"),
+    "morning": MessageLookupByLibrary.simpleMessage("Morning"),
+    "pay_cash": MessageLookupByLibrary.simpleMessage("Pay Cash"),
+    "payment": MessageLookupByLibrary.simpleMessage("Payment"),
+    "payment_summary": MessageLookupByLibrary.simpleMessage("Payment Summary"),
     "profile": MessageLookupByLibrary.simpleMessage("Profile"),
     "search": MessageLookupByLibrary.simpleMessage("Search"),
+    "select_appointment": MessageLookupByLibrary.simpleMessage(
+      "Select Appointment",
+    ),
+    "select_payment_method": MessageLookupByLibrary.simpleMessage(
+      "Select Payment Method",
+    ),
     "specialties": MessageLookupByLibrary.simpleMessage("Specialties"),
+    "total_amount": MessageLookupByLibrary.simpleMessage("Total Amount"),
+    "vodafone_cash": MessageLookupByLibrary.simpleMessage("Vodafone Cash"),
     "your_next_appointment": MessageLookupByLibrary.simpleMessage(
       "Your Next Appointment",
     ),

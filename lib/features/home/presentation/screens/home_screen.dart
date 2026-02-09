@@ -9,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
+  static const String routeName = "/home-screen";
   List<Widget> _pages(BuildContext context) {
     return [
       HomePageWidget(),

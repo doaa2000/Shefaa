@@ -5,7 +5,43 @@
     "your_next_appointment": "موعدك القادم",
     "home": "الرئيسية",
     "appointments": "المواعيد",
-    "profile": "الملف الشخصي"
+    "profile": "الملف الشخصي",
+    "doctors": "الأطباء",
+    "book_now": "احجز الآن",
+    "select_appointment": "اختر الموعد",
+    "available_days": "الأيام المتاحة",
+    "available_time": "الوقت المتاح",
+    "morning": "صباحًا",
+    "evening": "مساءً",
+    "confirm_booking": "تأكيد الحجز",
+    "payment": "الدفع",
+    "payment_summary": "ملخص الدفع",
+    "consultation_fee": "رسوم الكشف",
+    "total_amount": "المبلغ الإجمالي",
+    "select_payment_method": "اختر طريقة الدفع",
+    "pay_cash": "الدفع نقدًا",
+    "vodafone_cash": "فودافون كاش",
+    "instapay": "انستا باي",
+    "confirm_booking_payment": "تأكيد الحجز والدفع",
+    "discount": "الخصم"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -5,7 +5,7 @@ abstract class AppColors {
   static const Color yellow = Color(0xFFEAB33C);
   static const Color darkGreen = Color(0xFF118650);
   static const Color lightPrimaryColor2 = Color(0xFFF0D9E5);
-  static const Color lightPrimaryColor = Color(0xFFD291B6);
+  static const Color lightPrimaryColor = Color.fromARGB(255, 194, 225, 240);
   static const Color lightBlue = Color(0xFFBCCDFA);
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Colors.black;

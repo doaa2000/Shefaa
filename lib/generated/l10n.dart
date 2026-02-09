@@ -93,6 +93,146 @@ class S {
   String get profile {
     return Intl.message('Profile', name: 'profile', desc: '', args: []);
   }
+
+  /// `Doctors`
+  String get doctors {
+    return Intl.message('Doctors', name: 'doctors', desc: '', args: []);
+  }
+
+  /// `Book Now`
+  String get book_now {
+    return Intl.message('Book Now', name: 'book_now', desc: '', args: []);
+  }
+
+  /// `Select Appointment`
+  String get select_appointment {
+    return Intl.message(
+      'Select Appointment',
+      name: 'select_appointment',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Available Days`
+  String get available_days {
+    return Intl.message(
+      'Available Days',
+      name: 'available_days',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Available Time`
+  String get available_time {
+    return Intl.message(
+      'Available Time',
+      name: 'available_time',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Morning`
+  String get morning {
+    return Intl.message('Morning', name: 'morning', desc: '', args: []);
+  }
+
+  /// `Evening`
+  String get evening {
+    return Intl.message('Evening', name: 'evening', desc: '', args: []);
+  }
+
+  /// `Confirm Booking`
+  String get confirm_booking {
+    return Intl.message(
+      'Confirm Booking',
+      name: 'confirm_booking',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Payment`
+  String get payment {
+    return Intl.message('Payment', name: 'payment', desc: '', args: []);
+  }
+
+  /// `Payment Summary`
+  String get payment_summary {
+    return Intl.message(
+      'Payment Summary',
+      name: 'payment_summary',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Consultation Fee`
+  String get consultation_fee {
+    return Intl.message(
+      'Consultation Fee',
+      name: 'consultation_fee',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Total Amount`
+  String get total_amount {
+    return Intl.message(
+      'Total Amount',
+      name: 'total_amount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Select Payment Method`
+  String get select_payment_method {
+    return Intl.message(
+      'Select Payment Method',
+      name: 'select_payment_method',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Pay Cash`
+  String get pay_cash {
+    return Intl.message('Pay Cash', name: 'pay_cash', desc: '', args: []);
+  }
+
+  /// `Vodafone Cash`
+  String get vodafone_cash {
+    return Intl.message(
+      'Vodafone Cash',
+      name: 'vodafone_cash',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `InstaPay`
+  String get instapay {
+    return Intl.message('InstaPay', name: 'instapay', desc: '', args: []);
+  }
+
+  /// `Confirm Booking & Payment`
+  String get confirm_booking_payment {
+    return Intl.message(
+      'Confirm Booking & Payment',
+      name: 'confirm_booking_payment',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Discount`
+  String get discount {
+    return Intl.message('Discount', name: 'discount', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
