@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:shefaa_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:shefaa_app/features/home/presentation/screens/home_screen.dart';
-
+import 'package:shefaa_app/generated/l10n.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -14,7 +14,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Shefaa App',
       debugShowCheckedModeBanner: false,
-
+  localizationsDelegates: const [
+    S.delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+  ],
+  supportedLocales: S.delegate.supportedLocales,
+  locale: const Locale('ar'),
       theme: ThemeData(
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.white,
@@ -24,7 +31,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       ),
-      home: const HomeScreen(),
+      home:  HomeScreen(),
     );
   }
 }

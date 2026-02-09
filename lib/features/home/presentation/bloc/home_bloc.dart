@@ -1,13 +1,20 @@
-// import 'package:bloc/bloc.dart';
-// import 'package:equatable/equatable.dart';
+import 'dart:async';
 
-// part 'home_event.dart';
-// part 'home_state.dart';
+import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
 
-// class HomeBloc extends Bloc<HomeEvent, HomeState> {
-//   HomeBloc() : super(HomeInitial()) {
-//     on<HomeEvent>((event, emit) {
-//       // TODO: implement event handler
-//     });
-//   }
-// }
+part 'home_event.dart';
+part 'home_state.dart';
+
+class HomeBloc extends Bloc<HomeEvent, HomeState> {
+  HomeBloc() : super(HomeState()) {
+    on<HomePageChanged>(_onHomePageChanged);
+  }
+
+  FutureOr<void> _onHomePageChanged(
+    HomePageChanged event,
+    Emitter<HomeState> emit,
+  ) {
+    emit(state.copyWith(currentIndex: event.index));
+  }
+}

@@ -1,9 +1,16 @@
-// part of 'home_bloc.dart';
+part of 'home_bloc.dart';
 
-// abstract class HomeState extends Equatable {
-//   const HomeState();  
+class HomeState extends Equatable {
+  final int currentIndex;
 
-//   @override
-//   List<Object> get props => [];
-// }
-// class HomeInitial extends HomeState {}
+  const HomeState({this.currentIndex = 0});
+
+  HomeState copyWith({int? currentIndex}) {
+    return HomeState(
+      currentIndex: currentIndex ?? this.currentIndex,
+    );
+  }
+
+  @override
+  List<Object> get props => [currentIndex];
+}
