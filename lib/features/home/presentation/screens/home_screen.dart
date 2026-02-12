@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shefaa_app/core/widgets/custom_app_bar.dart';
+import 'package:shefaa_app/features/bookings/presentation/screens/bookings_screen.dart';
 import 'package:shefaa_app/features/home/presentation/bloc/home_bloc.dart';
 import 'package:shefaa_app/features/home/presentation/widgets/home_app_bar.dart';
 import 'package:shefaa_app/features/home/presentation/widgets/home_page_widget.dart';
@@ -13,7 +15,7 @@ class HomeScreen extends StatelessWidget {
   List<Widget> _pages(BuildContext context) {
     return [
       HomePageWidget(),
-      Center(child: Text("Appointments Page")),
+      BookingsScreen(),
       Center(child: Text("Profile Page")),
     ];
   }
@@ -26,7 +28,10 @@ class HomeScreen extends StatelessWidget {
         builder: (context, state) {
           final pages = _pages(context);
           return Scaffold(
-            appBar: state.currentIndex == 0 ? HomeAppBar() : null,
+            appBar:
+                state.currentIndex == 0
+                    ? HomeAppBar()
+                    : CustomAppBar(title: ''),
             body: pages[state.currentIndex],
             bottomNavigationBar: CustomBottomNavBar(
               currentIndex: state.currentIndex,
