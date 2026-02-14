@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shefaa_app/core/helper_functions/on_generate_route.dart';
 import 'package:shefaa_app/core/utils/app_colors.dart';
+import 'package:shefaa_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:shefaa_app/features/home/presentation/screens/home_screen.dart';
 import 'package:shefaa_app/generated/l10n.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryColor),
       ),
-      home: HomeScreen(),
+      home: LoginScreen(),
     );
   }
 }

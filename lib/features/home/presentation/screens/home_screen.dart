@@ -7,6 +7,7 @@ import 'package:shefaa_app/features/home/presentation/widgets/home_page_widget.d
 import 'package:shefaa_app/features/home/presentation/widgets/custom_bottom_nav_bar.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shefaa_app/features/profile/presentation/screens/profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -16,7 +17,7 @@ class HomeScreen extends StatelessWidget {
     return [
       HomePageWidget(),
       BookingsScreen(),
-      Center(child: Text("Profile Page")),
+     ProfileScreen(),
     ];
   }
 

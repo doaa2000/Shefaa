@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:shefaa_app/features/auth/presentation/screens/login_screen.dart';
+import 'package:shefaa_app/features/auth/presentation/screens/register_screen.dart';
 import 'package:shefaa_app/features/booking_appointment_screen/presentation/screens/booking_appointment_screen.dart';
+import 'package:shefaa_app/features/bookings/presentation/screens/bookings_details_screen.dart';
 import 'package:shefaa_app/features/doctors/presentation/screens/doctors_screen.dart';
 import 'package:shefaa_app/features/home/presentation/screens/home_screen.dart';
 import 'package:shefaa_app/features/payment/presentation/screens/payment_screen.dart';
 
 Route<dynamic> onGenerateRoute(RouteSettings settings) {
   switch (settings.name) {
+    case LoginScreen.routeName:
+      return MaterialPageRoute(builder: (context) => const LoginScreen());
+    case RegisterScreen.routeName:
+      return MaterialPageRoute(builder: (context) => const RegisterScreen());
     case HomeScreen.routeName:
       return MaterialPageRoute(builder: (context) => const HomeScreen());
     case DoctorsScreen.routeName:
@@ -13,6 +20,11 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case BookingAppointmentScreen.routeName:
       return MaterialPageRoute(
         builder: (context) => const BookingAppointmentScreen(),
+      );
+
+    case BookingsDetailsScreen.routeName:
+      return MaterialPageRoute(
+        builder: (context) => const BookingsDetailsScreen(),
       );
     case PaymentScreen.routeName:
       return MaterialPageRoute(builder: (context) => const PaymentScreen());

@@ -29,94 +29,99 @@ class _BookingCardState extends State<BookingCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// Header
-          Row(
-            children: [
-              CircleAvatar(radius: 22, backgroundColor: Colors.grey.shade300),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.doctorName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, '/bookings_details_screen');
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.grey.shade200),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// Header
+            Row(
+              children: [
+                CircleAvatar(radius: 22, backgroundColor: Colors.grey.shade300),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.doctorName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
+                      const SizedBox(height: 2),
+                      Text(
+                        widget.specialty,
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (widget.confirmed)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      widget.specialty,
+                    decoration: BoxDecoration(
+                      color: AppColors.lightPrimaryColor,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Text(
+                      'مؤكد',
                       style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 13,
+                        color: AppColors.primaryColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                  ],
-                ),
-              ),
-              if (widget.confirmed)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
                   ),
-                  decoration: BoxDecoration(
-                    color: AppColors.lightPrimaryColor,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Text(
-                    'مؤكد',
-                    style: TextStyle(
-                      color: AppColors.primaryColor,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-            ],
-          ),
+              ],
+            ),
 
-          const SizedBox(height: 16),
+            const SizedBox(height: 16),
 
-          infoRow(Icons.calendar_today, widget.date),
-          infoRow(Icons.access_time, widget.time),
-          infoRow(Icons.location_on, widget.location),
+            infoRow(Icons.calendar_today, widget.date),
+            infoRow(Icons.access_time, widget.time),
+            infoRow(Icons.location_on, widget.location),
 
-          const SizedBox(height: 16),
+            const SizedBox(height: 16),
 
-          BookingActionToggle(
-            selectedIndex: actionIndex,
-            onChanged: (index) {
-              setState(() => actionIndex = index);
+            BookingActionToggle(
+              selectedIndex: actionIndex,
+              onChanged: (index) {
+                setState(() => actionIndex = index);
 
-              if (index == 0) {
-                // تعديل الموعد
-              } else {
-                // إلغاء الحجز (يفتح confirmation)
-              }
-            },
-          ),
-        ],
+                if (index == 0) {
+                  // تعديل الموعد
+                } else {
+                  // إلغاء الحجز (يفتح confirmation)
+                }
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

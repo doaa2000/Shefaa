@@ -233,6 +233,86 @@ class S {
   String get discount {
     return Intl.message('Discount', name: 'discount', desc: '', args: []);
   }
+
+  /// `Booking Details`
+  String get booking_details {
+    return Intl.message(
+      'Booking Details',
+      name: 'booking_details',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Your Appointment`
+  String get your_appointment {
+    return Intl.message(
+      'Your Appointment',
+      name: 'your_appointment',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cancel Booking`
+  String get cancel_booking {
+    return Intl.message(
+      'Cancel Booking',
+      name: 'cancel_booking',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Create Account`
+  String get create_account {
+    return Intl.message(
+      'Create Account',
+      name: 'create_account',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Full Name`
+  String get full_name {
+    return Intl.message('Full Name', name: 'full_name', desc: '', args: []);
+  }
+
+  /// `Email`
+  String get email {
+    return Intl.message('Email', name: 'email', desc: '', args: []);
+  }
+
+  /// `Phone Number`
+  String get phone_number {
+    return Intl.message(
+      'Phone Number',
+      name: 'phone_number',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Birth Date`
+  String get birth_date {
+    return Intl.message('Birth Date', name: 'birth_date', desc: '', args: []);
+  }
+
+  /// `Password`
+  String get password {
+    return Intl.message('Password', name: 'password', desc: '', args: []);
+  }
+
+  /// `Confirm Password`
+  String get confirm_password {
+    return Intl.message(
+      'Confirm Password',
+      name: 'confirm_password',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

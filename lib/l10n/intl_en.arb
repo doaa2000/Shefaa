@@ -22,7 +22,25 @@
     "vodafone_cash": "Vodafone Cash",
     "instapay": "InstaPay",
     "confirm_booking_payment": "Confirm Booking & Payment",
-    "discount": "Discount"
+    "discount": "Discount",
+    "booking_details": "Booking Details",
+    "your_appointment": "Your Appointment",
+    "cancel_booking": "Cancel Booking",
+    "create_account": "Create Account",
+    "full_name": "Full Name",
+    "email": "Email",
+    "phone_number": "Phone Number",
+    "birth_date": "Birth Date",
+    "password": "Password",
+    "confirm_password": "Confirm Password"
+
+
+
+
+
+
+
+
 
 
 

@@ -23,7 +23,27 @@
     "vodafone_cash": "فودافون كاش",
     "instapay": "انستا باي",
     "confirm_booking_payment": "تأكيد الحجز والدفع",
-    "discount": "الخصم"
+    "discount": "الخصم",
+    "booking_details": "تفاصيل الحجز",
+    "your_appointment": "موعدك",
+    "cancel_booking": "إلغاء الحجز",
+    "create_account": "إنشاء حساب",
+    "full_name": "الاسم بالكامل",
+    "email": "البريد الإلكتروني",
+    "phone_number": "رقم الهاتف",
+    "birth_date": "تاريخ الميلاد",
+    "password": "كلمة المرور",
+    "confirm_password": "تأكيد كلمة المرور"
+
+
+
+
+
+
+
+
+
+
 
 
 
