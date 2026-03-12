@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:shefaa_app/features/booking_appointment_screen/presentation/widgets/time_card_widget.dart';
+import 'package:shefaa_app/features/doctor_availability/presentation/widgets/time_card_widget.dart';
 
 class TimeCardListWidget extends StatelessWidget {
-  final List<String> hours;
+  final List<dynamic> hours;
   final int selectedIndex;
   final Function(int)? onHourSelected;
 

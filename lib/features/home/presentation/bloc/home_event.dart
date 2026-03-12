@@ -6,6 +6,7 @@ abstract class HomeEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
+
 class HomePageChanged extends HomeEvent {
   final int index;
 
@@ -14,3 +15,9 @@ class HomePageChanged extends HomeEvent {
   @override
   List<Object> get props => [index];
 }
+
+class GetSpecialtiesEvent extends HomeEvent {}
+
+class GetDoctorsEvent extends HomeEvent {}
+
+class GetBookingsEvent extends HomeEvent {}

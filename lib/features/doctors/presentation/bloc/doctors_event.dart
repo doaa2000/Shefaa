@@ -6,3 +6,9 @@ abstract class DoctorsEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
+
+class GetDoctorsEvent extends DoctorsEvent {
+  final String specialtyId;
+
+  const GetDoctorsEvent({required this.specialtyId});
+}

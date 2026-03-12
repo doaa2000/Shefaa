@@ -1,62 +1,120 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shefaa_app/core/enums/request_state.dart';
 import 'package:shefaa_app/core/utils/app_colors.dart';
+import 'package:shefaa_app/features/profile/presentation/bloc/profile_bloc.dart';
 
 class ProfileHeaderCard extends StatelessWidget {
   const ProfileHeaderCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(blurRadius: 10, color: Colors.black.withOpacity(.05)),
-        ],
-      ),
-      child: Row(
-        children: [
-          Stack(
-            children: [
-              const CircleAvatar(
-                radius: 35,
-                backgroundImage: NetworkImage(
-                  "https://i.pravatar.cc/150?img=4",
-                ),
+    return BlocBuilder<ProfileBloc, ProfileState>(
+      builder: (context, state) {
+        if (state.profileState == RequestState.loading) {
+          return _loadingCard();
+        }
+
+        if (state.profileState == RequestState.error) {
+          return _errorCard(state.profileMessage);
+        }
+
+        if (state.user == null) {
+          return const SizedBox.shrink();
+        }
+
+        final user = state.user!;
+
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                blurRadius: 10,
+                color: Colors.black.withOpacity(.05),
               ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.primaryColor,
+            ],
+          ),
+          child: Row(
+            children: [
+              Stack(
+                children: [
+                  const CircleAvatar(
+                    radius: 35,
+                    backgroundImage: NetworkImage(
+                      "https://i.pravatar.cc/150?img=4",
+                    ),
                   ),
-                  child: const Icon(Icons.edit, size: 14, color: Colors.white),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.primaryColor,
+                      ),
+                      child: const Icon(
+                        Icons.edit,
+                        size: 14,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      user.name ?? '—',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      user.email,
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          SizedBox(width: 10),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "أحمد المصري",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 5),
-                Text(
-                  "ahmed.masry@email.com",
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ],
-            ),
-          ),
-        ],
+        );
+      },
+    );
+  }
+
+  /// 🔄 Loading
+  Widget _loadingCard() {
+    return Container(
+      height: 90,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: const Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  /// ❌ Error
+  Widget _errorCard(String message) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.red.withOpacity(.05),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        message,
+        style: const TextStyle(color: Colors.red),
       ),
     );
   }

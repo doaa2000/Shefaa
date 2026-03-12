@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shefaa_app/core/widgets/custom_mini_button.dart';
-import 'package:shefaa_app/features/booking_appointment_screen/presentation/screens/booking_appointment_screen.dart';
+import 'package:shefaa_app/features/doctor_availability/presentation/screens/doctor_availability_screen.dart';
 import 'package:shefaa_app/generated/l10n.dart';
 
 class DoctorCard extends StatelessWidget {
@@ -95,7 +95,7 @@ class DoctorCard extends StatelessWidget {
               child: CustomMiniButton(
                 title: S.of(context).book_now,
                 onPressed: () {
-                  Navigator.pushNamed(context, BookingAppointmentScreen.routeName);
+                  Navigator.pushNamed(context, DoctorAvailabilityScreen.routeName);
                 },
               ),
             ),

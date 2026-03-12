@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shefaa_app/core/services/service_locator.dart';
 import 'package:shefaa_app/core/widgets/custom_app_bar.dart';
 import 'package:shefaa_app/features/bookings/presentation/screens/bookings_screen.dart';
 import 'package:shefaa_app/features/home/presentation/bloc/home_bloc.dart';
@@ -24,7 +25,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => HomeBloc(),
+      create: (_) => getIt  <HomeBloc>()..add(GetSpecialtiesEvent()),
       child: BlocBuilder<HomeBloc, HomeState>(
         builder: (context, state) {
           final pages = _pages(context);

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shefaa_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:shefaa_app/features/auth/presentation/screens/register_screen.dart';
-import 'package:shefaa_app/features/booking_appointment_screen/presentation/screens/booking_appointment_screen.dart';
+import 'package:shefaa_app/features/doctor_availability/presentation/screens/doctor_availability_screen.dart';
 import 'package:shefaa_app/features/bookings/presentation/screens/bookings_details_screen.dart';
 import 'package:shefaa_app/features/doctors/presentation/screens/doctors_screen.dart';
 import 'package:shefaa_app/features/home/presentation/screens/home_screen.dart';
@@ -17,9 +17,9 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (context) => const HomeScreen());
     case DoctorsScreen.routeName:
       return MaterialPageRoute(builder: (context) => const DoctorsScreen());
-    case BookingAppointmentScreen.routeName:
+    case DoctorAvailabilityScreen.routeName:
       return MaterialPageRoute(
-        builder: (context) => const BookingAppointmentScreen(),
+        builder: (context) => const DoctorAvailabilityScreen(),
       );
 
     case BookingsDetailsScreen.routeName:
