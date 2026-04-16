@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:dartz/dartz.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shefaa_app/features/auth/data/models/user_model.dart';
 import 'package:shefaa_app/features/auth/domain/entities/user.dart';
@@ -15,6 +16,7 @@ abstract class AuthRemoteDataSource {
     required String name,
     required String phone,
   });
+  Future<Unit> logout();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -95,4 +97,10 @@ Future<UserModel> register({
     });
   }
 }
+
+  @override
+  Future<Unit> logout() async {
+    await supabase.auth.signOut();
+    return unit;
+  }
 }

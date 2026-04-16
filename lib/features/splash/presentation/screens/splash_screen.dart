@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shefaa_app/core/services/secure_storage_service.dart';
 import 'package:get_it/get_it.dart';
+import 'package:shefaa_app/core/utils/app_router.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -27,9 +28,9 @@ class _SplashScreenState extends State<SplashScreen> {
     if (!mounted) return;
 
     if (token != null && token.isNotEmpty) {
-      Navigator.pushReplacementNamed(context, '/home-screen');
+      Navigator.pushReplacementNamed(context, AppRoutes.home);
     } else {
-      Navigator.pushReplacementNamed(context, '/login-screen');
+      Navigator.pushReplacementNamed(context, AppRoutes.login);
     }
   }
 

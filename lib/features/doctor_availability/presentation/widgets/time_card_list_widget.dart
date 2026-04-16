@@ -21,7 +21,7 @@ class TimeCardListWidget extends StatelessWidget {
       children: List.generate(
         hours.length,
         (index) => TimeCardWidget(
-          hour: hours[index],
+          hour: hours[index].toString(),
           isSelected: index == selectedIndex,
           onTap: () {
             if (onHourSelected != null) onHourSelected!(index);

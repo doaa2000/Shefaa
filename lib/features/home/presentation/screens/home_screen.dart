@@ -13,7 +13,7 @@ import 'package:shefaa_app/features/profile/presentation/screens/profile_screen.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  static const String routeName = "/home-screen";
+  static const String routeName = "/home";
   List<Widget> _pages(BuildContext context) {
     return [
       HomePageWidget(),

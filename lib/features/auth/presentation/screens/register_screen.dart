@@ -13,7 +13,7 @@ import 'package:shefaa_app/generated/l10n.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
-  static const routeName = '/register-screen';
+  static const routeName = '/register';
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();

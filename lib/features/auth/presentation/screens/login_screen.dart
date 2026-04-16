@@ -9,7 +9,7 @@ import 'package:shefaa_app/core/widgets/app_text_field.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
-  static const routeName = '/login-screen';
+  static const routeName = '/login';
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();

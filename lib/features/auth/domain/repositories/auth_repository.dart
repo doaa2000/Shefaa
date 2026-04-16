@@ -16,4 +16,9 @@ abstract class AuthRepository {
    required String name,
   required  String phone,
   });
-}
+
+Future<Either<Failure, Unit>> logout();}
+
+
+
+

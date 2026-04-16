@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:shefaa_app/core/domain/use_cases.dart';
 import 'package:shefaa_app/core/enums/request_state.dart';
 import 'package:shefaa_app/core/services/secure_storage_service.dart';
 import 'package:shefaa_app/features/auth/domain/entities/user.dart';
 import 'package:shefaa_app/features/auth/domain/usecases/login_usecase.dart';
+import 'package:shefaa_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:shefaa_app/features/auth/domain/usecases/register_usecase.dart';
 
 part 'auth_event.dart';
@@ -13,11 +17,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginUseCase loginUseCase;
   final RegisterUseCase registerUseCase;
   final SecureStorageService secureStorageService;
+  final LogoutUseCase logoutUseCase;
 
-  AuthBloc({required this.loginUseCase, required this.registerUseCase, required this.secureStorageService}) : super(const AuthState()) {
+  AuthBloc({required this.loginUseCase, required this.registerUseCase, required this.secureStorageService, required this.logoutUseCase}) : super(const AuthState()) {
     on<LoginEvent>(_login);
-    on<LogoutEvent>((event, emit) => emit(state.copyWith(user: null)));
     on<RegisterEvent>(_register);
+    on<LogoutEvent>(_logout);
+
   }
 Future<void> _login(LoginEvent event, Emitter<AuthState> emit) async {
   emit(state.copyWith(loginState: RequestState.loading));
@@ -82,5 +88,12 @@ Future<void> _login(LoginEvent event, Emitter<AuthState> emit) async {
       },
     );
     
+  }
+
+
+
+  FutureOr<void> _logout(LogoutEvent event, Emitter<AuthState> emit)async {
+    await logoutUseCase(NoParameters());
+    emit(state.copyWith(logoutState: RequestState.loaded));
   }
 }

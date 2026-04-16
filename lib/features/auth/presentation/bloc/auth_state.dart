@@ -7,12 +7,17 @@ class AuthState extends Equatable {
   final RequestState registerState;
   final String registerMessage;
 
+   final RequestState logoutState;
+  final String logoutMessage;
+
   const AuthState({
     this.loginState = RequestState.initial,
     this.loginMessage = '',
     this.user,
     this.registerState = RequestState.initial,
     this.registerMessage = '',
+      this.logoutState = RequestState.initial,
+      this.logoutMessage = '',
   });
 
   AuthState copyWith({
@@ -21,6 +26,8 @@ class AuthState extends Equatable {
     UserEntity? user,
     RequestState? registerState,
     String? registerMessage,
+    RequestState? logoutState,
+    String? logoutMessage,
   }) {
     return AuthState(
       loginState: loginState ??this. loginState,
@@ -28,6 +35,8 @@ class AuthState extends Equatable {
       user: user ?? this.user,
       registerState: registerState ?? this.registerState,
       registerMessage: registerMessage ?? this.registerMessage,
+      logoutState: logoutState ?? this.logoutState,
+      logoutMessage: logoutMessage ?? this.logoutMessage,
     );
   }
 
@@ -38,5 +47,7 @@ class AuthState extends Equatable {
     user,
     registerState,
     registerMessage,
+    logoutState,
+    logoutMessage,
   ];
 }

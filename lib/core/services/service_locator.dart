@@ -4,6 +4,7 @@ import 'package:shefaa_app/features/auth/data/datasources/auth_remote_datasource
 import 'package:shefaa_app/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:shefaa_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:shefaa_app/features/auth/domain/usecases/login_usecase.dart';
+import 'package:shefaa_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:shefaa_app/features/auth/domain/usecases/register_usecase.dart';
 import 'package:shefaa_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:shefaa_app/features/doctor_availability/data/datasources/doctor_availability_remote_datasource.dart';
@@ -74,7 +75,7 @@ getIt.registerLazySingleton<ProfileRepository>(
 
   getIt.registerLazySingleton<RegisterUseCase>(() => RegisterUseCase(getIt()));
   getIt.registerLazySingleton<GetProfileUseCase>(() => GetProfileUseCase(getIt()));
-
+getIt.registerLazySingleton<LogoutUseCase>(() => LogoutUseCase(getIt()));
 
   getIt.registerLazySingleton<GetSpecialtiesUsecase>(
     () => GetSpecialtiesUsecase(getIt()),
@@ -92,7 +93,7 @@ getIt.registerLazySingleton<ProfileRepository>(
     () => DoctorsBloc(getDoctorsUseCase: getIt()),
   );
   getIt.registerFactory<AuthBloc>(
-    () => AuthBloc(loginUseCase: getIt(), registerUseCase: getIt(), secureStorageService: getIt()),
+    () => AuthBloc(loginUseCase: getIt(), registerUseCase: getIt(), secureStorageService: getIt(), logoutUseCase: getIt()),
   );
 getIt.registerFactory<ProfileBloc>(
     () => ProfileBloc(getProfileUseCase: getIt()),

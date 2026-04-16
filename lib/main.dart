@@ -11,6 +11,7 @@ import 'package:shefaa_app/generated/l10n.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+  
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
     Bloc.observer = CustomBlocObserver();
