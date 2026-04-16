@@ -29,6 +29,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "book_now": MessageLookupByLibrary.simpleMessage("احجز الآن"),
     "booking_details": MessageLookupByLibrary.simpleMessage("تفاصيل الحجز"),
     "cancel_booking": MessageLookupByLibrary.simpleMessage("إلغاء الحجز"),
+    "city": MessageLookupByLibrary.simpleMessage("المدينة"),
     "confirm_booking": MessageLookupByLibrary.simpleMessage("تأكيد الحجز"),
     "confirm_booking_payment": MessageLookupByLibrary.simpleMessage(
       "تأكيد الحجز والدفع",
@@ -43,6 +44,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "email": MessageLookupByLibrary.simpleMessage("البريد الإلكتروني"),
     "evening": MessageLookupByLibrary.simpleMessage("مساءً"),
     "full_name": MessageLookupByLibrary.simpleMessage("الاسم بالكامل"),
+    "governorate": MessageLookupByLibrary.simpleMessage("المحافظة"),
     "home": MessageLookupByLibrary.simpleMessage("الرئيسية"),
     "instapay": MessageLookupByLibrary.simpleMessage("انستا باي"),
     "morning": MessageLookupByLibrary.simpleMessage("صباحًا"),
@@ -54,6 +56,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "profile": MessageLookupByLibrary.simpleMessage("الملف الشخصي"),
     "search": MessageLookupByLibrary.simpleMessage("ابحث"),
     "select_appointment": MessageLookupByLibrary.simpleMessage("اختر الموعد"),
+    "select_city": MessageLookupByLibrary.simpleMessage("اختر المدينة"),
+    "select_governorate": MessageLookupByLibrary.simpleMessage("اختر المحافظة"),
+    "select_location": MessageLookupByLibrary.simpleMessage("اختر موقعك"),
     "select_payment_method": MessageLookupByLibrary.simpleMessage(
       "اختر طريقة الدفع",
     ),

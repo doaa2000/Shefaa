@@ -33,7 +33,13 @@
     "phone_number": "رقم الهاتف",
     "birth_date": "تاريخ الميلاد",
     "password": "كلمة المرور",
-    "confirm_password": "تأكيد كلمة المرور"
+    "confirm_password": "تأكيد كلمة المرور",
+    "select_location": "اختر موقعك",
+    "governorate": "المحافظة",
+    "city": "المدينة",
+    "select_city": "اختر المدينة",
+    "select_governorate": "اختر المحافظة"
+    
 
 
 

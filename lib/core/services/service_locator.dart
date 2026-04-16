@@ -22,6 +22,7 @@ import 'package:shefaa_app/features/home/data/repositories/home_repository_impl.
 import 'package:shefaa_app/features/home/domain/repositories/home_repository.dart';
 import 'package:shefaa_app/features/home/domain/usecases/get_specialties_usecase.dart';
 import 'package:shefaa_app/features/home/presentation/bloc/home_bloc.dart';
+import 'package:shefaa_app/features/location/presentation/bloc/location_bloc.dart';
 import 'package:shefaa_app/features/profile/data/datasources/profile_remote_datasource.dart';
 import 'package:shefaa_app/features/profile/data/repositories/profile_repository_impl.dart';
 import 'package:shefaa_app/features/profile/domain/repositories/profile_repository.dart';
@@ -95,7 +96,11 @@ getIt.registerLazySingleton<LogoutUseCase>(() => LogoutUseCase(getIt()));
   getIt.registerFactory<AuthBloc>(
     () => AuthBloc(loginUseCase: getIt(), registerUseCase: getIt(), secureStorageService: getIt(), logoutUseCase: getIt()),
   );
-getIt.registerFactory<ProfileBloc>(
+
+  getIt.registerFactory<LocationBloc>(
+    () => LocationBloc(),
+  );
+  getIt.registerFactory<ProfileBloc>(
     () => ProfileBloc(getProfileUseCase: getIt()),
   );
 getIt.registerFactory<HomeBloc>(

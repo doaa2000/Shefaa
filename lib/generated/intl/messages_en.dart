@@ -29,6 +29,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "book_now": MessageLookupByLibrary.simpleMessage("Book Now"),
     "booking_details": MessageLookupByLibrary.simpleMessage("Booking Details"),
     "cancel_booking": MessageLookupByLibrary.simpleMessage("Cancel Booking"),
+    "city": MessageLookupByLibrary.simpleMessage("City"),
     "confirm_booking": MessageLookupByLibrary.simpleMessage("Confirm Booking"),
     "confirm_booking_payment": MessageLookupByLibrary.simpleMessage(
       "Confirm Booking & Payment",
@@ -45,6 +46,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "email": MessageLookupByLibrary.simpleMessage("Email"),
     "evening": MessageLookupByLibrary.simpleMessage("Evening"),
     "full_name": MessageLookupByLibrary.simpleMessage("Full Name"),
+    "governorate": MessageLookupByLibrary.simpleMessage("Governorate"),
     "home": MessageLookupByLibrary.simpleMessage("Home"),
     "instapay": MessageLookupByLibrary.simpleMessage("InstaPay"),
     "morning": MessageLookupByLibrary.simpleMessage("Morning"),
@@ -57,6 +59,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "search": MessageLookupByLibrary.simpleMessage("Search"),
     "select_appointment": MessageLookupByLibrary.simpleMessage(
       "Select Appointment",
+    ),
+    "select_city": MessageLookupByLibrary.simpleMessage("Select City"),
+    "select_governorate": MessageLookupByLibrary.simpleMessage(
+      "Select Governorate",
+    ),
+    "select_location": MessageLookupByLibrary.simpleMessage(
+      "Select Your Location",
     ),
     "select_payment_method": MessageLookupByLibrary.simpleMessage(
       "Select Payment Method",

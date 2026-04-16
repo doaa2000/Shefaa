@@ -9,6 +9,7 @@ class ProfileHeaderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return BlocBuilder<ProfileBloc, ProfileState>(
       builder: (context, state) {
         if (state.profileState == RequestState.loading) {

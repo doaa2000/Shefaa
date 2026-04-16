@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shefaa_app/core/enums/request_state.dart';
 import 'package:shefaa_app/core/utils/app_colors.dart';
+import 'package:shefaa_app/core/utils/app_router.dart';
 import 'package:shefaa_app/core/widgets/custom_button.dart';
 import 'package:shefaa_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:shefaa_app/features/auth/presentation/widgets/auth_footer.dart';
@@ -29,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("تم تسجيل الدخول بنجاح")),
           );
-          Navigator.pushNamed(context, '/home-screen');
+          Navigator.pushNamed(context, AppRoutes.location);
         } else if (state.loginState == RequestState.error) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.loginMessage ?? "حدث خطأ")),

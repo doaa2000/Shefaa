@@ -313,6 +313,41 @@ class S {
       args: [],
     );
   }
+
+  /// `Select Your Location`
+  String get select_location {
+    return Intl.message(
+      'Select Your Location',
+      name: 'select_location',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Governorate`
+  String get governorate {
+    return Intl.message('Governorate', name: 'governorate', desc: '', args: []);
+  }
+
+  /// `City`
+  String get city {
+    return Intl.message('City', name: 'city', desc: '', args: []);
+  }
+
+  /// `Select City`
+  String get select_city {
+    return Intl.message('Select City', name: 'select_city', desc: '', args: []);
+  }
+
+  /// `Select Governorate`
+  String get select_governorate {
+    return Intl.message(
+      'Select Governorate',
+      name: 'select_governorate',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

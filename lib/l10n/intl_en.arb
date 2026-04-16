@@ -32,7 +32,12 @@
     "phone_number": "Phone Number",
     "birth_date": "Birth Date",
     "password": "Password",
-    "confirm_password": "Confirm Password"
+    "confirm_password": "Confirm Password",
+    "select_location": "Select Your Location",
+    "governorate": "Governorate",
+    "city": "City",
+    "select_city": "Select City",
+    "select_governorate": "Select Governorate"
 
 
 
