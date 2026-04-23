@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:shefaa_app/core/errors/failure.dart';
 import 'package:shefaa_app/features/doctor_availability/data/datasources/doctor_availability_remote_datasource.dart';
 import 'package:shefaa_app/features/doctor_availability/domain/entities/doctor_availability.dart';
+import 'package:shefaa_app/features/doctor_availability/domain/entities/doctor_details_entity.dart';
 import 'package:shefaa_app/features/doctor_availability/domain/repositories/doctor_availability_repository.dart';
 
 
@@ -11,9 +12,15 @@ class DoctorAvailabilityRepositoryImpl implements DoctorAvailabilityRepository {
   DoctorAvailabilityRepositoryImpl(this.remoteDatasource);
 
   @override
-  Future<Either<Failure, List<DoctorAvailabilityEntity>>> getDoctorAvailability(String doctorId) async {
+  Future<Either<Failure, DoctorDetailsEntity>> getDoctorAvailability(
+    String doctorId,
+    DateTime date, // ✅ add date
+  ) async {
     try {
-      final availability = await remoteDatasource.getDoctorAvailability(doctorId);
+      final availability = await remoteDatasource.getDoctorAvailability(
+        doctorId,
+        date, // ✅ pass date
+      );
       return Right(availability);
     } catch (e) {
       return Left(ServerFailure(e.toString()));

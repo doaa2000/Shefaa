@@ -41,6 +41,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Consultation Fee",
     ),
     "create_account": MessageLookupByLibrary.simpleMessage("Create Account"),
+    "currency": MessageLookupByLibrary.simpleMessage("EGP"),
     "discount": MessageLookupByLibrary.simpleMessage("Discount"),
     "doctors": MessageLookupByLibrary.simpleMessage("Doctors"),
     "email": MessageLookupByLibrary.simpleMessage("Email"),
@@ -49,6 +50,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "governorate": MessageLookupByLibrary.simpleMessage("Governorate"),
     "home": MessageLookupByLibrary.simpleMessage("Home"),
     "instapay": MessageLookupByLibrary.simpleMessage("InstaPay"),
+    "minutes": MessageLookupByLibrary.simpleMessage("Minutes"),
     "morning": MessageLookupByLibrary.simpleMessage("Morning"),
     "password": MessageLookupByLibrary.simpleMessage("Password"),
     "pay_cash": MessageLookupByLibrary.simpleMessage("Pay Cash"),
@@ -73,6 +75,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "specialties": MessageLookupByLibrary.simpleMessage("Specialties"),
     "total_amount": MessageLookupByLibrary.simpleMessage("Total Amount"),
     "vodafone_cash": MessageLookupByLibrary.simpleMessage("Vodafone Cash"),
+    "waiting_time": MessageLookupByLibrary.simpleMessage("Waiting Time"),
     "your_appointment": MessageLookupByLibrary.simpleMessage(
       "Your Appointment",
     ),

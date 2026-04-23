@@ -39,6 +39,11 @@ class HomeDoctorsList extends StatelessWidget {
                 specialty: doctor.title ?? '',
                 imageUrl: doctor.image ??
                     'https://i.pravatar.cc/150?img=${index + 3}',
+                   consultationFee: doctor.consultationFee ?? 0,
+                    location: doctor.location ?? 'Unknown',
+                    waitingTime: doctor.waitingTime != null
+                    ? '${doctor.waitingTime} mins'
+                    : 'N/A',
                 onTap: () {
                   // TODO: navigate to doctor details
                 },

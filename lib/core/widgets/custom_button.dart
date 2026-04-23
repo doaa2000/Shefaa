@@ -4,7 +4,7 @@ import 'package:shefaa_app/core/utils/app_text_styles.dart';
 
 class CustomButton extends StatelessWidget {
   final String title;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed; // ✅ nullable → allows disabled state
   final double height;
   final double borderRadius;
   final Color backgroundColor;
@@ -20,16 +20,21 @@ class CustomButton extends StatelessWidget {
     this.textColor = AppColors.white,
   });
 
+  // ✅ Button is disabled when onPressed is null
+  bool get _isDisabled => onPressed == null;
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: height,
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: onPressed,
+        onPressed: onPressed, // ✅ null = automatically disabled by Flutter
         style: ElevatedButton.styleFrom(
           elevation: 0,
-          backgroundColor: backgroundColor,
+          backgroundColor: _isDisabled
+              ? AppColors.primaryColor.withOpacity(0.4) // ✅ faded when disabled
+              : backgroundColor,
           foregroundColor: textColor,
           padding: const EdgeInsets.symmetric(horizontal: 20),
           shape: RoundedRectangleBorder(

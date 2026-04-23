@@ -39,6 +39,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "consultation_fee": MessageLookupByLibrary.simpleMessage("رسوم الكشف"),
     "create_account": MessageLookupByLibrary.simpleMessage("إنشاء حساب"),
+    "currency": MessageLookupByLibrary.simpleMessage("جنيه"),
     "discount": MessageLookupByLibrary.simpleMessage("الخصم"),
     "doctors": MessageLookupByLibrary.simpleMessage("الأطباء"),
     "email": MessageLookupByLibrary.simpleMessage("البريد الإلكتروني"),
@@ -47,6 +48,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "governorate": MessageLookupByLibrary.simpleMessage("المحافظة"),
     "home": MessageLookupByLibrary.simpleMessage("الرئيسية"),
     "instapay": MessageLookupByLibrary.simpleMessage("انستا باي"),
+    "minutes": MessageLookupByLibrary.simpleMessage("دقائق"),
     "morning": MessageLookupByLibrary.simpleMessage("صباحًا"),
     "password": MessageLookupByLibrary.simpleMessage("كلمة المرور"),
     "pay_cash": MessageLookupByLibrary.simpleMessage("الدفع نقدًا"),
@@ -65,6 +67,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "specialties": MessageLookupByLibrary.simpleMessage("التخصصات"),
     "total_amount": MessageLookupByLibrary.simpleMessage("المبلغ الإجمالي"),
     "vodafone_cash": MessageLookupByLibrary.simpleMessage("فودافون كاش"),
+    "waiting_time": MessageLookupByLibrary.simpleMessage("وقت الانتظار"),
     "your_appointment": MessageLookupByLibrary.simpleMessage("موعدك"),
     "your_next_appointment": MessageLookupByLibrary.simpleMessage(
       "موعدك القادم",

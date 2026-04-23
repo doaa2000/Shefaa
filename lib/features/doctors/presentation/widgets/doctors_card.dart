@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:shefaa_app/core/utils/app_images.dart';
+import 'package:shefaa_app/core/utils/app_text_styles.dart';
 import 'package:shefaa_app/core/widgets/custom_mini_button.dart';
 import 'package:shefaa_app/features/doctor_availability/presentation/screens/doctor_availability_screen.dart';
 import 'package:shefaa_app/generated/l10n.dart';
@@ -7,6 +10,9 @@ class DoctorCard extends StatelessWidget {
   final String name;
   final String specialty;
   final String imageUrl;
+  final String location;
+  final dynamic consultationFee;
+  final String waitingTime;
   final double rating;
   final VoidCallback? onTap;
 
@@ -16,7 +22,7 @@ class DoctorCard extends StatelessWidget {
     required this.specialty,
     required this.imageUrl,
     this.rating = 4.5,
-    this.onTap,
+    this.onTap, required this.location, required this.consultationFee, required this.waitingTime,
   });
 
   @override
@@ -25,7 +31,7 @@ class DoctorCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(20),
       onTap: onTap,
       child: Container(
-        height: 150,
+        height: 255,
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -88,6 +94,63 @@ class DoctorCard extends StatelessWidget {
                 ),
               ],
             ),
+             const SizedBox(height: 12),
+
+             Column(
+              children: [
+                Row(children: [
+
+                  SvgPicture.asset(
+  Assets.imagesMarker,
+  width: 16,
+  height: 16,
+),
+             const SizedBox(width: 6),
+
+ Text(
+                        location,
+                        style: TextStyles.meduim14,
+                      ),
+
+                      
+                ],),
+                            const SizedBox(height: 12),
+
+                Row(children: [
+
+                  SvgPicture.asset(
+  Assets.imagesMoney,
+  width: 16,
+  height: 16,
+),
+             const SizedBox(width: 6),
+
+ Text(
+                        "${S.of(context).consultation_fee}: $consultationFee ${S.of(context).currency}",
+                        style: TextStyles.meduim14,
+                      ),
+
+                      
+                ],),
+                  const SizedBox(height: 12),
+
+                Row(children: [
+
+                  SvgPicture.asset(
+  Assets.imagesClock,
+  width: 16,
+  height: 16,
+),
+             const SizedBox(width: 6),
+
+ Text(
+                        "${S.of(context).waiting_time}: $waitingTime ${S.of(context).minutes}",
+                        style: TextStyles.meduim14,
+                      ),
+
+                      
+                ],)
+              ]),
             const SizedBox(height: 12),
 
             Align(

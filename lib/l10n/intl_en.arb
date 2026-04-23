@@ -37,7 +37,10 @@
     "governorate": "Governorate",
     "city": "City",
     "select_city": "Select City",
-    "select_governorate": "Select Governorate"
+    "select_governorate": "Select Governorate",
+    "waiting_time": "Waiting Time",
+    "currency": "EGP",
+    "minutes": "Minutes"
 
 
 

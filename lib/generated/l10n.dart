@@ -348,6 +348,26 @@ class S {
       args: [],
     );
   }
+
+  /// `Waiting Time`
+  String get waiting_time {
+    return Intl.message(
+      'Waiting Time',
+      name: 'waiting_time',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `EGP`
+  String get currency {
+    return Intl.message('EGP', name: 'currency', desc: '', args: []);
+  }
+
+  /// `Minutes`
+  String get minutes {
+    return Intl.message('Minutes', name: 'minutes', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

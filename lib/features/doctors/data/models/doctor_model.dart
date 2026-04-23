@@ -10,6 +10,8 @@ class DoctorModel extends DoctorEntity {
     super.rating,
     required super.clinicId,
     required super.specialaization,
+    super.consultationFee,
+    super.waitingTime, required super.location,
   });
 
   factory DoctorModel.fromMap(Map<String, dynamic> json) {
@@ -23,6 +25,11 @@ class DoctorModel extends DoctorEntity {
       title: json['title'] as String?,
       rating:
           json['rating'] != null ? (json['rating'] as num).toDouble() : null,
+      consultationFee: json['consultation_fee'] != null
+          ? (json['consultation_fee'] as num).toDouble() : null,
+      waitingTime: json['waiting_time'] != null
+          ? (json['waiting_time'] as int) : null,
+      location: json['location'] as String?,
     );
   }
 
@@ -36,6 +43,9 @@ class DoctorModel extends DoctorEntity {
       'rating': rating,
       'clinic_id': clinicId,
       'specialaization': specialaization,
+      'consultation_fee': consultationFee,
+      'waiting_time': waitingTime,
+      'location': location,
     };
   }
 }

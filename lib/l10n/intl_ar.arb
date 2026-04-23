@@ -38,7 +38,10 @@
     "governorate": "المحافظة",
     "city": "المدينة",
     "select_city": "اختر المدينة",
-    "select_governorate": "اختر المحافظة"
+    "select_governorate": "اختر المحافظة",
+    "waiting_time": "وقت الانتظار",
+    "currency": "جنيه",
+    "minutes": "دقائق"
     
 
 

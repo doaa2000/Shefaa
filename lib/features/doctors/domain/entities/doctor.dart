@@ -9,6 +9,9 @@ class DoctorEntity extends Equatable {
   final String? image;
   final String? title;
   final double? rating;
+  final dynamic consultationFee;
+  final int ? waitingTime;
+  final String? location;
 
   const DoctorEntity({
     required this.id,
@@ -17,7 +20,7 @@ class DoctorEntity extends Equatable {
     required this.clinicId,
     this.image,
     this.title,
-    this.rating, required this.specialaization,
+    this.rating, required this.specialaization, this.consultationFee, this.waitingTime,required this.location,
   });
 
   @override
@@ -30,5 +33,8 @@ class DoctorEntity extends Equatable {
     title,
     rating,
     specialaization,
+    consultationFee,
+    waitingTime,
+    location,
   ];
 }
