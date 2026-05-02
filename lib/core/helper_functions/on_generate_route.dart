@@ -7,6 +7,7 @@ import 'package:shefaa_app/features/doctors/presentation/screens/doctors_screen.
 import 'package:shefaa_app/features/home/presentation/screens/home_screen.dart';
 import 'package:shefaa_app/features/location/presentation/screens/location_screen.dart';
 import 'package:shefaa_app/features/payment/presentation/screens/payment_screen.dart';
+import 'package:shefaa_app/features/profile/presentation/screens/update_profile_screen.dart';
 
 Route<dynamic> onGenerateRoute(RouteSettings settings) {
   switch (settings.name) {
@@ -20,6 +21,9 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (context) => const HomeScreen());
     case DoctorsScreen.routeName:
       return MaterialPageRoute(builder: (context) => const DoctorsScreen());
+
+      case UpdateProfileScreen.routeName:
+      return MaterialPageRoute(builder: (context) => const UpdateProfileScreen());
     case DoctorAvailabilityScreen.routeName:
       return MaterialPageRoute(
         builder: (context) => const DoctorAvailabilityScreen(),
@@ -30,7 +34,9 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
         builder: (context) => const BookingsDetailsScreen(),
       );
     case PaymentScreen.routeName:
-      return MaterialPageRoute(builder: (context) => const PaymentScreen());
+      return MaterialPageRoute(builder: (context) => const PaymentScreen(),
+        settings: settings,
+      );
     default:
       return MaterialPageRoute(
         builder:

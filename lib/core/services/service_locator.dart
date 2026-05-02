@@ -7,6 +7,12 @@ import 'package:shefaa_app/features/auth/domain/usecases/login_usecase.dart';
 import 'package:shefaa_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:shefaa_app/features/auth/domain/usecases/register_usecase.dart';
 import 'package:shefaa_app/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:shefaa_app/features/bookings/data/datasources/bookings_remote_datasource.dart';
+import 'package:shefaa_app/features/bookings/data/repositories/booking_repository_impl.dart';
+import 'package:shefaa_app/features/bookings/domain/repositories/booking_repository.dart';
+import 'package:shefaa_app/features/bookings/domain/usecases/create_booking_usecase.dart';
+import 'package:shefaa_app/features/bookings/domain/usecases/get_booking_usecase.dart';
+import 'package:shefaa_app/features/bookings/presentation/bloc/bookings_bloc.dart';
 import 'package:shefaa_app/features/doctor_availability/data/datasources/doctor_availability_remote_datasource.dart';
 import 'package:shefaa_app/features/doctor_availability/data/repositories/doctor_availability_repository_impl.dart';
 import 'package:shefaa_app/features/doctor_availability/domain/repositories/doctor_availability_repository.dart';
@@ -53,6 +59,10 @@ getIt.registerLazySingleton<HomeRemoteDatasource>(
   getIt.registerLazySingleton<DoctorAvailabilityRemoteDatasource>(
     () => DoctorAvailabilityRemoteDatasourceImpl(getIt()),
   );
+
+  getIt.registerLazySingleton<BookingRemoteDatasource>(
+    () => BookingRemoteDatasourceImpl(getIt()),
+  );
   // 3️⃣ Repository
   getIt.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(getIt()),
@@ -71,6 +81,10 @@ getIt.registerLazySingleton<ProfileRepository>(
   getIt.registerLazySingleton<DoctorAvailabilityRepository>(
     () => DoctorAvailabilityRepositoryImpl(getIt()),
   );
+
+  getIt.registerLazySingleton<BookingRepository>(
+    () => BookingRepositoryImpl(getIt()),
+  );
   // 4️⃣ UseCases
   getIt.registerLazySingleton<LoginUseCase>(() => LoginUseCase(getIt()));
 
@@ -88,6 +102,13 @@ getIt.registerLazySingleton<LogoutUseCase>(() => LogoutUseCase(getIt()));
 
   getIt.registerLazySingleton<GetDoctorAvailabilityUsecase>(
     () => GetDoctorAvailabilityUsecase(getIt()),
+  );
+
+  getIt.registerLazySingleton<CreateBookingUsecase>(
+    () => CreateBookingUsecase(getIt()),
+  );
+  getIt.registerLazySingleton<GetMyBookingsUsecase>(
+    () => GetMyBookingsUsecase(getIt()),
   );
   // 5️⃣ Bloc
   getIt.registerFactory<DoctorsBloc>(
@@ -112,5 +133,8 @@ getIt.registerFactory<HomeBloc>(
 
 getIt.registerFactory<DoctorAvailabilityBloc>(
     () => DoctorAvailabilityBloc(getDoctorAvailabilityUsecase: getIt()),
+  );
+  getIt.registerFactory<BookingBloc>(
+    () => BookingBloc(createBookingUsecase: getIt(), getMyBookingsUsecase: getIt()),
   );
 }

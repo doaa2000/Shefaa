@@ -18,6 +18,8 @@ class SupportCard extends StatelessWidget {
         children: [
           SettingsTile(title: "المساعدة والدعم", icon: Icons.help_outline),
           SettingsTile(title: "عن التطبيق", icon: Icons.info_outline),
+                    SettingsTile(title: "عن المطور", icon: Icons.info_outline),
+
         ],
       ),
     );

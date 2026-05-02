@@ -22,6 +22,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+    "account_info": MessageLookupByLibrary.simpleMessage("معلومات الحساب"),
     "appointments": MessageLookupByLibrary.simpleMessage("المواعيد"),
     "available_days": MessageLookupByLibrary.simpleMessage("الأيام المتاحة"),
     "available_time": MessageLookupByLibrary.simpleMessage("الوقت المتاح"),
@@ -29,10 +30,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "book_now": MessageLookupByLibrary.simpleMessage("احجز الآن"),
     "booking_details": MessageLookupByLibrary.simpleMessage("تفاصيل الحجز"),
     "cancel_booking": MessageLookupByLibrary.simpleMessage("إلغاء الحجز"),
+    "change_password": MessageLookupByLibrary.simpleMessage(
+      "تغيير كلمة المرور",
+    ),
     "city": MessageLookupByLibrary.simpleMessage("المدينة"),
     "confirm_booking": MessageLookupByLibrary.simpleMessage("تأكيد الحجز"),
     "confirm_booking_payment": MessageLookupByLibrary.simpleMessage(
       "تأكيد الحجز والدفع",
+    ),
+    "confirm_new_password": MessageLookupByLibrary.simpleMessage(
+      "تأكيد كلمة المرور الجديدة",
     ),
     "confirm_password": MessageLookupByLibrary.simpleMessage(
       "تأكيد كلمة المرور",
@@ -43,21 +50,54 @@ class MessageLookup extends MessageLookupByLibrary {
     "discount": MessageLookupByLibrary.simpleMessage("الخصم"),
     "doctors": MessageLookupByLibrary.simpleMessage("الأطباء"),
     "email": MessageLookupByLibrary.simpleMessage("البريد الإلكتروني"),
+    "email_address": MessageLookupByLibrary.simpleMessage("البريد الإلكتروني"),
+    "email_hint": MessageLookupByLibrary.simpleMessage("example@mail.com"),
+    "email_invalid_error": MessageLookupByLibrary.simpleMessage(
+      "أدخل بريد إلكتروني صحيح",
+    ),
+    "email_required_error": MessageLookupByLibrary.simpleMessage(
+      "البريد الإلكتروني مطلوب",
+    ),
     "evening": MessageLookupByLibrary.simpleMessage("مساءً"),
     "full_name": MessageLookupByLibrary.simpleMessage("الاسم بالكامل"),
+    "full_name_hint": MessageLookupByLibrary.simpleMessage("أدخل اسمك بالكامل"),
     "governorate": MessageLookupByLibrary.simpleMessage("المحافظة"),
     "home": MessageLookupByLibrary.simpleMessage("الرئيسية"),
     "instapay": MessageLookupByLibrary.simpleMessage("انستا باي"),
     "minutes": MessageLookupByLibrary.simpleMessage("دقائق"),
     "morning": MessageLookupByLibrary.simpleMessage("صباحًا"),
+    "name_min_error": MessageLookupByLibrary.simpleMessage(
+      "يجب أن يكون الاسم 3 أحرف على الأقل",
+    ),
+    "name_required_error": MessageLookupByLibrary.simpleMessage("الاسم مطلوب"),
+    "new_password": MessageLookupByLibrary.simpleMessage("كلمة المرور الجديدة"),
     "password": MessageLookupByLibrary.simpleMessage("كلمة المرور"),
+    "password_hint": MessageLookupByLibrary.simpleMessage("••••••••"),
+    "password_min_error": MessageLookupByLibrary.simpleMessage(
+      "كلمة المرور يجب ألا تقل عن 8 أحرف",
+    ),
+    "passwords_not_match": MessageLookupByLibrary.simpleMessage(
+      "كلمتا المرور غير متطابقتين",
+    ),
     "pay_cash": MessageLookupByLibrary.simpleMessage("الدفع نقدًا"),
     "payment": MessageLookupByLibrary.simpleMessage("الدفع"),
     "payment_summary": MessageLookupByLibrary.simpleMessage("ملخص الدفع"),
+    "personal_info": MessageLookupByLibrary.simpleMessage("المعلومات الشخصية"),
+    "phone_hint": MessageLookupByLibrary.simpleMessage("+20 01X XXXX XXXX"),
+    "phone_invalid_error": MessageLookupByLibrary.simpleMessage(
+      "أدخل رقم هاتف صحيح",
+    ),
     "phone_number": MessageLookupByLibrary.simpleMessage("رقم الهاتف"),
+    "phone_required_error": MessageLookupByLibrary.simpleMessage(
+      "رقم الهاتف مطلوب",
+    ),
     "profile": MessageLookupByLibrary.simpleMessage("الملف الشخصي"),
+    "save_changes": MessageLookupByLibrary.simpleMessage("حفظ التغييرات"),
     "search": MessageLookupByLibrary.simpleMessage("ابحث"),
     "select_appointment": MessageLookupByLibrary.simpleMessage("اختر الموعد"),
+    "select_birth_date": MessageLookupByLibrary.simpleMessage(
+      "اختر تاريخ الميلاد",
+    ),
     "select_city": MessageLookupByLibrary.simpleMessage("اختر المدينة"),
     "select_governorate": MessageLookupByLibrary.simpleMessage("اختر المحافظة"),
     "select_location": MessageLookupByLibrary.simpleMessage("اختر موقعك"),
@@ -66,6 +106,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "specialties": MessageLookupByLibrary.simpleMessage("التخصصات"),
     "total_amount": MessageLookupByLibrary.simpleMessage("المبلغ الإجمالي"),
+    "update_profile": MessageLookupByLibrary.simpleMessage(
+      "تحديث الملف الشخصي",
+    ),
     "vodafone_cash": MessageLookupByLibrary.simpleMessage("فودافون كاش"),
     "waiting_time": MessageLookupByLibrary.simpleMessage("وقت الانتظار"),
     "your_appointment": MessageLookupByLibrary.simpleMessage("موعدك"),

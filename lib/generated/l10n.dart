@@ -368,6 +368,211 @@ class S {
   String get minutes {
     return Intl.message('Minutes', name: 'minutes', desc: '', args: []);
   }
+
+  /// `Update Profile`
+  String get update_profile {
+    return Intl.message(
+      'Update Profile',
+      name: 'update_profile',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Personal Info`
+  String get personal_info {
+    return Intl.message(
+      'Personal Info',
+      name: 'personal_info',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Account Info`
+  String get account_info {
+    return Intl.message(
+      'Account Info',
+      name: 'account_info',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Change Password`
+  String get change_password {
+    return Intl.message(
+      'Change Password',
+      name: 'change_password',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter your full name`
+  String get full_name_hint {
+    return Intl.message(
+      'Enter your full name',
+      name: 'full_name_hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Name is required`
+  String get name_required_error {
+    return Intl.message(
+      'Name is required',
+      name: 'name_required_error',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Name must be at least 3 characters`
+  String get name_min_error {
+    return Intl.message(
+      'Name must be at least 3 characters',
+      name: 'name_min_error',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `+20 01X XXXX XXXX`
+  String get phone_hint {
+    return Intl.message(
+      '+20 01X XXXX XXXX',
+      name: 'phone_hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Phone number is required`
+  String get phone_required_error {
+    return Intl.message(
+      'Phone number is required',
+      name: 'phone_required_error',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter a valid phone number`
+  String get phone_invalid_error {
+    return Intl.message(
+      'Enter a valid phone number',
+      name: 'phone_invalid_error',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Select your birth date`
+  String get select_birth_date {
+    return Intl.message(
+      'Select your birth date',
+      name: 'select_birth_date',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Email Address`
+  String get email_address {
+    return Intl.message(
+      'Email Address',
+      name: 'email_address',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `example@mail.com`
+  String get email_hint {
+    return Intl.message(
+      'example@mail.com',
+      name: 'email_hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Email is required`
+  String get email_required_error {
+    return Intl.message(
+      'Email is required',
+      name: 'email_required_error',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter a valid email address`
+  String get email_invalid_error {
+    return Intl.message(
+      'Enter a valid email address',
+      name: 'email_invalid_error',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `New Password`
+  String get new_password {
+    return Intl.message(
+      'New Password',
+      name: 'new_password',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `••••••••`
+  String get password_hint {
+    return Intl.message('••••••••', name: 'password_hint', desc: '', args: []);
+  }
+
+  /// `Password must be at least 8 characters`
+  String get password_min_error {
+    return Intl.message(
+      'Password must be at least 8 characters',
+      name: 'password_min_error',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Confirm New Password`
+  String get confirm_new_password {
+    return Intl.message(
+      'Confirm New Password',
+      name: 'confirm_new_password',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Passwords do not match`
+  String get passwords_not_match {
+    return Intl.message(
+      'Passwords do not match',
+      name: 'passwords_not_match',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save Changes`
+  String get save_changes {
+    return Intl.message(
+      'Save Changes',
+      name: 'save_changes',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -41,7 +41,35 @@
     "select_governorate": "اختر المحافظة",
     "waiting_time": "وقت الانتظار",
     "currency": "جنيه",
-    "minutes": "دقائق"
+    "minutes": "دقائق",
+    "update_profile": "تحديث الملف الشخصي",
+    "personal_info": "المعلومات الشخصية",
+  "account_info": "معلومات الحساب",
+  "change_password": "تغيير كلمة المرور",
+
+  "full_name_hint": "أدخل اسمك بالكامل",
+  "name_required_error": "الاسم مطلوب",
+  "name_min_error": "يجب أن يكون الاسم 3 أحرف على الأقل",
+
+  "phone_hint": "+20 01X XXXX XXXX",
+  "phone_required_error": "رقم الهاتف مطلوب",
+  "phone_invalid_error": "أدخل رقم هاتف صحيح",
+
+  "select_birth_date": "اختر تاريخ الميلاد",
+
+  "email_address": "البريد الإلكتروني",
+  "email_hint": "example@mail.com",
+  "email_required_error": "البريد الإلكتروني مطلوب",
+  "email_invalid_error": "أدخل بريد إلكتروني صحيح",
+
+  "new_password": "كلمة المرور الجديدة",
+  "password_hint": "••••••••",
+  "password_min_error": "كلمة المرور يجب ألا تقل عن 8 أحرف",
+
+  "confirm_new_password": "تأكيد كلمة المرور الجديدة",
+  "passwords_not_match": "كلمتا المرور غير متطابقتين",
+
+  "save_changes": "حفظ التغييرات"
     
 
 

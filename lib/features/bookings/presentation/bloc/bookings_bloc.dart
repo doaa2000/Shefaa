@@ -1,13 +1,70 @@
-import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
+import 'dart:async';
 
-part 'bookings_event.dart';
-part 'bookings_state.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shefaa_app/core/domain/use_cases.dart';
+import 'package:shefaa_app/core/enums/request_state.dart';
+import 'package:shefaa_app/features/bookings/domain/usecases/create_booking_usecase.dart';
+import 'package:shefaa_app/features/bookings/domain/usecases/get_booking_usecase.dart';
+import 'package:shefaa_app/features/bookings/presentation/bloc/bookings_event.dart';
+import 'package:shefaa_app/features/bookings/presentation/bloc/bookings_state.dart';
 
-class BookingsBloc extends Bloc<BookingsEvent, BookingsState> {
-  BookingsBloc() : super(BookingsInitial()) {
-    on<BookingsEvent>((event, emit) {
-      // TODO: implement event handler
-    });
+class BookingBloc extends Bloc<BookingEvent, BookingState> {
+  final CreateBookingUsecase createBookingUsecase;
+  final GetMyBookingsUsecase getMyBookingsUsecase;
+
+  BookingBloc({
+    required this.createBookingUsecase,
+    required this.getMyBookingsUsecase,
+  }) : super(const BookingState()) {
+    on<CreateBookingEvent>(_onCreateBooking);
+    on<GetMyBookingsEvent>(_onGetMyBookings);
+  }
+
+  FutureOr<void> _onCreateBooking(
+    CreateBookingEvent event,
+    Emitter<BookingState> emit,
+  ) async {
+    emit(state.copyWith(createBookingState: RequestState.loading));
+
+    final result = await createBookingUsecase(
+      CreateBookingParams(
+        doctorId: event.doctorId,
+        amount:         event.amount,
+        paymentMethod:  event.paymentMethod,
+        bookedDate:     event.bookedDate,
+        startTime:      event.startTime,
+        endTime:        event.endTime,
+      ),
+    );
+
+    result.fold(
+      (failure) => emit(state.copyWith(
+        createBookingState: RequestState.error,
+        errorMessage: failure.message,
+      )),
+      (_) => emit(state.copyWith(
+        createBookingState: RequestState.loaded, 
+      )),
+    );
+  }
+
+  FutureOr<void> _onGetMyBookings(
+    GetMyBookingsEvent event,
+    Emitter<BookingState> emit,
+  ) async {
+    emit(state.copyWith(getBookingsState: RequestState.loading));
+
+    final result = await getMyBookingsUsecase(NoParameters());
+
+    result.fold(
+      (failure) => emit(state.copyWith(
+        getBookingsState: RequestState.error,
+        errorMessage: failure.message,
+      )),
+      (bookings) => emit(state.copyWith(
+        getBookingsState: RequestState.loaded,
+        bookings: bookings,
+      )),
+    );
   }
 }

@@ -17,11 +17,8 @@ class SettingsCard extends StatelessWidget {
       child: const Column(
         children: [
           SettingsTile(title: "إعدادات الحساب", icon: Icons.settings),
-          SettingsTile(title: "الإشعارات", icon: Icons.notifications_none),
-          SettingsTile(
-            title: "السجلات الطبية",
-            icon: Icons.description_outlined,
-          ),
+          SettingsTile(title: "تقييم التطبيق", icon: Icons.notifications_none),
+          
         ],
       ),
     );

@@ -10,6 +10,7 @@ import 'package:shefaa_app/features/doctor_availability/presentation/bloc/doctor
 import 'package:shefaa_app/features/doctor_availability/presentation/widgets/date_card_list_view.dart';
 import 'package:shefaa_app/features/doctor_availability/presentation/widgets/doctor_details_widget.dart';
 import 'package:shefaa_app/features/doctor_availability/presentation/widgets/time_card_list_widget.dart';
+import 'package:shefaa_app/features/payment/data/models/payment_args_model.dart';
 import 'package:shefaa_app/features/payment/presentation/screens/payment_screen.dart';
 import 'package:shefaa_app/generated/l10n.dart';
 
@@ -171,10 +172,13 @@ class DoctorAvailabilityScreen extends StatelessWidget {
                   },
                 ),
               ),
+      const SizedBox(height: 20),
 
               // ✅ Confirm button — only active when a slot is selected
               BlocBuilder<DoctorAvailabilityBloc, DoctorAvailabilityState>(
                 builder: (context, state) {
+                                      final doctor = state.doctorDetails?.doctor;
+
                   final hasSelection =
                       state.selectedMorningSlotId != null ||
                       state.selectedEveningSlotId != null;
@@ -187,17 +191,19 @@ class DoctorAvailabilityScreen extends StatelessWidget {
                             final slot = state.selectedMorningSlot ??
                                          state.selectedEveningSlot;
 
-                            Navigator.pushNamed(
-                              context,
-                              PaymentScreen.routeName,
-                              arguments: {
-                                'slot_id':    slot?.id,
-                                'start_time': slot?.startTime,
-                                'date': state.selectedDate
-                                    .toIso8601String()
-                                    .split('T')[0],
-                              },
-                            );
+                          Navigator.pushNamed(
+  context,
+  PaymentScreen.routeName,
+  arguments: PaymentArgsModel(
+    slotId: slot!.id,
+    doctorId: slot.doctorId,
+    endTime: slot.endTime,
+    amount: doctor!.consultationFee,
+    doctorName: doctor.name,
+    date: state.selectedDate,
+    startTime: slot.startTime,
+  ),
+);
                           }
                         : null, // ✅ disabled if nothing selected
                   );

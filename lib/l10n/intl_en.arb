@@ -40,7 +40,35 @@
     "select_governorate": "Select Governorate",
     "waiting_time": "Waiting Time",
     "currency": "EGP",
-    "minutes": "Minutes"
+    "minutes": "Minutes",
+    "update_profile":"Update Profile",
+     "personal_info": "Personal Info",
+  "account_info": "Account Info",
+  "change_password": "Change Password",
+
+  "full_name_hint": "Enter your full name",
+  "name_required_error": "Name is required",
+  "name_min_error": "Name must be at least 3 characters",
+
+  "phone_hint": "+20 01X XXXX XXXX",
+  "phone_required_error": "Phone number is required",
+  "phone_invalid_error": "Enter a valid phone number",
+
+  "select_birth_date": "Select your birth date",
+
+  "email_address": "Email Address",
+  "email_hint": "example@mail.com",
+  "email_required_error": "Email is required",
+  "email_invalid_error": "Enter a valid email address",
+
+  "new_password": "New Password",
+  "password_hint": "••••••••",
+  "password_min_error": "Password must be at least 8 characters",
+
+  "confirm_new_password": "Confirm New Password",
+  "passwords_not_match": "Passwords do not match",
+
+  "save_changes": "Save Changes"
 
 
 
