@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:shefaa_app/features/bookings/data/models/booking_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -81,13 +79,8 @@ Future<List<BookingModel>> getMyBookings() async {
       ''')
       .order('booked_date', ascending: false);
 
-  log('📦 Raw bookings data: $res'); // ✅ قبل الـ return
-
-  final list = (res as List).map((e) {
-    log('📌 single booking: $e'); // ✅ شوفي كل booking لوحده
-    return BookingModel.fromMap(e);
-  }).toList();
-
-  return list;
+  return (res as List)
+      .map((e) => BookingModel.fromMap(e as Map<String, dynamic>))
+      .toList();
 }
 }
