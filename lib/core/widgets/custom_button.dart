@@ -9,6 +9,7 @@ class CustomButton extends StatelessWidget {
   final double borderRadius;
   final Color backgroundColor;
   final Color textColor;
+  final bool isLoading;
 
   const CustomButton({
     super.key,
@@ -18,10 +19,12 @@ class CustomButton extends StatelessWidget {
     this.borderRadius = 10,
     this.backgroundColor = AppColors.primaryColor,
     this.textColor = AppColors.white,
+    this.isLoading = false,
   });
 
-  // ✅ Button is disabled when onPressed is null
-  bool get _isDisabled => onPressed == null;
+  // Disabled when there is no handler, or while a request is in flight so the
+  // same request cannot be fired twice by an impatient double tap.
+  bool get _isDisabled => onPressed == null || isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +32,7 @@ class CustomButton extends StatelessWidget {
       height: height,
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: onPressed, // ✅ null = automatically disabled by Flutter
+        onPressed: _isDisabled ? null : onPressed,
         style: ElevatedButton.styleFrom(
           elevation: 0,
           backgroundColor: _isDisabled
@@ -42,7 +45,16 @@ class CustomButton extends StatelessWidget {
           ),
           textStyle: TextStyles.bold16,
         ),
-        child: Text(title),
+        child: isLoading
+            ? SizedBox(
+                height: height * 0.5,
+                width: height * 0.5,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.4,
+                  valueColor: AlwaysStoppedAnimation<Color>(textColor),
+                ),
+              )
+            : Text(title),
       ),
     );
   }
