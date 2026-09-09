@@ -140,8 +140,11 @@ create table if not exists public.bookings (
   booked_date date not null,
   start_time  time not null,
   end_time    time not null,
+  -- 'no_show' matters for revenue: a patient who books and never arrives must be
+  -- distinguishable from one who attended, or commission cannot be computed later.
+  -- The doctor dashboard already sends this value (appointment.labels.ts).
   status      text not null default 'pending'
-                check (status in ('pending', 'confirmed', 'completed', 'cancelled')),
+                check (status in ('pending', 'confirmed', 'completed', 'cancelled', 'no_show')),
   created_at  timestamptz not null default now()
 );
 
