@@ -4,6 +4,6 @@ import 'package:shefaa_app/features/doctors/domain/entities/doctor.dart';
 
 abstract class DoctorsRepository {
   Future<Either<Failure, List<DoctorEntity>>> getDoctors(
-    String specialtyId,
+    int specialtyId,
   );
 }

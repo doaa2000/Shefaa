@@ -5,28 +5,48 @@ import 'package:shefaa_app/features/doctors/presentation/bloc/doctors_bloc.dart'
 import 'package:shefaa_app/features/doctors/presentation/widgets/doctors_card.dart';
 
 class HomeDoctorsList extends StatelessWidget {
-  const HomeDoctorsList({super.key});
+  const HomeDoctorsList({super.key, this.specialtyName});
+
+  /// Used only to word the empty state; the list itself is already filtered.
+  final String? specialtyName;
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DoctorsBloc, DoctorsState>(
       builder: (context, state) {
-        // 🔄 Loading
         if (state.getDoctorsState == RequestState.loading) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        // ❌ Error
         if (state.getDoctorsState == RequestState.error) {
-          return const Center(child: Text('Something went wrong'));
+          return _Message(
+            icon: Icons.error_outline,
+            color: Colors.red,
+            text: state.errorMessage?.isNotEmpty == true
+                ? state.errorMessage!
+                : 'تعذر تحميل الأطباء',
+            actionLabel: 'إعادة المحاولة',
+            onAction: () {
+              final specialtyId = state.specialtyId;
+              if (specialtyId != null) {
+                context
+                    .read<DoctorsBloc>()
+                    .add(GetDoctorsEvent(specialtyId: specialtyId));
+              }
+            },
+          );
         }
 
-        // 📭 Empty
         if (state.doctors.isEmpty) {
-          return const Center(child: Text('No doctors found'));
+          return _Message(
+            icon: Icons.person_search_outlined,
+            color: Colors.grey,
+            text: specialtyName == null
+                ? 'لا يوجد أطباء متاحون حالياً'
+                : 'لا يوجد أطباء في $specialtyName حالياً',
+          );
         }
 
-        // ✅ Loaded
         return ListView.builder(
           itemCount: state.doctors.length,
           itemBuilder: (context, index) {
@@ -36,22 +56,59 @@ class HomeDoctorsList extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: DoctorCard(
                 name: doctor.name,
-                specialty: doctor.title ?? '',
+                specialty: doctor.title ?? doctor.specialaization,
                 imageUrl: doctor.image ??
                     'https://i.pravatar.cc/150?img=${index + 3}',
-                   consultationFee: doctor.consultationFee ?? 0,
-                    location: doctor.location ?? 'Unknown',
-                    waitingTime: doctor.waitingTime != null
-                    ? '${doctor.waitingTime} mins'
-                    : 'N/A',
+                consultationFee: doctor.consultationFee ?? 0,
+                location: doctor.location ?? 'غير محدد',
+                waitingTime: doctor.waitingTime != null
+                    ? '${doctor.waitingTime} دقيقة'
+                    : '—',
                 onTap: () {
-                  // TODO: navigate to doctor details
+                  // TODO(F4): open the doctor's own screen.
                 },
               ),
             );
           },
         );
       },
+    );
+  }
+}
+
+class _Message extends StatelessWidget {
+  const _Message({
+    required this.icon,
+    required this.color,
+    required this.text,
+    this.actionLabel,
+    this.onAction,
+  });
+
+  final IconData icon;
+  final Color color;
+  final String text;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: color, size: 40),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Text(text, textAlign: TextAlign.center),
+          ),
+          if (actionLabel != null && onAction != null) ...[
+            const SizedBox(height: 12),
+            TextButton(onPressed: onAction, child: Text(actionLabel!)),
+          ],
+        ],
+      ),
     );
   }
 }
