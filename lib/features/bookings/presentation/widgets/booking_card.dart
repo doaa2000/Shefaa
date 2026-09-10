@@ -1,25 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:shefaa_app/core/utils/app_colors.dart';
-import 'package:shefaa_app/features/bookings/presentation/widgets/booking_action_toggle.dart';
-class BookingCard extends StatelessWidget {
-  final String doctorName;
-  final String specialty;
-  final String date;
-  final String time;
-  final String status;
-  final double amount;
-  final String paymentMethod;
+import 'package:shefaa_app/core/utils/app_text_styles.dart';
+import 'package:shefaa_app/features/bookings/domain/entites/booking.dart';
+import 'package:shefaa_app/features/doctor_availability/data/models/doctor_availability_model.dart';
 
-  const BookingCard({
-    super.key,
-    required this.doctorName,
-    required this.specialty,
-    required this.date,
-    required this.time,
-    required this.status,
-    required this.amount,
-    required this.paymentMethod,
-  });
+class BookingCard extends StatelessWidget {
+  const BookingCard({super.key, required this.booking, this.onCancel});
+
+  final BookingEntity booking;
+
+  /// Null hides the cancel action — a past or already cancelled booking has
+  /// nothing left to cancel.
+  final VoidCallback? onCancel;
+
+  static const List<String> _dayNames = [
+    'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت',
+  ];
+  static const List<String> _monthNames = [
+    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
+  ];
+
+  String get _date =>
+      '${_dayNames[booking.bookedDate.weekday % 7]} '
+      '${booking.bookedDate.day} ${_monthNames[booking.bookedDate.month - 1]}';
+
+  String get _sessionLabel =>
+      booking.session == 'morning' ? 'الفترة الصباحية' : 'الفترة المسائية';
 
   @override
   Widget build(BuildContext context) {
@@ -27,47 +34,113 @@ class BookingCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(color: Colors.grey.shade200),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(doctorName,
-                  style: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.w500)),
-              _StatusBadge(status: status),
+              CircleAvatar(
+                radius: 24,
+                backgroundColor: AppColors.primaryColor.withOpacity(0.1),
+                backgroundImage: (booking.doctor.image?.isNotEmpty ?? false)
+                    ? NetworkImage(booking.doctor.image!)
+                    : null,
+                child: (booking.doctor.image?.isNotEmpty ?? false)
+                    ? null
+                    : const Icon(Icons.person, color: AppColors.primaryColor),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(booking.doctor.name,
+                        style: TextStyles.bold16.copyWith(color: Colors.black)),
+                    const SizedBox(height: 2),
+                    Text(booking.doctor.specialaization,
+                        style: TextStyles.meduim12
+                            .copyWith(color: Colors.grey.shade600)),
+                  ],
+                ),
+              ),
+              _StatusChip(status: booking.status),
             ],
           ),
-          const SizedBox(height: 4),
-          Text(specialty,
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
-          const Divider(height: 20),
-          Row(children: [
-            const Icon(Icons.calendar_today_outlined, size: 14, color: Colors.grey),
-            const SizedBox(width: 6),
-            Text(date, style: const TextStyle(fontSize: 12)),
-            const SizedBox(width: 16),
-            const Icon(Icons.access_time_outlined, size: 14, color: Colors.grey),
-            const SizedBox(width: 6),
-            Text(time, style: const TextStyle(fontSize: 12)),
-          ]),
-          const SizedBox(height: 8),
+          const SizedBox(height: 14),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(children: [
-                const Icon(Icons.payment_outlined, size: 14, color: Colors.grey),
-                const SizedBox(width: 6),
-                Text(paymentMethod == 'cash' ? 'كاش' : 'انستا باي',
-                    style: const TextStyle(fontSize: 12)),
-              ]),
-              Text('${amount.toStringAsFixed(0)} ج.م',
-                  style: const TextStyle(
-                      fontSize: 13, fontWeight: FontWeight.w500)),
+              Icon(Icons.calendar_today, size: 15, color: Colors.grey.shade600),
+              const SizedBox(width: 6),
+              Text(_date, style: TextStyles.meduim14),
+              const SizedBox(width: 14),
+              Icon(Icons.access_time, size: 15, color: Colors.grey.shade600),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  '$_sessionLabel · '
+                  '${DoctorSessionModel.formatTime(booking.startTime)}',
+                  style: TextStyles.meduim14,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          // Only worth showing while the visit is still ahead: a queue position
+          // on a booking that has already happened means nothing.
+          if (booking.queueNumber != null && booking.isUpcoming) ...[
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+              decoration: BoxDecoration(
+                color: AppColors.primaryColor.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.confirmation_number_outlined,
+                      size: 18, color: AppColors.primaryColor),
+                  const SizedBox(width: 8),
+                  Text('دورك رقم ${booking.queueNumber}',
+                      style: TextStyles.bold14
+                          .copyWith(color: AppColors.primaryColor)),
+                  if (booking.queueNumber! > 1) ...[
+                    const SizedBox(width: 8),
+                    Text('· قدامك ${booking.queueNumber! - 1}',
+                        style: TextStyles.meduim12
+                            .copyWith(color: Colors.grey.shade600)),
+                  ],
+                ],
+              ),
+            ),
+          ],
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Text(
+                '${booking.payment.amount.toStringAsFixed(0)} جنيه',
+                style: TextStyles.bold14.copyWith(color: Colors.black),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                booking.payment.isPaid ? '· مدفوع' : '· يُدفع في العيادة',
+                style: TextStyles.meduim12.copyWith(color: Colors.grey.shade600),
+              ),
+              const Spacer(),
+              if (onCancel != null)
+                TextButton(
+                  onPressed: onCancel,
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.red.shade700,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: const Text('إلغاء'),
+                ),
             ],
           ),
         ],
@@ -76,25 +149,29 @@ class BookingCard extends StatelessWidget {
   }
 }
 
-class _StatusBadge extends StatelessWidget {
+class _StatusChip extends StatelessWidget {
+  const _StatusChip({required this.status});
   final String status;
-  const _StatusBadge({required this.status});
+
+  static const Map<String, (String, Color)> _map = {
+    'confirmed': ('مؤكد', Colors.green),
+    'pending': ('قيد التأكيد', Colors.orange),
+    'completed': ('تم', Colors.blue),
+    'cancelled': ('ملغي', Colors.grey),
+    'no_show': ('لم يحضر', Colors.brown),
+  };
 
   @override
   Widget build(BuildContext context) {
-    final map = {
-      'confirmed': ('قادم',     const Color(0xFFEBF6FB), const Color(0xFF0C447C)),
-      'completed': ('مكتمل',   const Color(0xFFEAF3DE), const Color(0xFF27500A)),
-      'cancelled': ('ملغي',    const Color(0xFFFCEBEB), const Color(0xFF791F1F)),
-    };
-    final (label, bg, fg) = map[status] ?? ('غير معروف', Colors.grey.shade100, Colors.grey);
-
+    final (label, color) = _map[status] ?? (status, Colors.grey);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-          color: bg, borderRadius: BorderRadius.circular(20)),
+        color: color.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(20),
+      ),
       child: Text(label,
-          style: TextStyle(fontSize: 11, color: fg)),
+          style: TextStyles.meduim12.copyWith(color: color)),
     );
   }
 }

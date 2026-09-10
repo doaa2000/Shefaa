@@ -1,7 +1,7 @@
 import 'package:shefaa_app/features/payment/domain/entites/payment.dart';
 
 class PaymentModel extends PaymentEntity {
-  PaymentModel({
+  const PaymentModel({
     required super.id,
     required super.amount,
     required super.paymentMethod,
@@ -10,10 +10,10 @@ class PaymentModel extends PaymentEntity {
 
   factory PaymentModel.fromMap(Map<String, dynamic> map) {
     return PaymentModel(
-      id:            map['id'],
-      amount:        (map['amount'] as num).toDouble(),
-      paymentMethod: map['payment_method'],
-      status:        map['status'],
+      id: (map['id'] as num?)?.toInt() ?? 0,
+      amount: (map['amount'] as num?)?.toDouble() ?? 0,
+      paymentMethod: map['payment_method'] as String? ?? 'cash',
+      status: map['status'] as String? ?? 'pending',
     );
   }
 }

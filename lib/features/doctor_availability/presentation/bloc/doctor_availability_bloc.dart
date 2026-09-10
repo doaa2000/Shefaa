@@ -17,98 +17,94 @@ class DoctorAvailabilityBloc
   DoctorAvailabilityBloc({required this.getDoctorAvailabilityUsecase})
       : super(DoctorAvailabilityState(selectedDate: DateTime.now())) {
     on<GetDoctorAvailabilityEvent>(_getDoctorAvailability);
-    on<SelectDateEvent>(_onSelectDateEvent);
-    on<SelectMorningSlotEvent>(_onSelectMorningSlot);
-    on<SelectEveningSlotEvent>(_onSelectEveningSlot);
+    on<SelectDateEvent>(_onSelectDate);
+    on<SelectSessionEvent>(_onSelectSession);
   }
 
-FutureOr<void> _getDoctorAvailability(
-  GetDoctorAvailabilityEvent event,
-  Emitter<DoctorAvailabilityState> emit,
-) async {
-  emit(state.copyWith(
-    getDoctorAvailabilityState: RequestState.loading,
-    doctorId: event.doctorId,
-  ));
-
-  final result = await getDoctorAvailabilityUsecase(
-    GetDoctorAvailabilityUsecaseParameters(
-      doctorId: event.doctorId,
-      date: event.date,
-    ),
-  );
-
-  result.fold(
-    (failure) => emit(state.copyWith(
-      getDoctorAvailabilityState: RequestState.error,
-      errorMessage: failure.message,
-    )),
-    (doctor) => emit(state.copyWith(
-      getDoctorAvailabilityState: RequestState.loaded,
-      doctorDetails: doctor,
-      selectedMorningSlotId: null,
-      selectedEveningSlotId: null,
-    )),
-  );
-}
-void _onSelectMorningSlot(
-  SelectMorningSlotEvent event,
-  Emitter<DoctorAvailabilityState> emit,
-) {
-  emit(state.copyWith(
-    selectedMorningSlotId: event.slotId,
-    selectedEveningSlotId: null,
-  ));
-}
-
-void _onSelectEveningSlot(
-  SelectEveningSlotEvent event,
-  Emitter<DoctorAvailabilityState> emit,
-) {
-  emit(state.copyWith(
-    selectedEveningSlotId: event.slotId,
-    selectedMorningSlotId: null,
-  ));
-}
-
-FutureOr<void> _onSelectDateEvent(
-  SelectDateEvent event,
-  Emitter<DoctorAvailabilityState> emit,
-) async {
-  emit(state.copyWith(
-    selectedDate: event.date,
-    getSlotsState: RequestState.loading,
-    selectedMorningSlotId: null,
-    selectedEveningSlotId: null,
-  ));
-
-  // Not state.doctorDetails!.doctor.id: when the first load failed there are
-  // no details, and force-unwrapping crashed the screen on a date tap.
-  final doctorId = state.doctorId;
-  if (doctorId == null) {
+  Future<void> _getDoctorAvailability(
+    GetDoctorAvailabilityEvent event,
+    Emitter<DoctorAvailabilityState> emit,
+  ) async {
     emit(state.copyWith(
-      getSlotsState: RequestState.error,
-      errorMessage: 'لم يتم تحديد الطبيب',
+      getDoctorAvailabilityState: RequestState.loading,
+      doctorId: event.doctorId,
+      selectedDate: event.date,
+      selectedSession: null,
     ));
-    return;
+
+    final result = await getDoctorAvailabilityUsecase(
+      GetDoctorAvailabilityUsecaseParameters(
+        doctorId: event.doctorId,
+        date: event.date,
+      ),
+    );
+
+    result.fold(
+      (failure) => emit(state.copyWith(
+        getDoctorAvailabilityState: RequestState.error,
+        errorMessage: failure.message,
+      )),
+      (details) => emit(state.copyWith(
+        getDoctorAvailabilityState: RequestState.loaded,
+        getSlotsState: RequestState.loaded,
+        doctorDetails: details,
+        selectedSession: _onlyOpenSession(details),
+      )),
+    );
   }
 
-  final result = await getDoctorAvailabilityUsecase(
-    GetDoctorAvailabilityUsecaseParameters(
-      doctorId: doctorId,
-      date: event.date,
-    ),
-  );
+  Future<void> _onSelectDate(
+    SelectDateEvent event,
+    Emitter<DoctorAvailabilityState> emit,
+  ) async {
+    emit(state.copyWith(
+      selectedDate: event.date,
+      getSlotsState: RequestState.loading,
+      selectedSession: null,
+    ));
 
-  result.fold(
-    (failure) => emit(state.copyWith(
-      getSlotsState: RequestState.error,
-      errorMessage: failure.message,
-    )),
-    (doctor) => emit(state.copyWith(
-      getSlotsState: RequestState.loaded,
-      doctorDetails: doctor,
-    )),
-  );
-}
+    // Not doctorDetails!.doctor.id: when the first load failed there are no
+    // details, and force-unwrapping crashed the screen on a date tap.
+    final doctorId = state.doctorId;
+    if (doctorId == null) {
+      emit(state.copyWith(
+        getSlotsState: RequestState.error,
+        errorMessage: 'لم يتم تحديد الطبيب',
+      ));
+      return;
+    }
+
+    final result = await getDoctorAvailabilityUsecase(
+      GetDoctorAvailabilityUsecaseParameters(
+        doctorId: doctorId,
+        date: event.date,
+      ),
+    );
+
+    result.fold(
+      (failure) => emit(state.copyWith(
+        getSlotsState: RequestState.error,
+        errorMessage: failure.message,
+      )),
+      (details) => emit(state.copyWith(
+        getSlotsState: RequestState.loaded,
+        doctorDetails: details,
+        selectedSession: _onlyOpenSession(details),
+      )),
+    );
+  }
+
+  void _onSelectSession(
+    SelectSessionEvent event,
+    Emitter<DoctorAvailabilityState> emit,
+  ) {
+    emit(state.copyWith(selectedSession: event.session));
+  }
+
+  /// With one session open there is nothing to choose, so choose it. Picking it
+  /// for the patient saves a tap that has only one possible outcome.
+  static String? _onlyOpenSession(DoctorDetailsEntity details) {
+    final open = details.sessions.where((s) => !s.isFull).toList();
+    return open.length == 1 ? open.first.session : null;
+  }
 }

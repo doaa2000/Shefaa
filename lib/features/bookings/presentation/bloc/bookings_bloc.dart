@@ -11,16 +11,19 @@ import 'package:shefaa_app/features/bookings/presentation/bloc/bookings_state.da
 class BookingBloc extends Bloc<BookingEvent, BookingState> {
   final CreateBookingUsecase createBookingUsecase;
   final GetMyBookingsUsecase getMyBookingsUsecase;
+  final CancelBookingUsecase cancelBookingUsecase;
 
   BookingBloc({
     required this.createBookingUsecase,
     required this.getMyBookingsUsecase,
+    required this.cancelBookingUsecase,
   }) : super(const BookingState()) {
     on<CreateBookingEvent>(_onCreateBooking);
     on<GetMyBookingsEvent>(_onGetMyBookings);
+    on<CancelBookingEvent>(_onCancelBooking);
   }
 
-  FutureOr<void> _onCreateBooking(
+  Future<void> _onCreateBooking(
     CreateBookingEvent event,
     Emitter<BookingState> emit,
   ) async {
@@ -29,11 +32,12 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     final result = await createBookingUsecase(
       CreateBookingParams(
         doctorId: event.doctorId,
-        amount:         event.amount,
-        paymentMethod:  event.paymentMethod,
-        bookedDate:     event.bookedDate,
-        startTime:      event.startTime,
-        endTime:        event.endTime,
+        amount: event.amount,
+        paymentMethod: event.paymentMethod,
+        bookedDate: event.bookedDate,
+        session: event.session,
+        startTime: event.startTime,
+        endTime: event.endTime,
       ),
     );
 
@@ -42,13 +46,11 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         createBookingState: RequestState.error,
         errorMessage: failure.message,
       )),
-      (_) => emit(state.copyWith(
-        createBookingState: RequestState.loaded, 
-      )),
+      (_) => emit(state.copyWith(createBookingState: RequestState.loaded)),
     );
   }
 
-  FutureOr<void> _onGetMyBookings(
+  Future<void> _onGetMyBookings(
     GetMyBookingsEvent event,
     Emitter<BookingState> emit,
   ) async {
@@ -65,6 +67,28 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         getBookingsState: RequestState.loaded,
         bookings: bookings,
       )),
+    );
+  }
+
+  Future<void> _onCancelBooking(
+    CancelBookingEvent event,
+    Emitter<BookingState> emit,
+  ) async {
+    emit(state.copyWith(cancelBookingState: RequestState.loading));
+
+    final result = await cancelBookingUsecase(event.bookingId);
+
+    await result.fold(
+      (failure) async => emit(state.copyWith(
+        cancelBookingState: RequestState.error,
+        errorMessage: failure.message,
+      )),
+      (_) async {
+        emit(state.copyWith(cancelBookingState: RequestState.loaded));
+        // Cancelling moves everyone behind this patient up a place, so the
+        // whole list is re-read rather than the one row patched locally.
+        add(const GetMyBookingsEvent());
+      },
     );
   }
 }

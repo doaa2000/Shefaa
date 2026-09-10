@@ -1,52 +1,46 @@
-import 'package:flutter/material.dart';
-import 'package:shefaa_app/features/doctor_availability/domain/entities/doctor_availability.dart';
 import 'package:shefaa_app/features/doctor_availability/domain/entities/doctor_availability.dart';
 
-class DoctorAvailabilityModel extends DoctorAvailabilityEntity {
-  DoctorAvailabilityModel({
-    required super.id,
-    required super.doctorId,
-    required super.date,
+class DoctorSessionModel extends DoctorSessionEntity {
+  const DoctorSessionModel({
+    required super.session,
     required super.startTime,
     required super.endTime,
-    required super.session,
-    required super.isActive,
+    required super.capacity,
+    required super.booked,
+    required super.remaining,
   });
 
-  factory DoctorAvailabilityModel.fromMap(Map<String, dynamic> map) {
-    return DoctorAvailabilityModel(
-      id:        map['id'].toString(),
-      doctorId:  map['doctor_id'].toString(),
-      date:      DateTime.parse(map['date']),
-      startTime: map['start_time'] ?? '',   // ✅ "09:00:00"
-      endTime:   map['end_time'] ?? '',     // ✅ "09:30:00"
-      session:   map['session'] ?? '',      // ✅ "morning" or "evening"
-      isActive:  map['is_active'] ?? true,  // ✅
+  /// One row of `doctor_sessions_on(doctor, date)`.
+  factory DoctorSessionModel.fromMap(Map<String, dynamic> map) {
+    return DoctorSessionModel(
+      session:   map['session'] as String,
+      startTime: map['start_time'] as String,
+      endTime:   map['end_time'] as String,
+      capacity:  (map['capacity'] as num).toInt(),
+      // `booked` is a count, which Postgres returns as bigint; over the wire it
+      // can arrive as either a number or a string.
+      booked:    _asInt(map['booked']),
+      remaining: _asInt(map['remaining']),
     );
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id':         id,
-      'doctor_id':  doctorId,
-      'date':       date.toIso8601String(),
-      'start_time': startTime,
-      'end_time':   endTime,
-      'session':    session,
-      'is_active':  isActive,
-    };
+  static int _asInt(Object? value) {
+    if (value == null) return 0;
+    if (value is num) return value.toInt();
+    return int.tryParse(value.toString()) ?? 0;
   }
 
-  // ✅ Helper: format time for display ("09:00:00" → "09:00 AM")
-  String get formattedStartTime => _formatTime(startTime);
-  String get formattedEndTime   => _formatTime(endTime);
+  /// Formats "17:00:00" as "5:00 م".
+  String get formattedStart => formatTime(startTime);
+  String get formattedEnd => formatTime(endTime);
 
-  String _formatTime(String time) {
+  static String formatTime(String time) {
     final parts = time.split(':');
-    final hour   = int.parse(parts[0]);
+    if (parts.length < 2) return time;
+    final hour = int.tryParse(parts[0]) ?? 0;
     final minute = parts[1];
-    final period = hour >= 12 ? 'PM' : 'AM';
-    final hour12 = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
+    final period = hour >= 12 ? 'م' : 'ص';
+    final hour12 = hour % 12 == 0 ? 12 : hour % 12;
     return '$hour12:$minute $period';
   }
 }
