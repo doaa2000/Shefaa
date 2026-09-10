@@ -6,7 +6,7 @@ import '../entities/doctor_availability.dart';
 // doctor_availability_repository.dart
 abstract class DoctorAvailabilityRepository {
   Future<Either<Failure, DoctorDetailsEntity>> getDoctorAvailability(
-    String doctorId,
+    int doctorId,
     DateTime date, // ✅ add date
   );
 }

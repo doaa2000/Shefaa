@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shefaa_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:shefaa_app/features/auth/presentation/screens/register_screen.dart';
+import 'package:shefaa_app/features/doctor_availability/data/models/doctor_availability_args_model.dart';
 import 'package:shefaa_app/features/doctor_availability/presentation/screens/doctor_availability_screen.dart';
 import 'package:shefaa_app/features/bookings/presentation/screens/bookings_details_screen.dart';
 import 'package:shefaa_app/features/doctors/data/models/doctors_args_model.dart';
@@ -43,8 +44,12 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
       );
 
     case DoctorAvailabilityScreen.routeName:
+      final availabilityArgs = settings.arguments;
+      if (availabilityArgs is! DoctorAvailabilityArgsModel) {
+        return _errorRoute('لم يتم تحديد الطبيب');
+      }
       return MaterialPageRoute(
-        builder: (context) => const DoctorAvailabilityScreen(),
+        builder: (context) => DoctorAvailabilityScreen(args: availabilityArgs),
         settings: settings,
       );
 

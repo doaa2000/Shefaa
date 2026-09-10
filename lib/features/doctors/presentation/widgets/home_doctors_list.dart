@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shefaa_app/core/enums/request_state.dart';
 import 'package:shefaa_app/features/doctors/presentation/bloc/doctors_bloc.dart';
+import 'package:shefaa_app/features/doctor_availability/data/models/doctor_availability_args_model.dart';
+import 'package:shefaa_app/features/doctor_availability/presentation/screens/doctor_availability_screen.dart';
 import 'package:shefaa_app/features/doctors/presentation/widgets/doctors_card.dart';
 
 class HomeDoctorsList extends StatelessWidget {
@@ -65,7 +67,15 @@ class HomeDoctorsList extends StatelessWidget {
                     ? '${doctor.waitingTime} دقيقة'
                     : '—',
                 onTap: () {
-                  // TODO(F4): open the doctor's own screen.
+                  // F4 will put the doctor's own screen in between; until then
+                  // the card opens their slots directly.
+                  Navigator.pushNamed(
+                    context,
+                    DoctorAvailabilityScreen.routeName,
+                    arguments: DoctorAvailabilityArgsModel(
+                      doctorId: doctor.id,
+                    ),
+                  );
                 },
               ),
             );

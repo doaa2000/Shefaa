@@ -5,7 +5,7 @@ abstract class DoctorAvailabilityEvent extends Equatable {
 }
 
 class GetDoctorAvailabilityEvent extends DoctorAvailabilityEvent {
-  final String doctorId;
+  final int doctorId;
   final DateTime date; 
 
   const GetDoctorAvailabilityEvent({

@@ -3,6 +3,12 @@ part of 'doctor_availability_bloc.dart';
 class DoctorAvailabilityState extends Equatable {
    static const _clear = Object();
   final DoctorDetailsEntity? doctorDetails;
+
+  /// Kept independently of [doctorDetails] so that changing the date still
+  /// knows which doctor to load when the first load failed and there are no
+  /// details to read the id back from.
+  final int? doctorId;
+
   final String? errorMessage;
   final RequestState getDoctorAvailabilityState;  
   final RequestState getSlotsState;               
@@ -12,6 +18,7 @@ class DoctorAvailabilityState extends Equatable {
 
   DoctorAvailabilityState({
     this.doctorDetails,
+    this.doctorId,
     this.errorMessage,
     this.getDoctorAvailabilityState = RequestState.initial,
     this.getSlotsState = RequestState.initial,             
@@ -35,6 +42,7 @@ class DoctorAvailabilityState extends Equatable {
 
 DoctorAvailabilityState copyWith({
   DoctorDetailsEntity? doctorDetails,
+  int? doctorId,
   String? errorMessage,
   RequestState? getDoctorAvailabilityState,
   RequestState? getSlotsState,
@@ -44,6 +52,7 @@ DoctorAvailabilityState copyWith({
 }) {
   return DoctorAvailabilityState(
     doctorDetails: doctorDetails ?? this.doctorDetails,
+    doctorId: doctorId ?? this.doctorId,
     errorMessage: errorMessage ?? this.errorMessage,
     getDoctorAvailabilityState:
         getDoctorAvailabilityState ?? this.getDoctorAvailabilityState,
@@ -63,6 +72,7 @@ DoctorAvailabilityState copyWith({
   @override
   List<Object?> get props => [
         doctorDetails,
+        doctorId,
         errorMessage,
         getDoctorAvailabilityState,
         getSlotsState,                                      

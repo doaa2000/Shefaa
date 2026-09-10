@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shefaa_app/core/enums/request_state.dart';
 import 'package:shefaa_app/core/services/service_locator.dart';
+import 'package:shefaa_app/core/utils/app_router.dart';
+import 'package:shefaa_app/features/doctor_availability/data/models/doctor_availability_args_model.dart';
 import 'package:shefaa_app/core/utils/app_text_styles.dart';
 import 'package:shefaa_app/core/utils/constants.dart';
 import 'package:shefaa_app/core/widgets/custom_app_bar.dart';
@@ -15,9 +17,11 @@ import 'package:shefaa_app/features/payment/presentation/screens/payment_screen.
 import 'package:shefaa_app/generated/l10n.dart';
 
 class DoctorAvailabilityScreen extends StatelessWidget {
-  const DoctorAvailabilityScreen({super.key});
+  const DoctorAvailabilityScreen({super.key, required this.args});
 
-  static const String routeName = "/doctor-availability";
+  final DoctorAvailabilityArgsModel args;
+
+  static const String routeName = AppRoutes.doctorAvailability;
 
   List<DateTime> _getNextDays({int count = 7}) {
     final today = DateTime.now();
@@ -47,8 +51,8 @@ class DoctorAvailabilityScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) => getIt<DoctorAvailabilityBloc>()
         ..add(GetDoctorAvailabilityEvent(
-          doctorId: "6",
-          date: DateTime.now(), // ✅ load today's slots on open
+          doctorId: args.doctorId,
+          date: DateTime.now(),
         )),
       child: Scaffold(
         appBar: CustomAppBar(title: S.of(context).select_appointment),
