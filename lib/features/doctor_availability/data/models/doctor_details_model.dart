@@ -3,31 +3,23 @@ import 'package:shefaa_app/features/doctor_availability/domain/entities/doctor_d
 import 'package:shefaa_app/features/doctors/data/models/doctor_model.dart';
 
 class DoctorDetailsModel extends DoctorDetailsEntity {
-  DoctorDetailsModel({
-    required super.doctor,
-    required super.morningSlots,
-    required super.eveningSlots,
-  });
+  const DoctorDetailsModel({required super.doctor, required super.sessions});
 
-  factory DoctorDetailsModel.fromMap(Map<String, dynamic> map) {
-    // ✅ Parse all slots
-    final allSlots = (map['doctor_availability'] as List? ?? [])
-        .map((e) => DoctorAvailabilityModel.fromMap(e))
-        .toList();
-
-    // ✅ Group by session
-    final morning = allSlots
-        .where((s) => s.session == 'morning')
-        .toList();
-
-    final evening = allSlots
-        .where((s) => s.session == 'evening')
-        .toList();
+  /// Built from two sources: the doctor row, and the rows returned by
+  /// `doctor_sessions_on` for the selected date.
+  factory DoctorDetailsModel.fromParts({
+    required Map<String, dynamic> doctorRow,
+    required List<dynamic> sessionRows,
+  }) {
+    final sessions = sessionRows
+        .map((e) => DoctorSessionModel.fromMap(e as Map<String, dynamic>))
+        .toList()
+      // Morning before evening, whatever order the function returned.
+      ..sort((a, b) => a.startTime.compareTo(b.startTime));
 
     return DoctorDetailsModel(
-      doctor:       DoctorModel.fromMap(map),
-      morningSlots: morning,
-      eveningSlots: evening,
+      doctor: DoctorModel.fromMap(doctorRow),
+      sessions: sessions,
     );
   }
 }

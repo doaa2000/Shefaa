@@ -2,11 +2,14 @@ part of 'doctor_availability_bloc.dart';
 
 abstract class DoctorAvailabilityEvent extends Equatable {
   const DoctorAvailabilityEvent();
+
+  @override
+  List<Object?> get props => [];
 }
 
 class GetDoctorAvailabilityEvent extends DoctorAvailabilityEvent {
   final int doctorId;
-  final DateTime date; 
+  final DateTime date;
 
   const GetDoctorAvailabilityEvent({
     required this.doctorId,
@@ -25,18 +28,13 @@ class SelectDateEvent extends DoctorAvailabilityEvent {
   List<Object?> get props => [date];
 }
 
-class SelectMorningSlotEvent extends DoctorAvailabilityEvent {
-  final int slotId;
-  const SelectMorningSlotEvent(this.slotId);
+/// Picks the morning or evening session. Replaces the per-slot selection: the
+/// patient chooses a session and takes the next place in its queue, not a
+/// specific minute.
+class SelectSessionEvent extends DoctorAvailabilityEvent {
+  final String session;
+  const SelectSessionEvent(this.session);
 
   @override
-  List<Object?> get props => [slotId];
-}
-
-class SelectEveningSlotEvent extends DoctorAvailabilityEvent {
-  final int slotId;
-  const SelectEveningSlotEvent(this.slotId);
-
-  @override
-  List<Object?> get props => [slotId];
+  List<Object?> get props => [session];
 }
