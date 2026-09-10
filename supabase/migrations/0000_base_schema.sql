@@ -168,6 +168,20 @@ create table if not exists public.admins (
   created_at timestamptz not null default now()
 );
 
+-- Admin status comes from membership in public.admins and nothing else.
+-- SECURITY DEFINER so the lookup is not itself filtered by admins' own RLS.
+-- Defined here, with the table, because migrations that add policies depend on
+-- it -- 0004 referenced it before the RLS migration had created it.
+create or replace function public.is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (select 1 from public.admins where id = auth.uid());
+$$;
+
 -- -----------------------------------------------------------------------------
 -- Keep a profile row in step with every auth user, so a signup can never end up
 -- with an auth account but no profile (the app currently inserts the profile

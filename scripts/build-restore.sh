@@ -18,14 +18,17 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ADMIN_REPO="${1:-$REPO_ROOT/../Shefaa_Admin_Panel}"
 
-SCHEMA="$REPO_ROOT/supabase/migrations/0000_base_schema.sql"
 SEED="$REPO_ROOT/supabase/seed.sql"
 RLS="$ADMIN_REPO/supabase/migrations/002_fix_rls_policies.sql"
 OUT="$REPO_ROOT/supabase/RESTORE_ALL.sql"
 
-for f in "$SCHEMA" "$SEED"; do
-  [[ -f "$f" ]] || { echo "error: missing $f" >&2; exit 1; }
-done
+[[ -f "$SEED" ]] || { echo "error: missing $SEED" >&2; exit 1; }
+
+# Every migration, in filename order, so a new one is picked up without
+# editing this script -- the previous version named 0000 alone and silently
+# left 0004's tables out, which the seed then failed to insert into.
+mapfile -t MIGRATIONS < <(find "$REPO_ROOT/supabase/migrations" -name '*.sql' | sort)
+[[ ${#MIGRATIONS[@]} -gt 0 ]] || { echo "error: no migrations found" >&2; exit 1; }
 
 if [[ ! -f "$RLS" ]]; then
   echo "error: cannot find the RLS migration at $RLS" >&2
@@ -42,7 +45,7 @@ fi
 --
 -- GENERATED FILE — do not edit. Run ./scripts/build-restore.sh instead.
 -- Sources:
---   supabase/migrations/0000_base_schema.sql
+--   supabase/migrations/*.sql   (in order)
 --   supabase/seed.sql
 --   ../Shefaa_Admin_Panel/supabase/migrations/002_fix_rls_policies.sql
 --
@@ -52,7 +55,11 @@ fi
 
 HEADER
   echo "-- ############## 1 of 3 — SCHEMA ##############"
-  cat "$SCHEMA"
+  for m in "${MIGRATIONS[@]}"; do
+    echo
+    echo "-- ---- $(basename "$m") ----"
+    cat "$m"
+  done
   echo
   echo "-- ############## 2 of 3 — REFERENCE DATA ##############"
   cat "$SEED"
