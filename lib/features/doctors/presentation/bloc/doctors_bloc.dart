@@ -19,7 +19,10 @@ class DoctorsBloc extends Bloc<DoctorsEvent, DoctorsState> {
     GetDoctorsEvent event,
     Emitter<DoctorsState> emit,
   ) async {
-    emit(state.copyWith(getDoctorsState: RequestState.loading));
+    emit(state.copyWith(
+      getDoctorsState: RequestState.loading,
+      specialtyId: event.specialtyId,
+    ));
     final result = await getDoctorsUseCase(
       GetDoctorsUsecaseParameters(specialtyId: event.specialtyId),
     );

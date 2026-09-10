@@ -13,7 +13,7 @@ class DoctorAvailabilityRepositoryImpl implements DoctorAvailabilityRepository {
 
   @override
   Future<Either<Failure, DoctorDetailsEntity>> getDoctorAvailability(
-    String doctorId,
+    int doctorId,
     DateTime date, // ✅ add date
   ) async {
     try {

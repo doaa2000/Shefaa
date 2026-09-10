@@ -14,13 +14,7 @@ class DoctorModel extends DoctorEntity {
     super.waitingTime, required super.location,
   });
 factory DoctorModel.fromMap(Map<String, dynamic> json) {
-    print('🔍 id: ${json['id']}');
-  print('🔍 specialty_id: ${json['specialty_id']}');
-  print('🔍 clinic_id: ${json['clinic_id']}');
-  print('🔍 waiting_time: ${json['waiting_time']}');
-  print('🔍 consultation_fee: ${json['consultation_fee']}');
-  print('🔍 rating: ${json['rating']}');
-  return DoctorModel(
+    return DoctorModel(
     id:              (json['id'] as num).toInt(),
     name:            json['name'] as String,
     specialaization: json['specialization'] as String? ?? '',

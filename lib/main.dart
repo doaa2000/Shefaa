@@ -4,6 +4,7 @@ import 'package:shefaa_app/core/helper_functions/on_generate_route.dart';
 import 'package:shefaa_app/core/services/custom_bloc_observer.dart';
 import 'package:shefaa_app/core/services/service_locator.dart';
 import 'package:shefaa_app/core/utils/app_colors.dart';
+import 'package:shefaa_app/core/utils/app_config.dart';
 import 'package:shefaa_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:shefaa_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:shefaa_app/features/splash/presentation/screens/splash_screen.dart';
@@ -16,9 +17,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
     Bloc.observer = CustomBlocObserver();
 
+  AppConfig.assertConfigured();
+
   await Supabase.initialize(
-    anonKey: 'sb_publishable_L0eHcg2ZM5NpAvpIUg-AKg_Q_xpwdYp',
-    url: 'https://gnzbyekpmbqxyuqofszt.supabase.co',
+    url: AppConfig.supabaseUrl,
+    anonKey: AppConfig.supabaseAnonKey,
   );
   setupServiceLocator();
   runApp(const MyApp());

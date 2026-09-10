@@ -9,6 +9,9 @@ class AppTextField extends StatefulWidget {
   final VoidCallback? onTap;
   final bool readOnly;
   final TextInputType? keyboardType;
+  final String? Function(String?)? validator;
+  final TextInputAction? textInputAction;
+  final void Function(String)? onFieldSubmitted;
 
   const AppTextField({
     super.key,
@@ -19,6 +22,9 @@ class AppTextField extends StatefulWidget {
     this.onTap,
     this.readOnly = false,
     this.keyboardType,
+    this.validator,
+    this.textInputAction,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -30,11 +36,14 @@ class _AppTextFieldState extends State<AppTextField> {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
       controller: widget.controller,
       onTap: widget.onTap,
       readOnly: widget.readOnly,
       keyboardType: widget.keyboardType,
+      validator: widget.validator,
+      textInputAction: widget.textInputAction,
+      onFieldSubmitted: widget.onFieldSubmitted,
       obscureText: widget.isPassword ? obscure : false,
       decoration: InputDecoration(
         hintText: widget.hint,

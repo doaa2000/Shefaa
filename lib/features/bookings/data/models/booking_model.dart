@@ -1,16 +1,6 @@
 import 'package:shefaa_app/features/bookings/domain/entites/booking.dart';
-import 'package:shefaa_app/features/doctor_availability/data/models/doctor_availability_model.dart';
-import 'package:shefaa_app/features/payment/data/models/payment_model.dart';
-
-import 'package:shefaa_app/features/bookings/domain/entites/booking.dart';
 import 'package:shefaa_app/features/doctors/data/models/doctor_model.dart';
 import 'package:shefaa_app/features/payment/data/models/payment_model.dart';
-
-// booking_model.dart
-import 'package:shefaa_app/features/bookings/domain/entites/booking.dart';
-import 'package:shefaa_app/features/doctors/data/models/doctor_model.dart';
-import 'package:shefaa_app/features/payment/data/models/payment_model.dart';
-
 class BookingModel extends BookingEntity {
   BookingModel({
     required super.id,
@@ -24,9 +14,6 @@ class BookingModel extends BookingEntity {
   });
 
   factory BookingModel.fromMap(Map<String, dynamic> map) {
-    print('📦 booking: $map');
-  print('💳 payment: ${map['payments']}');
-  print('👨‍⚕️ doctor: ${map['doctor']}');
     return BookingModel(
       id:         map['id'] is String ? int.parse(map['id']) : map['id'],
       status:     map['status'],

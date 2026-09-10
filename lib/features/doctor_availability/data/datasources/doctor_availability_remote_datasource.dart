@@ -5,7 +5,7 @@ import 'package:shefaa_app/features/doctor_availability/data/models/doctor_detai
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class DoctorAvailabilityRemoteDatasource {
-  Future<DoctorDetailsModel> getDoctorAvailability(String doctorId, DateTime date);
+  Future<DoctorDetailsModel> getDoctorAvailability(int doctorId, DateTime date);
 }
 
 class DoctorAvailabilityRemoteDatasourceImpl
@@ -15,7 +15,7 @@ class DoctorAvailabilityRemoteDatasourceImpl
   DoctorAvailabilityRemoteDatasourceImpl(this.supabase);
 
   @override
-  Future<DoctorDetailsModel> getDoctorAvailability(String doctorId, DateTime date) async {
+  Future<DoctorDetailsModel> getDoctorAvailability(int doctorId, DateTime date) async {
     final String formattedDate = date.toIso8601String().split('T')[0]; // "2026-04-25"
 
     final data = await supabase

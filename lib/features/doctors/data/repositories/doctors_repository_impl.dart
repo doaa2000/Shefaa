@@ -12,7 +12,7 @@ class DoctorsRepositoryImpl implements DoctorsRepository {
 
   @override
   Future<Either<Failure, List<DoctorEntity>>> getDoctors(
-    String specialtyId,
+    int specialtyId,
   ) async {
     try {
       final doctors =

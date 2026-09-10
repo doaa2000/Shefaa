@@ -28,6 +28,7 @@ FutureOr<void> _getDoctorAvailability(
 ) async {
   emit(state.copyWith(
     getDoctorAvailabilityState: RequestState.loading,
+    doctorId: event.doctorId,
   ));
 
   final result = await getDoctorAvailabilityUsecase(
@@ -81,9 +82,20 @@ FutureOr<void> _onSelectDateEvent(
     selectedEveningSlotId: null,
   ));
 
+  // Not state.doctorDetails!.doctor.id: when the first load failed there are
+  // no details, and force-unwrapping crashed the screen on a date tap.
+  final doctorId = state.doctorId;
+  if (doctorId == null) {
+    emit(state.copyWith(
+      getSlotsState: RequestState.error,
+      errorMessage: 'لم يتم تحديد الطبيب',
+    ));
+    return;
+  }
+
   final result = await getDoctorAvailabilityUsecase(
     GetDoctorAvailabilityUsecaseParameters(
-      doctorId: state.doctorDetails!.doctor.id.toString(),
+      doctorId: doctorId,
       date: event.date,
     ),
   );

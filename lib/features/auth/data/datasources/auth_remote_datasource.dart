@@ -1,7 +1,4 @@
-import 'dart:developer';
-
 import 'package:dartz/dartz.dart';
-import 'package:flutter/foundation.dart';
 import 'package:shefaa_app/features/auth/data/models/user_model.dart';
 import 'package:shefaa_app/features/auth/domain/entities/user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -36,9 +33,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
     final user = response.user!;
     final session = response.session!;
-if (kDebugMode) {
-  log(session.accessToken);
-}    return UserModel(
+
+    return UserModel(
       id: user.id,
       email: user.email!,
       accessToken: session.accessToken,

@@ -25,7 +25,7 @@ class GetDoctorAvailabilityUsecase
 }
 
 class GetDoctorAvailabilityUsecaseParameters {
-  final String doctorId;
+  final int doctorId;
   final DateTime date;
 
   GetDoctorAvailabilityUsecaseParameters({required this.doctorId, required this.date});

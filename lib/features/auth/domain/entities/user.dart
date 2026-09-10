@@ -33,4 +33,14 @@ class UserEntity extends Equatable {
         accessToken,
         refreshToken,
       ];
+
+  /// Equatable stringifies every prop in debug builds, and CustomBlocObserver
+  /// logs each AuthState transition — which would put the access and refresh
+  /// tokens straight into the device log. Redact them here so no call site can
+  /// leak them by accident.
+  @override
+  String toString() => 'UserEntity(id: $id, email: $email, name: $name, '
+      'phone: $phone, gender: $gender, birthDate: $birthDate, '
+      'accessToken: ${accessToken == null ? 'null' : '<redacted>'}, '
+      'refreshToken: ${refreshToken == null ? 'null' : '<redacted>'})';
 }

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shefaa_app/core/enums/request_state.dart';
 import 'package:shefaa_app/core/utils/app_colors.dart';
 import 'package:shefaa_app/core/utils/app_text_styles.dart';
+import 'package:shefaa_app/features/doctors/data/models/doctors_args_model.dart';
 import 'package:shefaa_app/features/doctors/presentation/screens/doctors_screen.dart';
 import 'package:shefaa_app/features/home/presentation/bloc/home_bloc.dart';
 
@@ -47,7 +48,10 @@ class SpecialtiesGrid extends StatelessWidget {
                 Navigator.pushNamed(
                   context,
                   DoctorsScreen.routeName,
-                  arguments: specialty.id, 
+                  arguments: DoctorsArgsModel(
+                    specialtyId: specialty.id,
+                    specialtyName: specialty.name,
+                  ),
                 );
               },
               child: Container(

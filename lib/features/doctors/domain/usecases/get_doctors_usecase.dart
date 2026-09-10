@@ -19,7 +19,7 @@ class GetDoctorsUseCase
 }
 
 class GetDoctorsUsecaseParameters {
-  final String specialtyId;
+  final int specialtyId;
 
   GetDoctorsUsecaseParameters({required this.specialtyId});
 }
