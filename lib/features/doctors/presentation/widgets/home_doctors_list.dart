@@ -54,6 +54,14 @@ class HomeDoctorsList extends StatelessWidget {
           itemBuilder: (context, index) {
             final doctor = state.doctors[index];
 
+            void openSlots() {
+              Navigator.pushNamed(
+                context,
+                DoctorAvailabilityScreen.routeName,
+                arguments: DoctorAvailabilityArgsModel(doctorId: doctor.id),
+              );
+            }
+
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: DoctorCard(
@@ -66,17 +74,10 @@ class HomeDoctorsList extends StatelessWidget {
                 waitingTime: doctor.waitingTime != null
                     ? '${doctor.waitingTime} دقيقة'
                     : '—',
-                onTap: () {
-                  // F4 will put the doctor's own screen in between; until then
-                  // the card opens their slots directly.
-                  Navigator.pushNamed(
-                    context,
-                    DoctorAvailabilityScreen.routeName,
-                    arguments: DoctorAvailabilityArgsModel(
-                      doctorId: doctor.id,
-                    ),
-                  );
-                },
+                // Both go to the slots for now. Once F4 exists, tapping the
+                // card opens the doctor's page while the button still books.
+                onTap: openSlots,
+                onBookTap: openSlots,
               ),
             );
           },

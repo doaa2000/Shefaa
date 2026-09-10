@@ -3,7 +3,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:shefaa_app/core/utils/app_images.dart';
 import 'package:shefaa_app/core/utils/app_text_styles.dart';
 import 'package:shefaa_app/core/widgets/custom_mini_button.dart';
-import 'package:shefaa_app/features/doctor_availability/presentation/screens/doctor_availability_screen.dart';
 import 'package:shefaa_app/generated/l10n.dart';
 
 class DoctorCard extends StatelessWidget {
@@ -16,6 +15,11 @@ class DoctorCard extends StatelessWidget {
   final double rating;
   final VoidCallback? onTap;
 
+  /// What "احجز الآن" does. Required, because a card that cannot say which
+  /// doctor it shows must not be the thing deciding where the button goes --
+  /// that is how it ended up opening the slots screen with no doctor at all.
+  final VoidCallback onBookTap;
+
   const DoctorCard({
     super.key,
     required this.name,
@@ -23,6 +27,7 @@ class DoctorCard extends StatelessWidget {
     required this.imageUrl,
     this.rating = 4.5,
     this.onTap, required this.location, required this.consultationFee, required this.waitingTime,
+    required this.onBookTap,
   });
 
   @override
@@ -157,9 +162,7 @@ class DoctorCard extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: CustomMiniButton(
                 title: S.of(context).book_now,
-                onPressed: () {
-                  Navigator.pushNamed(context, DoctorAvailabilityScreen.routeName);
-                },
+                onPressed: onBookTap,
               ),
             ),
           ],
