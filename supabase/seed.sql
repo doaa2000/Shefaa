@@ -116,6 +116,44 @@ where d.status = 'active'
   and extract(dow from day) <> 5             -- 5 = Friday
 on conflict (doctor_id, date, start_time) do nothing;
 
+-- ---------- Weekly schedules -------------------------------------------------
+-- The pattern each doctor works, from which availability is computed for any
+-- date (see doctor_sessions_on). Capacities differ by what the specialty
+-- actually does in a session: a dentist's list carries scalings and fillings,
+-- a paediatrician's does not.
+--
+-- weekday: 0 = Sunday .. 6 = Saturday. Fridays are left out.
+insert into public.doctor_schedule (doctor_id, weekday, session, start_time, end_time, capacity)
+select d.doctor_id, w.weekday, d.session, d.start_time, d.end_time, d.capacity
+from (values
+  --  id, session,   from,    to,      cap, days
+  (1,  'evening', '17:00'::time, '21:00'::time, 12, array[0,2,4]),  -- قلب
+  (2,  'evening', '16:00'::time, '20:00'::time, 20, array[1,3]),    -- جلدية
+  (3,  'morning', '09:00'::time, '13:00'::time, 25, array[0,1,2,3]),-- أطفال
+  (4,  'evening', '17:00'::time, '21:00'::time, 16, array[2,4,6]),  -- عظام
+  (5,  'evening', '17:00'::time, '21:00'::time,  8, array[0,2,4]),  -- أسنان
+  (6,  'evening', '18:00'::time, '21:00'::time, 12, array[1,3]),    -- مخ وأعصاب
+  (7,  'morning', '10:00'::time, '14:00'::time, 14, array[0,2,4]),  -- نساء
+  (8,  'evening', '16:00'::time, '20:00'::time, 20, array[1,3,6]),  -- عيون
+  (9,  'evening', '17:00'::time, '21:00'::time, 20, array[0,2,4]),  -- أنف وأذن
+  (10, 'evening', '18:00'::time, '21:00'::time,  6, array[1,3]),    -- نفسي
+  (11, 'morning', '09:00'::time, '13:00'::time, 20, array[2,4]),    -- جلدية
+  (12, 'evening', '17:00'::time, '21:00'::time, 12, array[1,3,6]),  -- قلب
+  (13, 'evening', '16:00'::time, '20:00'::time, 14, array[0,2]),    -- نساء
+  (14, 'morning', '09:00'::time, '13:00'::time, 16, array[1,3,6])   -- عظام
+) as d(doctor_id, session, start_time, end_time, capacity, days)
+cross join lateral unnest(d.days) as w(weekday)
+where exists (select 1 from public."Doctors" doc where doc.id = d.doctor_id)
+on conflict (doctor_id, weekday, session) do nothing;
+
+-- A second, morning list for the two busiest general specialties.
+insert into public.doctor_schedule (doctor_id, weekday, session, start_time, end_time, capacity)
+select d.doctor_id, w.weekday, 'morning', '09:00'::time, '12:00'::time, d.capacity
+from (values (3, 20, array[4]), (9, 15, array[1,3])) as d(doctor_id, capacity, days)
+cross join lateral unnest(d.days) as w(weekday)
+where exists (select 1 from public."Doctors" doc where doc.id = d.doctor_id)
+on conflict (doctor_id, weekday, session) do nothing;
+
 -- ---------- Re-sync the identity sequences -----------------------------------
 -- Explicit ids above bypass the sequences; without this the next INSERT that
 -- relies on the default would collide with an id we just used.
