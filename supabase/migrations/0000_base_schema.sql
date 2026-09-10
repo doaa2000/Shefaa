@@ -191,3 +191,25 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
+
+-- -----------------------------------------------------------------------------
+-- Table privileges for the Supabase roles.
+--
+-- RLS decides which rows a role sees; GRANT decides whether it may read the
+-- table at all. Without this every app query fails with 42501, whatever the
+-- policies say. Not `grant all`: that includes TRUNCATE, which ignores RLS.
+-- -----------------------------------------------------------------------------
+grant usage on schema public to anon, authenticated, service_role;
+grant select, insert, update, delete on all tables in schema public to authenticated;
+grant select on all tables in schema public to anon;
+grant all on all tables in schema public to service_role;
+grant usage, select on all sequences in schema public to anon, authenticated, service_role;
+
+alter default privileges in schema public
+  grant select, insert, update, delete on tables to authenticated;
+alter default privileges in schema public
+  grant select on tables to anon;
+alter default privileges in schema public
+  grant all on tables to service_role;
+alter default privileges in schema public
+  grant usage, select on sequences to anon, authenticated, service_role;
