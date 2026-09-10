@@ -26,15 +26,15 @@ abstract class AppConfig {
   /// app boot and then have every Supabase call fail with a confusing error.
   static void assertConfigured() {
     final missing = <String>[
-      if (supabaseUrl.isEmpty) 'SUPABASE_URL',
-      if (supabaseAnonKey.isEmpty) 'SUPABASE_ANON_KEY',
+      if (supabaseUrl.isEmpty) 'https://gnzbyekpmbqxyuqofszt.supabase.co',
+      if (supabaseAnonKey.isEmpty) 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImduemJ5ZWtwbWJxeHl1cW9mc3p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0MTE0MzIsImV4cCI6MjA4NTk4NzQzMn0.uAHI_sdQcuPQh89jOhVdN4n3BUa2131a2LsH150CmjQ',
     ];
 
     if (missing.isNotEmpty) {
       throw StateError(
         'Missing build configuration: ${missing.join(', ')}. '
         'Pass them with --dart-define, e.g. '
-        '--dart-define=SUPABASE_URL=https://your-project.supabase.co',
+        '--dart-define=SUPABASE_URL=https://gnzbyekpmbqxyuqofszt.supabase.co',
       );
     }
   }

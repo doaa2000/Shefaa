@@ -5,7 +5,7 @@
 --
 -- GENERATED FILE — do not edit. Run ./scripts/build-restore.sh instead.
 -- Sources:
---   supabase/migrations/0000_base_schema.sql
+--   supabase/migrations/*.sql   (in order)
 --   supabase/seed.sql
 --   ../Shefaa_Admin_Panel/supabase/migrations/002_fix_rls_policies.sql
 --
@@ -14,6 +14,8 @@
 -- =============================================================================
 
 -- ############## 1 of 3 — SCHEMA ##############
+
+-- ---- 0000_base_schema.sql ----
 -- =============================================================================
 -- Shefaa — Base schema for the patient app.
 --
@@ -184,6 +186,20 @@ create table if not exists public.admins (
   created_at timestamptz not null default now()
 );
 
+-- Admin status comes from membership in public.admins and nothing else.
+-- SECURITY DEFINER so the lookup is not itself filtered by admins' own RLS.
+-- Defined here, with the table, because migrations that add policies depend on
+-- it -- 0004 referenced it before the RLS migration had created it.
+create or replace function public.is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (select 1 from public.admins where id = auth.uid());
+$$;
+
 -- -----------------------------------------------------------------------------
 -- Keep a profile row in step with every auth user, so a signup can never end up
 -- with an auth account but no profile (the app currently inserts the profile
@@ -229,6 +245,304 @@ alter default privileges in schema public
   grant all on tables to service_role;
 alter default privileges in schema public
   grant usage, select on sequences to anon, authenticated, service_role;
+
+-- ---- 0002_allow_no_show_status.sql ----
+-- =============================================================================
+-- Allow 'no_show' on bookings.status.
+--
+-- The doctor dashboard offers "No show" as a status (its appointment.labels.ts
+-- lists it alongside completed/cancelled) and calls updateStatus with it, but
+-- the CHECK constraint in 0000_base_schema.sql did not permit the value, so the
+-- action would have failed against the database with a constraint violation.
+--
+-- The distinction also matters for revenue: commission is owed on a visit that
+-- happened, and a booking the patient never showed up for is not that. Without
+-- a separate value both collapse into 'cancelled' and the history needed to
+-- bill a clinic later is lost.
+--
+-- Run this only if you already applied 0000_base_schema.sql. Fresh installs
+-- pick the value up from the corrected 0000.
+-- =============================================================================
+
+alter table public.bookings drop constraint if exists bookings_status_check;
+
+alter table public.bookings add constraint bookings_status_check
+  check (status in ('pending', 'confirmed', 'completed', 'cancelled', 'no_show'));
+
+-- ---- 0003_grant_table_privileges.sql ----
+-- =============================================================================
+-- Grant table privileges to the Supabase roles.
+--
+-- PostgreSQL checks permissions in two layers:
+--
+--   1. GRANT       — may this role touch the table at all?
+--   2. RLS policy  — which rows may it see or change?
+--
+-- 0000_base_schema.sql and 002_fix_rls_policies.sql set up layer 2 and left
+-- layer 1 entirely to Supabase's default privileges. When those defaults do
+-- not apply -- as happened here after the tables were dropped and recreated --
+-- every query from the app fails with:
+--
+--   PostgrestException(message: permission denied for table specialties,
+--                      code: 42501)
+--
+-- Note the difference in symptom: a row blocked by RLS comes back as an empty
+-- result, never as an error. A 42501 is always a missing GRANT.
+--
+-- Safe to re-run.
+-- =============================================================================
+
+grant usage on schema public to anon, authenticated, service_role;
+
+-- SELECT/INSERT/UPDATE/DELETE only -- deliberately NOT `grant all`, which
+-- would include TRUNCATE. TRUNCATE is not subject to row level security, so
+-- granting it would let any signed-in patient empty a table outright no matter
+-- what the policies say.
+grant select, insert, update, delete
+  on all tables in schema public
+  to authenticated;
+
+grant select on all tables in schema public to anon;
+
+-- Identity columns do not need this, but any serial column added later would.
+grant usage, select on all sequences in schema public to anon, authenticated, service_role;
+
+-- service_role runs behind the API and bypasses RLS by design; it is the role
+-- an Edge Function uses to create a booking and its payment server-side.
+grant all on all tables in schema public to service_role;
+
+-- The same, for tables added from here on, so a new table is never invisible
+-- to the app for this reason again.
+alter default privileges in schema public
+  grant select, insert, update, delete on tables to authenticated;
+
+alter default privileges in schema public
+  grant select on tables to anon;
+
+alter default privileges in schema public
+  grant all on tables to service_role;
+
+alter default privileges in schema public
+  grant usage, select on sequences to anon, authenticated, service_role;
+
+-- ---- 0004_doctor_schedule.sql ----
+-- =============================================================================
+-- Weekly schedules, replacing the per-date availability rows.
+--
+-- doctor_availability stored one row per concrete date and time, so somebody
+-- had to keep inserting rows forever. The seed generated 14 days; on day 15
+-- every doctor would have shown no availability and the app would have said
+-- "no slots" as though that were normal.
+--
+-- A doctor's working week is a pattern, so it is stored as one. Availability
+-- for any date is computed from that pattern, which means it never expires and
+-- changing the pattern needs no regeneration.
+--
+-- doctor_availability is NOT dropped here: the app still reads it. It goes when
+-- the screens move over.
+-- =============================================================================
+
+-- -----------------------------------------------------------------------------
+-- The weekly pattern. 2-6 rows per doctor instead of thousands.
+-- -----------------------------------------------------------------------------
+create table if not exists public.doctor_schedule (
+  id         bigint generated by default as identity primary key,
+  doctor_id  bigint not null references public."Doctors" (id) on delete cascade,
+  weekday    smallint not null check (weekday between 0 and 6),  -- 0 = Sunday, matching extract(dow)
+  session    text not null check (session in ('morning', 'evening')),
+  start_time time not null,
+  end_time   time not null,
+
+  -- How many patients the doctor takes in this session. Entered directly
+  -- rather than derived from an average visit length: a dentist whose list
+  -- mixes a 10-minute check with a 45-minute scaling knows their own number,
+  -- and any average we computed would be worse than their estimate.
+  capacity   integer not null check (capacity > 0),
+
+  is_active  boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint doctor_schedule_time_order check (end_time > start_time),
+  unique (doctor_id, weekday, session)
+);
+
+create index if not exists doctor_schedule_lookup_idx
+  on public.doctor_schedule (doctor_id, weekday) where is_active;
+
+-- -----------------------------------------------------------------------------
+-- Exceptions: a holiday, or one day that runs differently.
+--
+-- session null  -> the whole day
+-- is_closed     -> no clinic
+-- capacity/times-> override just those, keeping the rest of the pattern
+--
+-- Known limit (accepted for v1): an exception adjusts a session the weekly
+-- pattern already has. It cannot add a session on a weekday the doctor does
+-- not normally work -- to open an extra Friday clinic, add Friday to the
+-- pattern and remove it afterwards.
+-- -----------------------------------------------------------------------------
+create table if not exists public.doctor_schedule_exceptions (
+  id         bigint generated by default as identity primary key,
+  doctor_id  bigint not null references public."Doctors" (id) on delete cascade,
+  date       date not null,
+  session    text check (session in ('morning', 'evening')),
+  is_closed  boolean not null default true,
+  start_time time,
+  end_time   time,
+  capacity   integer check (capacity > 0),
+  reason     text,
+  created_at timestamptz not null default now(),
+  constraint doctor_exception_time_order
+    check (start_time is null or end_time is null or end_time > start_time),
+  unique (doctor_id, date, session)
+);
+
+create index if not exists doctor_schedule_exceptions_lookup_idx
+  on public.doctor_schedule_exceptions (doctor_id, date);
+
+-- -----------------------------------------------------------------------------
+-- bookings: a booking now belongs to a session, not to a 30-minute slot.
+--
+-- start_time/end_time are kept as a snapshot of the session window at the time
+-- of booking, so a later change to the schedule does not rewrite history.
+-- -----------------------------------------------------------------------------
+alter table public.bookings
+  add column if not exists session text
+    check (session is null or session in ('morning', 'evening'));
+
+-- The old index assumed one patient per (doctor, date, start_time). Under the
+-- queue model everyone in a session shares the same window, so it would reject
+-- the second booking of every session.
+drop index if exists public.bookings_no_double_booking;
+
+-- What actually needs preventing now: the same patient taking two places in
+-- one session. Capacity is enforced when booking, against doctor_sessions_on.
+create unique index if not exists bookings_one_place_per_session
+  on public.bookings (doctor_id, patient_id, booked_date, session)
+  where status <> 'cancelled';
+
+create index if not exists bookings_session_queue_idx
+  on public.bookings (doctor_id, booked_date, session, created_at)
+  where status <> 'cancelled';
+
+-- -----------------------------------------------------------------------------
+-- What is available for one doctor on one date, after exceptions and bookings.
+-- -----------------------------------------------------------------------------
+create or replace function public.doctor_sessions_on(p_doctor bigint, p_date date)
+returns table (
+  session    text,
+  start_time time,
+  end_time   time,
+  capacity   integer,
+  booked     bigint,
+  remaining  integer
+)
+language sql
+stable
+security invoker
+set search_path = public
+as $$
+  with base as (
+    select s.session, s.start_time, s.end_time, s.capacity
+    from public.doctor_schedule s
+    where s.doctor_id = p_doctor
+      and s.weekday = extract(dow from p_date)::smallint
+      and s.is_active
+  ),
+  applied as (
+    select
+      b.session,
+      coalesce(ex.start_time, b.start_time) as start_time,
+      coalesce(ex.end_time,   b.end_time)   as end_time,
+      coalesce(ex.capacity,   b.capacity)   as capacity,
+      -- a whole-day exception wins over a per-session one
+      coalesce(day_ex.is_closed, ex.is_closed, false) as closed
+    from base b
+    left join public.doctor_schedule_exceptions ex
+      on ex.doctor_id = p_doctor and ex.date = p_date and ex.session = b.session
+    left join public.doctor_schedule_exceptions day_ex
+      on day_ex.doctor_id = p_doctor and day_ex.date = p_date and day_ex.session is null
+  )
+  select
+    a.session, a.start_time, a.end_time, a.capacity,
+    count(bk.id) as booked,
+    greatest(a.capacity - count(bk.id), 0)::integer as remaining
+  from applied a
+  left join public.bookings bk
+    on  bk.doctor_id   = p_doctor
+    and bk.booked_date = p_date
+    and bk.session     = a.session
+    and bk.status <> 'cancelled'
+  where not a.closed
+  group by a.session, a.start_time, a.end_time, a.capacity
+  order by a.start_time;
+$$;
+
+-- -----------------------------------------------------------------------------
+-- Queue position, computed rather than stored.
+--
+-- Stored numbers would need rewriting for everyone behind a cancellation, and
+-- would race when two patients book at the same moment. Computed, a cancelled
+-- booking simply drops out and the numbers behind it close up -- which is the
+-- promise the patient is shown: your number can improve, never get worse.
+-- -----------------------------------------------------------------------------
+create or replace view public.booking_queue as
+  select
+    b.id as booking_id,
+    b.doctor_id,
+    b.patient_id,
+    b.booked_date,
+    b.session,
+    b.status,
+    row_number() over (
+      partition by b.doctor_id, b.booked_date, b.session
+      order by b.created_at, b.id
+    )::integer as queue_number
+  from public.bookings b
+  where b.status <> 'cancelled';
+
+-- -----------------------------------------------------------------------------
+-- Row level security and grants.
+--
+-- Both, deliberately: policies without grants produce 42501 and are
+-- unreachable, which is exactly how the last round broke.
+-- -----------------------------------------------------------------------------
+alter table public.doctor_schedule            enable row level security;
+alter table public.doctor_schedule_exceptions enable row level security;
+
+do $$
+declare tbl text;
+begin
+  foreach tbl in array array['doctor_schedule', 'doctor_schedule_exceptions']
+  loop
+    -- every signed-in user may read: this is what the app shows as availability
+    execute format('drop policy if exists sched_read_all on public.%I;', tbl);
+    execute format(
+      'create policy sched_read_all on public.%I
+         for select to authenticated using (true);', tbl);
+
+    -- only an admin may write, until doctors have accounts of their own;
+    -- a doctor-owns-their-schedule policy lands with doctor login
+    execute format('drop policy if exists sched_admin_write on public.%I;', tbl);
+    execute format(
+      'create policy sched_admin_write on public.%I
+         for all to authenticated
+         using (public.is_admin()) with check (public.is_admin());', tbl);
+  end loop;
+end $$;
+
+grant select, insert, update, delete
+  on public.doctor_schedule, public.doctor_schedule_exceptions
+  to authenticated;
+grant select on public.doctor_schedule, public.doctor_schedule_exceptions to anon;
+grant all on public.doctor_schedule, public.doctor_schedule_exceptions to service_role;
+grant usage, select on all sequences in schema public to anon, authenticated, service_role;
+
+grant select on public.booking_queue to authenticated, anon, service_role;
+
+revoke execute on function public.doctor_sessions_on(bigint, date) from public;
+grant execute on function public.doctor_sessions_on(bigint, date)
+  to anon, authenticated, service_role;
 
 -- ############## 2 of 3 — REFERENCE DATA ##############
 -- =============================================================================
@@ -348,6 +662,44 @@ cross join (
 where d.status = 'active'
   and extract(dow from day) <> 5             -- 5 = Friday
 on conflict (doctor_id, date, start_time) do nothing;
+
+-- ---------- Weekly schedules -------------------------------------------------
+-- The pattern each doctor works, from which availability is computed for any
+-- date (see doctor_sessions_on). Capacities differ by what the specialty
+-- actually does in a session: a dentist's list carries scalings and fillings,
+-- a paediatrician's does not.
+--
+-- weekday: 0 = Sunday .. 6 = Saturday. Fridays are left out.
+insert into public.doctor_schedule (doctor_id, weekday, session, start_time, end_time, capacity)
+select d.doctor_id, w.weekday, d.session, d.start_time, d.end_time, d.capacity
+from (values
+  --  id, session,   from,    to,      cap, days
+  (1,  'evening', '17:00'::time, '21:00'::time, 12, array[0,2,4]),  -- قلب
+  (2,  'evening', '16:00'::time, '20:00'::time, 20, array[1,3]),    -- جلدية
+  (3,  'morning', '09:00'::time, '13:00'::time, 25, array[0,1,2,3]),-- أطفال
+  (4,  'evening', '17:00'::time, '21:00'::time, 16, array[2,4,6]),  -- عظام
+  (5,  'evening', '17:00'::time, '21:00'::time,  8, array[0,2,4]),  -- أسنان
+  (6,  'evening', '18:00'::time, '21:00'::time, 12, array[1,3]),    -- مخ وأعصاب
+  (7,  'morning', '10:00'::time, '14:00'::time, 14, array[0,2,4]),  -- نساء
+  (8,  'evening', '16:00'::time, '20:00'::time, 20, array[1,3,6]),  -- عيون
+  (9,  'evening', '17:00'::time, '21:00'::time, 20, array[0,2,4]),  -- أنف وأذن
+  (10, 'evening', '18:00'::time, '21:00'::time,  6, array[1,3]),    -- نفسي
+  (11, 'morning', '09:00'::time, '13:00'::time, 20, array[2,4]),    -- جلدية
+  (12, 'evening', '17:00'::time, '21:00'::time, 12, array[1,3,6]),  -- قلب
+  (13, 'evening', '16:00'::time, '20:00'::time, 14, array[0,2]),    -- نساء
+  (14, 'morning', '09:00'::time, '13:00'::time, 16, array[1,3,6])   -- عظام
+) as d(doctor_id, session, start_time, end_time, capacity, days)
+cross join lateral unnest(d.days) as w(weekday)
+where exists (select 1 from public."Doctors" doc where doc.id = d.doctor_id)
+on conflict (doctor_id, weekday, session) do nothing;
+
+-- A second, morning list for the two busiest general specialties.
+insert into public.doctor_schedule (doctor_id, weekday, session, start_time, end_time, capacity)
+select d.doctor_id, w.weekday, 'morning', '09:00'::time, '12:00'::time, d.capacity
+from (values (3, 20, array[4]), (9, 15, array[1,3])) as d(doctor_id, capacity, days)
+cross join lateral unnest(d.days) as w(weekday)
+where exists (select 1 from public."Doctors" doc where doc.id = d.doctor_id)
+on conflict (doctor_id, weekday, session) do nothing;
 
 -- ---------- Re-sync the identity sequences -----------------------------------
 -- Explicit ids above bypass the sequences; without this the next INSERT that

@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "shefaa_app (dev)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define-from-file=dart_defines.dev.json"
+      ]
+    },
+    {
+      "name": "shefaa_app (dev, profile mode)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "flutterMode": "profile",
+      "args": [
+        "--dart-define-from-file=dart_defines.dev.json"
+      ]
+    }
+  ]
+}

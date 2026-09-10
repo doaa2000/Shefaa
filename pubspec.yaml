@@ -69,13 +69,10 @@ dependencies:
 
 
 dev_dependencies:
-  appsflyer_sdk: ^6.17.7+1
-  device_preview: ^1.2.0
   device_user_agent: ^0.1.2
   dio: ^5.7.0
   firebase_core: ^4.1.0
   firebase_messaging: ^16.0.1
-  firebase_remote_config: ^6.0.1
   flutter_dotenv: ^6.0.0
   flutter_launcher_icons: ^0.14.3
   flutter_lints: ^6.0.0
