@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shefaa_app/core/helper_functions/on_generate_route.dart';
 import 'package:shefaa_app/core/services/custom_bloc_observer.dart';
+import 'package:shefaa_app/core/services/secure_storage_service.dart';
 import 'package:shefaa_app/core/services/service_locator.dart';
+import 'package:shefaa_app/core/utils/app_router.dart';
 import 'package:shefaa_app/core/utils/app_colors.dart';
 import 'package:shefaa_app/core/utils/app_config.dart';
 import 'package:shefaa_app/features/auth/presentation/bloc/auth_bloc.dart';
@@ -27,14 +31,62 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final _navigatorKey = GlobalKey<NavigatorState>();
+  StreamSubscription<dynamic>? _authSubscription;
+
+  /// The auth stream replays its last event to a new listener, so the first
+  /// thing we hear is whatever Supabase restored at startup. The splash screen
+  /// owns that decision -- and may still recover a session from our own refresh
+  /// token -- so this must not act on it, least of all by clearing the tokens
+  /// the splash is about to try.
+  var _sawStartupEvent = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // When the session goes away while the app is open -- signed out, or a
+    // refresh token that no longer works -- every query silently starts coming
+    // back empty, because row level security answers `anon` with zero rows
+    // instead of an error. Leave the signed-in screens rather than let the
+    // patient stare at a home screen with no doctors on it.
+    _authSubscription =
+        Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+      if (!_sawStartupEvent) {
+        _sawStartupEvent = true;
+        return;
+      }
+
+      if (data.session != null) return;
+
+      unawaited(getIt<SecureStorageService>().clearTokens());
+
+      final navigator = _navigatorKey.currentState;
+      if (navigator == null) return;
+      navigator.pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+    });
+  }
+
+  @override
+  void dispose() {
+    _authSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => getIt<AuthBloc>(),
       child: MaterialApp(
+        navigatorKey: _navigatorKey,
         title: 'Shefaa App',
         debugShowCheckedModeBanner: false,
         localizationsDelegates: const [
