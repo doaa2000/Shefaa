@@ -12,16 +12,28 @@ import 'package:shefaa_app/features/location/presentation/screens/location_scree
 import 'package:shefaa_app/features/payment/presentation/screens/payment_screen.dart';
 import 'package:shefaa_app/features/profile/presentation/screens/update_profile_screen.dart';
 
+// Every route is built with `settings` so it keeps its name. Without that a
+// route is anonymous, and code that asks the navigator which screen is on top
+// -- the session guard in main.dart, for one -- cannot tell.
 Route<dynamic> onGenerateRoute(RouteSettings settings) {
   switch (settings.name) {
     case LoginScreen.routeName:
-      return MaterialPageRoute(builder: (context) => const LoginScreen());
+      return MaterialPageRoute(
+        builder: (context) => const LoginScreen(),
+        settings: settings,
+      );
 
     case RegisterScreen.routeName:
-      return MaterialPageRoute(builder: (context) => const RegisterScreen());
+      return MaterialPageRoute(
+        builder: (context) => const RegisterScreen(),
+        settings: settings,
+      );
 
     case LocationScreen.routeName:
-      return MaterialPageRoute(builder: (context) => const LocationScreen());
+      return MaterialPageRoute(
+        builder: (context) => const LocationScreen(),
+        settings: settings,
+      );
 
     case HomeScreen.routeName:
       // An int argument selects the tab to land on, so a flow that ends
@@ -50,6 +62,7 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case UpdateProfileScreen.routeName:
       return MaterialPageRoute(
         builder: (context) => const UpdateProfileScreen(),
+        settings: settings,
       );
 
     case DoctorAvailabilityScreen.routeName:
