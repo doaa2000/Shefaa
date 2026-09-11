@@ -45,10 +45,7 @@ Future<void> _login(LoginEvent event, Emitter<AuthState> emit) async {
       );
     },
     (user) async {
-      await secureStorageService.saveTokens(
-        accessToken: user.accessToken!,
-        refreshToken: user.refreshToken!,
-      );
+      await _persistTokens(user);
 
       emit(
         state.copyWith(
@@ -74,8 +71,8 @@ Future<void> _login(LoginEvent event, Emitter<AuthState> emit) async {
       ),
     );
 
-    result.fold(
-      (failure) {
+    await result.fold(
+      (failure) async {
         emit(
           state.copyWith(
             registerState: RequestState.error,
@@ -83,7 +80,12 @@ Future<void> _login(LoginEvent event, Emitter<AuthState> emit) async {
           ),
         );
       },
-      (user) {
+      (user) async {
+        // Registering signs the patient in, so it has to leave the same trail
+        // login does. It did not, so the token in storage stayed the previous
+        // account's -- and the splash screen trusted it.
+        await _persistTokens(user);
+
         emit(state.copyWith(registerState: RequestState.loaded, user: user));
       },
     );
@@ -94,6 +96,26 @@ Future<void> _login(LoginEvent event, Emitter<AuthState> emit) async {
 
   FutureOr<void> _logout(LogoutEvent event, Emitter<AuthState> emit)async {
     await logoutUseCase(NoParameters());
+
+    // Signing out of Supabase is not enough on its own: the splash screen
+    // reads these, and a token left behind here sent the next launch to the
+    // home screen with no session behind it.
+    await secureStorageService.clearTokens();
+
     emit(state.copyWith(logoutState: RequestState.loaded));
+  }
+
+  /// Stores the tokens of a session we just obtained. A user without them is
+  /// not something to crash on -- it means there is no session to remember,
+  /// and the splash screen will send them to the login screen.
+  Future<void> _persistTokens(UserEntity user) async {
+    final accessToken = user.accessToken;
+    final refreshToken = user.refreshToken;
+    if (accessToken == null || refreshToken == null) return;
+
+    await secureStorageService.saveTokens(
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    );
   }
 }
