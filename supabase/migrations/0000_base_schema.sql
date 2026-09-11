@@ -74,8 +74,23 @@ create table if not exists public."Doctors" (
   consultation_fee numeric(10,2) not null default 0 check (consultation_fee >= 0),
   waiting_time     integer check (waiting_time >= 0),
   status           text not null default 'active',
-  created_at       timestamptz not null default now()
+
+  -- The other two apps depend on these: the admin panel writes email, and the
+  -- doctor dashboard finds the signed-in doctor through user_id. Reconstructing
+  -- this table from the Flutter models alone left them out.
+  email            text,
+  user_id          uuid references auth.users (id) on delete set null,
+  phone            text,
+  bio              text,
+  license_number   text,
+  created_at       timestamptz not null default now(),
+  updated_at       timestamptz not null default now()
 );
+
+create unique index if not exists doctors_user_id_key
+  on public."Doctors" (user_id) where user_id is not null;
+create unique index if not exists doctors_email_key
+  on public."Doctors" (lower(email)) where email is not null;
 
 create index if not exists doctors_specialty_idx on public."Doctors" (specialty_id);
 create index if not exists doctors_clinic_idx    on public."Doctors" (clinic_id);
