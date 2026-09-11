@@ -23,7 +23,15 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (context) => const LocationScreen());
 
     case HomeScreen.routeName:
-      return MaterialPageRoute(builder: (context) => const HomeScreen());
+      // An int argument selects the tab to land on, so a flow that ends
+      // somewhere specific can say where.
+      final tab = settings.arguments is int
+          ? settings.arguments as int
+          : HomeScreen.homeTab;
+      return MaterialPageRoute(
+        builder: (context) => HomeScreen(initialTab: tab),
+        settings: settings,
+      );
 
     case DoctorsScreen.routeName:
       // The screen cannot render without knowing which specialty it lists, so

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shefaa_app/core/services/service_locator.dart';
+import 'package:shefaa_app/core/utils/app_router.dart';
 import 'package:shefaa_app/core/widgets/custom_app_bar.dart';
 import 'package:shefaa_app/features/bookings/presentation/screens/bookings_screen.dart';
 import 'package:shefaa_app/features/home/presentation/bloc/home_bloc.dart';
@@ -11,9 +12,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shefaa_app/features/profile/presentation/screens/profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, this.initialTab = homeTab});
 
-  static const String routeName = "/home";
+  /// Which tab to open on. Confirming a booking sends the patient straight to
+  /// [bookingsTab]; without this the screen always opened on the home tab and
+  /// the "حجوزاتي" button appeared to do nothing.
+  final int initialTab;
+
+  static const int homeTab = 0;
+  static const int bookingsTab = 1;
+  static const int profileTab = 2;
+
+  static const String routeName = AppRoutes.home;
+
   List<Widget> _pages(BuildContext context) {
     return [
       HomePageWidget(),
@@ -25,7 +36,9 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => getIt  <HomeBloc>()..add(GetSpecialtiesEvent()),
+      create: (_) => getIt<HomeBloc>()
+        ..add(GetSpecialtiesEvent())
+        ..add(HomePageChanged(initialTab)),
       child: BlocBuilder<HomeBloc, HomeState>(
         builder: (context, state) {
           final pages = _pages(context);
