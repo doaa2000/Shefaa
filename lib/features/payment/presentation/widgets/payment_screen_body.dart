@@ -128,7 +128,13 @@ class PaymentScreenBody extends StatelessWidget {
             listenWhen: (p, c) => p.createBookingState != c.createBookingState,
             listener: (context, state) {
               if (state.createBookingState == RequestState.loaded) {
-                _showSuccess(context, args);
+                // The number the database assigned, not the one predicted on
+                // the session card before anyone else had committed.
+                _showSuccess(
+                  context,
+                  args,
+                  state.bookedQueueNumber ?? args.queueNumber,
+                );
               }
               if (state.createBookingState == RequestState.error) {
                 ScaffoldMessenger.of(context)
@@ -170,7 +176,11 @@ class PaymentScreenBody extends StatelessWidget {
   /// doing nothing. The whole stack is replaced instead, so back does not lead
   /// into a payment flow that is already finished, and BookingsScreen re-reads
   /// on open so the new booking is there.
-  void _showSuccess(BuildContext context, PaymentArgsModel args) {
+  void _showSuccess(
+    BuildContext context,
+    PaymentArgsModel args,
+    int queueNumber,
+  ) {
     showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -204,7 +214,7 @@ class PaymentScreenBody extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                'دورك رقم ${args.queueNumber}',
+                'دورك رقم $queueNumber',
                 style: TextStyles.bold18.copyWith(color: AppColors.primaryColor),
               ),
             ),

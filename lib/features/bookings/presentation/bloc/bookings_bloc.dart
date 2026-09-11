@@ -46,7 +46,10 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         createBookingState: RequestState.error,
         errorMessage: failure.message,
       )),
-      (_) => emit(state.copyWith(createBookingState: RequestState.loaded)),
+      (queueNumber) => emit(state.copyWith(
+        createBookingState: RequestState.loaded,
+        bookedQueueNumber: queueNumber,
+      )),
     );
   }
 
