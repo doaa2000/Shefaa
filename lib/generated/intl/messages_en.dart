@@ -55,6 +55,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "email_invalid_error": MessageLookupByLibrary.simpleMessage(
       "Enter a valid email address",
     ),
+    "email_locked_note": MessageLookupByLibrary.simpleMessage("Your email is tied to your account and can't be changed here"),
     "email_required_error": MessageLookupByLibrary.simpleMessage(
       "Email is required",
     ),
@@ -96,6 +97,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Phone number is required",
     ),
     "profile": MessageLookupByLibrary.simpleMessage("Profile"),
+    "profile_updated_success": MessageLookupByLibrary.simpleMessage("Changes saved successfully"),
     "save_changes": MessageLookupByLibrary.simpleMessage("Save Changes"),
     "search": MessageLookupByLibrary.simpleMessage("Search"),
     "select_appointment": MessageLookupByLibrary.simpleMessage(

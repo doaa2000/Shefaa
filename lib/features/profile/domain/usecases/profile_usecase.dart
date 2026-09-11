@@ -23,3 +23,27 @@ class GetProfileUseCaseParams {
 
   GetProfileUseCaseParams({required this.userId});
 }
+
+class UpdateProfileUseCase
+    extends BaseUsecase<UserEntity, UpdateProfileUseCaseParams> {
+  final ProfileRepository profileRepository;
+
+  UpdateProfileUseCase(this.profileRepository);
+
+  @override
+  Future<Either<Failure, UserEntity>> call(
+    UpdateProfileUseCaseParams params,
+  ) async {
+    return await profileRepository.updateProfile(
+      user: params.user,
+      newPassword: params.newPassword,
+    );
+  }
+}
+
+class UpdateProfileUseCaseParams {
+  final UserEntity user;
+  final String? newPassword;
+
+  UpdateProfileUseCaseParams({required this.user, this.newPassword});
+}

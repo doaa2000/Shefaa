@@ -574,6 +574,26 @@ class S {
       args: [],
     );
   }
+
+  /// `Your email is tied to your account and can\'t be changed here`
+  String get email_locked_note {
+    return Intl.message(
+      'Your email is tied to your account and can\'t be changed here',
+      name: 'email_locked_note',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Changes saved successfully`
+  String get profile_updated_success {
+    return Intl.message(
+      'Changes saved successfully',
+      name: 'profile_updated_success',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

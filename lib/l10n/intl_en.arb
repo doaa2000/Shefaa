@@ -68,35 +68,8 @@
   "confirm_new_password": "Confirm New Password",
   "passwords_not_match": "Passwords do not match",
 
-  "save_changes": "Save Changes"
+  "save_changes": "Save Changes",
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  "email_locked_note": "Your email is tied to your account and can't be changed here",
+  "profile_updated_success": "Changes saved successfully"
 }

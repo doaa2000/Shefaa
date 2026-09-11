@@ -13,6 +13,7 @@ class ProfileTextField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.textInputAction = TextInputAction.next,
     this.obscureText = false,
+    this.readOnly = false,
     this.suffixIcon,
     this.validator,
     super.key,
@@ -25,6 +26,7 @@ class ProfileTextField extends StatelessWidget {
   final TextInputType keyboardType;
   final TextInputAction textInputAction;
   final bool obscureText;
+  final bool readOnly;
   final Widget? suffixIcon;
   final String? Function(String?)? validator;
 
@@ -43,6 +45,7 @@ class ProfileTextField extends StatelessWidget {
           keyboardType: keyboardType,
           textInputAction: textInputAction,
           obscureText: obscureText,
+          readOnly: readOnly,
           validator: validator,
           style: theme.textTheme.bodyMedium,
           decoration: InputDecoration(
@@ -55,7 +58,7 @@ class ProfileTextField extends StatelessWidget {
             ),
             suffixIcon: suffixIcon,
             filled: true,
-            fillColor: Colors.grey.shade100,
+            fillColor: readOnly ? Colors.grey.shade200 : Colors.grey.shade100,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 14,

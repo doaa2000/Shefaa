@@ -59,7 +59,12 @@ Future<UserModel> register({
   final user = response.user!;
   final session = response.session!; 
 
-  await supabase.from('profiles').insert({
+  // upsert, not insert: the handle_new_user trigger on auth.users has already
+  // created this profile row by the time signUp returns, so a plain insert
+  // fails with 23505 duplicate key and registration dies. The trigger only
+  // knows the name, so this is also what puts the phone, gender and birth
+  // date on the row.
+  await supabase.from('profiles').upsert({
     'id': user.id,
     'name': name,
     'phone': phone,
