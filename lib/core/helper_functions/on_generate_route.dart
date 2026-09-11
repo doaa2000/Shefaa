@@ -3,6 +3,7 @@ import 'package:shefaa_app/features/auth/presentation/screens/login_screen.dart'
 import 'package:shefaa_app/features/auth/presentation/screens/register_screen.dart';
 import 'package:shefaa_app/features/doctor_availability/data/models/doctor_availability_args_model.dart';
 import 'package:shefaa_app/features/doctor_availability/presentation/screens/doctor_availability_screen.dart';
+import 'package:shefaa_app/features/bookings/domain/entites/booking.dart';
 import 'package:shefaa_app/features/bookings/presentation/screens/bookings_details_screen.dart';
 import 'package:shefaa_app/features/doctors/data/models/doctors_args_model.dart';
 import 'package:shefaa_app/features/doctors/presentation/screens/doctors_screen.dart';
@@ -62,8 +63,14 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
       );
 
     case BookingsDetailsScreen.routeName:
+      // The screen is nothing but this one booking's details, so a call
+      // without it is a routing mistake, not an empty screen.
+      final booking = settings.arguments;
+      if (booking is! BookingEntity) {
+        return _errorRoute('لم يتم تحديد الحجز');
+      }
       return MaterialPageRoute(
-        builder: (context) => const BookingsDetailsScreen(),
+        builder: (context) => BookingsDetailsScreen(booking: booking),
         settings: settings,
       );
 

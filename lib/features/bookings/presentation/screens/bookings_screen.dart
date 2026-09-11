@@ -9,6 +9,7 @@ import 'package:shefaa_app/features/bookings/domain/entites/booking.dart';
 import 'package:shefaa_app/features/bookings/presentation/bloc/bookings_bloc.dart';
 import 'package:shefaa_app/features/bookings/presentation/bloc/bookings_event.dart';
 import 'package:shefaa_app/features/bookings/presentation/bloc/bookings_state.dart';
+import 'package:shefaa_app/features/bookings/presentation/screens/bookings_details_screen.dart';
 import 'package:shefaa_app/features/bookings/presentation/widgets/booking_card.dart';
 
 class BookingsScreen extends StatelessWidget {
@@ -121,10 +122,27 @@ class _BookingsViewState extends State<_BookingsView> {
             booking: booking,
             // Only an upcoming booking can be cancelled.
             onCancel: _tab == 0 ? () => _confirmCancel(context, booking) : null,
+            onTap: () => _openDetails(context, booking),
           );
         },
       ),
     );
+  }
+
+  /// The details screen has no bloc of its own; it pops with true when the
+  /// patient confirms a cancel there, and the cancel runs here where the
+  /// BookingBloc and the result snackbar already live.
+  Future<void> _openDetails(BuildContext context, BookingEntity booking) async {
+    final bloc = context.read<BookingBloc>();
+    final cancelRequested = await Navigator.pushNamed(
+      context,
+      BookingsDetailsScreen.routeName,
+      arguments: booking,
+    );
+
+    if (cancelRequested == true) {
+      bloc.add(CancelBookingEvent(booking.id));
+    }
   }
 
   Future<void> _confirmCancel(

@@ -1,37 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:shefaa_app/core/widgets/card_container.dart';
+import 'package:shefaa_app/features/bookings/domain/entites/booking.dart';
 
 class PaymentSummaryCard extends StatelessWidget {
-  const PaymentSummaryCard({super.key});
+  const PaymentSummaryCard({super.key, required this.booking});
+
+  final BookingEntity booking;
+
+  static const Map<String, String> _methodLabels = {
+    'cash': 'كاش في العيادة',
+    'vodafone_cash': 'فودافون كاش',
+    'card': 'بطاقة',
+  };
 
   @override
   Widget build(BuildContext context) {
+    final payment = booking.payment;
+    final method = _methodLabels[payment.paymentMethod] ?? payment.paymentMethod;
+    final amount = '${payment.amount.toStringAsFixed(0)} جنيه';
+
     return CardContainer(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            "ملخص الدفع",
+            'ملخص الدفع',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
           const SizedBox(height: 12),
-          const _PriceRow(title: "رسوم الكشف", price: "300 ريال"),
+          // One line, no invented tax: the patient pays the doctor's fee and
+          // nothing else. The app's commission is settled with the clinic, not
+          // added on top of the visit.
+          _PriceRow(title: 'رسوم الكشف', price: amount),
           const SizedBox(height: 8),
-          const _PriceRow(title: "الضريبة (15%)", price: "45 ريال"),
+          _PriceRow(title: 'طريقة الدفع', price: method),
           const Divider(height: 24),
-          const _PriceRow(title: "الإجمالي", price: "345 ريال", isTotal: true),
+          _PriceRow(title: 'الإجمالي', price: amount, isTotal: true),
           const SizedBox(height: 12),
-          // Container(
-          //   padding: const EdgeInsets.all(10),
-          //   decoration: BoxDecoration(
-          //     color: Colors.green.shade100,
-          //     borderRadius: BorderRadius.circular(12),
-          //   ),
-          //   child: const Text(
-          //     "تم الدفع بنجاح باستخدام Visa **** 4242",
-          //     style: TextStyle(color: Colors.green),
-          //   ),
-          // )
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: payment.isPaid ? Colors.green.shade50 : Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              payment.isPaid
+                  ? 'تم الدفع'
+                  : 'المبلغ يتدفع في العيادة يوم الكشف',
+              style: TextStyle(
+                color: payment.isPaid
+                    ? Colors.green.shade800
+                    : Colors.grey.shade700,
+              ),
+            ),
+          ),
         ],
       ),
     );
