@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shefaa_app/core/enums/request_state.dart';
 import 'package:shefaa_app/core/utils/app_colors.dart';
+import 'package:shefaa_app/core/utils/app_router.dart';
 import 'package:shefaa_app/core/utils/app_text_styles.dart';
 import 'package:shefaa_app/core/utils/constants.dart';
 import 'package:shefaa_app/core/widgets/custom_button.dart';
@@ -9,6 +10,7 @@ import 'package:shefaa_app/features/bookings/presentation/bloc/bookings_bloc.dar
 import 'package:shefaa_app/features/bookings/presentation/bloc/bookings_event.dart';
 import 'package:shefaa_app/features/bookings/presentation/bloc/bookings_state.dart';
 import 'package:shefaa_app/features/doctor_availability/data/models/doctor_availability_model.dart';
+import 'package:shefaa_app/features/home/presentation/screens/home_screen.dart';
 import 'package:shefaa_app/features/payment/data/models/payment_args_model.dart';
 import 'package:shefaa_app/generated/l10n.dart';
 
@@ -162,8 +164,12 @@ class PaymentScreenBody extends StatelessWidget {
     );
   }
 
-  /// Confirmation, then back to the root. The booking screen re-reads on open,
-  /// so the patient lands on their new booking rather than a stale list.
+  /// Confirmation, then straight to the bookings tab.
+  ///
+  /// popUntil(isFirst) only went back to the home tab, which read as the button
+  /// doing nothing. The whole stack is replaced instead, so back does not lead
+  /// into a payment flow that is already finished, and BookingsScreen re-reads
+  /// on open so the new booking is there.
   void _showSuccess(BuildContext context, PaymentArgsModel args) {
     showDialog<void>(
       context: context,
@@ -215,7 +221,11 @@ class PaymentScreenBody extends StatelessWidget {
             child: TextButton(
               onPressed: () {
                 Navigator.of(dialogContext).pop();
-                Navigator.of(context).popUntil((route) => route.isFirst);
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  AppRoutes.home,
+                  (route) => false,
+                  arguments: HomeScreen.bookingsTab,
+                );
               },
               child: const Text('حجوزاتي'),
             ),
