@@ -94,15 +94,30 @@ Future<void> _login(LoginEvent event, Emitter<AuthState> emit) async {
 
 
 
-  FutureOr<void> _logout(LogoutEvent event, Emitter<AuthState> emit)async {
-    await logoutUseCase(NoParameters());
+  FutureOr<void> _logout(LogoutEvent event, Emitter<AuthState> emit) async {
+    emit(state.copyWith(logoutState: RequestState.loading));
+
+    final result = await logoutUseCase(NoParameters());
 
     // Signing out of Supabase is not enough on its own: the splash screen
     // reads these, and a token left behind here sent the next launch to the
-    // home screen with no session behind it.
+    // home screen with no session behind it. Cleared whatever the server
+    // said -- a round trip that failed is no reason to leave this device
+    // signed in.
     await secureStorageService.clearTokens();
 
-    emit(state.copyWith(logoutState: RequestState.loaded));
+    // A fresh state, not copyWith: the point of logging out is that nothing
+    // of the last account is left behind -- not the user, and not the login
+    // and register states that a later screen would read.
+    result.fold(
+      (failure) => emit(
+        AuthState(
+          logoutState: RequestState.loaded,
+          logoutMessage: failure.message,
+        ),
+      ),
+      (_) => emit(const AuthState(logoutState: RequestState.loaded)),
+    );
   }
 
   /// Stores the tokens of a session we just obtained. A user without them is

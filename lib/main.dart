@@ -10,7 +10,6 @@ import 'package:shefaa_app/core/utils/app_router.dart';
 import 'package:shefaa_app/core/utils/app_colors.dart';
 import 'package:shefaa_app/core/utils/app_config.dart';
 import 'package:shefaa_app/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:shefaa_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:shefaa_app/features/splash/presentation/screens/splash_screen.dart';
 import 'package:shefaa_app/generated/l10n.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -70,9 +69,25 @@ class _MyAppState extends State<MyApp> {
       unawaited(getIt<SecureStorageService>().clearTokens());
 
       final navigator = _navigatorKey.currentState;
-      if (navigator == null) return;
+      if (navigator == null || _isOnLogin(navigator)) return;
+
       navigator.pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
     });
+  }
+
+  /// Logging out navigates on its own, from the button the patient pressed.
+  /// This guard is for the sessions that end without anyone asking, so it must
+  /// not push a second login screen on top of the first.
+  ///
+  /// popUntil with a predicate that is true straight away pops nothing -- it is
+  /// how a NavigatorState is asked which route is on top.
+  bool _isOnLogin(NavigatorState navigator) {
+    var onLogin = false;
+    navigator.popUntil((route) {
+      onLogin = route.settings.name == AppRoutes.login;
+      return true;
+    });
+    return onLogin;
   }
 
   @override
