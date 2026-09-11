@@ -3,12 +3,12 @@ import 'package:shefaa_app/core/domain/use_cases.dart';
 import 'package:shefaa_app/core/errors/failure.dart';
 import 'package:shefaa_app/features/bookings/domain/repositories/booking_repository.dart';
 
-class CreateBookingUsecase extends BaseUsecase<void, CreateBookingParams> {
+class CreateBookingUsecase extends BaseUsecase<int, CreateBookingParams> {
   final BookingRepository repository;
   CreateBookingUsecase(this.repository);
 
   @override
-  Future<Either<Failure, void>> call(CreateBookingParams params) {
+  Future<Either<Failure, int>> call(CreateBookingParams params) {
     return repository.createBooking(
       doctorId: params.doctorId,
       amount: params.amount,

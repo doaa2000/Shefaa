@@ -2,7 +2,8 @@ import 'package:shefaa_app/features/bookings/data/models/booking_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class BookingRemoteDatasource {
-  Future<void> createBooking({
+  /// Returns the place in the queue the booking actually got.
+  Future<int> createBooking({
     required int doctorId,
     required double amount,
     required String paymentMethod,
@@ -22,7 +23,7 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
   BookingRemoteDatasourceImpl(this.supabase);
 
   @override
-  Future<void> createBooking({
+  Future<int> createBooking({
     required int doctorId,
     required double amount,
     required String paymentMethod,
@@ -31,32 +32,28 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
     required String startTime,
     required String endTime,
   }) async {
-    final patientId = supabase.auth.currentUser!.id;
+    // One call, one transaction. Two separate inserts meant that when the
+    // booking was refused -- a full session is an ordinary outcome now -- the
+    // payment row from the first insert stayed behind, and a patient is not
+    // allowed to delete it. create_booking writes both or neither, and hands
+    // back the place in the queue the booking actually got rather than the
+    // number predicted before anyone else had committed.
+    final rows = await supabase.rpc(
+      'create_booking',
+      params: {
+        'p_doctor': doctorId,
+        'p_date': _dateOnly(bookedDate),
+        'p_session': session,
+        'p_start': startTime,
+        'p_end': endTime,
+        'p_amount': amount,
+        'p_method': paymentMethod,
+      },
+    );
 
-    final payment = await supabase
-        .from('payments')
-        .insert({
-          'patient_id': patientId,
-          'amount': amount,
-          'payment_method': paymentMethod,
-          // Cash is collected at the clinic, so nothing has been paid yet.
-          // Recording 'paid' here put revenue in the books for patients who had
-          // not walked in, and for some who never would.
-          'status': 'pending',
-        })
-        .select('id')
-        .single();
-
-    await supabase.from('bookings').insert({
-      'patient_id': patientId,
-      'doctor_id': doctorId,
-      'payment_id': payment['id'],
-      'booked_date': _dateOnly(bookedDate),
-      'session': session,
-      'start_time': startTime,
-      'end_time': endTime,
-      'status': 'confirmed',
-    });
+    // A set-returning function comes back as a list of rows.
+    final row = (rows as List).cast<Map<String, dynamic>>().first;
+    return (row['queue_number'] as num).toInt();
   }
 
   @override

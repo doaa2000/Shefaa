@@ -3,7 +3,8 @@ import 'package:shefaa_app/core/errors/failure.dart';
 import 'package:shefaa_app/features/bookings/domain/entites/booking.dart';
 
 abstract class BookingRepository {
-  Future<Either<Failure, void>> createBooking({
+  /// Returns the place in the queue the booking got.
+  Future<Either<Failure, int>> createBooking({
     required int doctorId,
     required double amount,
     required String paymentMethod,
