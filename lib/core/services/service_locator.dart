@@ -90,6 +90,9 @@ getIt.registerLazySingleton<ProfileRepository>(
 
   getIt.registerLazySingleton<RegisterUseCase>(() => RegisterUseCase(getIt()));
   getIt.registerLazySingleton<GetProfileUseCase>(() => GetProfileUseCase(getIt()));
+  getIt.registerLazySingleton<UpdateProfileUseCase>(
+    () => UpdateProfileUseCase(getIt()),
+  );
 getIt.registerLazySingleton<LogoutUseCase>(() => LogoutUseCase(getIt()));
 
   getIt.registerLazySingleton<GetSpecialtiesUsecase>(
@@ -125,7 +128,7 @@ getIt.registerLazySingleton<LogoutUseCase>(() => LogoutUseCase(getIt()));
     () => LocationBloc(),
   );
   getIt.registerFactory<ProfileBloc>(
-    () => ProfileBloc(getProfileUseCase: getIt()),
+    () => ProfileBloc(getProfileUseCase: getIt(), updateProfileUseCase: getIt()),
   );
 getIt.registerFactory<HomeBloc>(
     () => HomeBloc(getSpecialtiesUsecase: getIt()),
