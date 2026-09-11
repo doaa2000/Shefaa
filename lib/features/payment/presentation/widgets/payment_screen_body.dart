@@ -5,297 +5,321 @@ import 'package:shefaa_app/core/utils/app_colors.dart';
 import 'package:shefaa_app/core/utils/app_text_styles.dart';
 import 'package:shefaa_app/core/utils/constants.dart';
 import 'package:shefaa_app/core/widgets/custom_button.dart';
-import 'package:shefaa_app/core/widgets/doctor_widget.dart';
 import 'package:shefaa_app/features/bookings/presentation/bloc/bookings_bloc.dart';
 import 'package:shefaa_app/features/bookings/presentation/bloc/bookings_event.dart';
 import 'package:shefaa_app/features/bookings/presentation/bloc/bookings_state.dart';
+import 'package:shefaa_app/features/doctor_availability/data/models/doctor_availability_model.dart';
 import 'package:shefaa_app/features/payment/data/models/payment_args_model.dart';
 import 'package:shefaa_app/generated/l10n.dart';
 
 class PaymentScreenBody extends StatelessWidget {
   const PaymentScreenBody({super.key});
 
+  static const List<String> _dayNames = [
+    'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت',
+  ];
+  static const List<String> _monthNames = [
+    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
+  ];
+
+  static String _formatDate(DateTime d) =>
+      '${_dayNames[d.weekday % 7]} ${d.day} ${_monthNames[d.month - 1]} ${d.year}';
+
   @override
   Widget build(BuildContext context) {
-        final args = ModalRoute.of(context)!.settings.arguments as PaymentArgsModel;
+    final args = ModalRoute.of(context)!.settings.arguments as PaymentArgsModel;
 
-    return  Padding(
+    return Padding(
       padding: const EdgeInsets.all(Constants.padding),
       child: Column(
         children: [
-          // Scrollable content
           Expanded(
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Doctor card
-                  Container(
-                    height: 100,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.grey.shade200),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: DoctorWidget(),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Appointment details
-                  Container(
-                    height: 140,
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.grey.shade200),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Icon(
-                              Icons.calendar_today,
-                              color: AppColors.primaryColor,
-                            ),
-                            SizedBox(width: 10),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("الأحد 15 يوليو 2026"),
-                                Text(
-                                  " 5 مساء",
-                                  style: TextStyles.meduim14.copyWith(
-                                    color: Colors.grey.shade600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Icon(
-                              Icons.pin_drop_outlined,
-                              color: AppColors.primaryColor,
-                            ),
-                            const SizedBox(width: 10),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("عيادة كيور الطبية"),
-                                Text(
-                                  "الرياض - شارع الملك فهد",
-                                  style: TextStyles.meduim14.copyWith(
-                                    color: Colors.grey.shade600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Payment summary
-                  Container(
-                    height: 170,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.grey.shade200),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
+                  // The place in the queue is the thing being bought, so it
+                  // leads. The old screen showed a fixed time the clinic was
+                  // never going to keep to.
+                  _QueueCard(args: args),
+                  const SizedBox(height: 16),
+                  _Card(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          S.of(context).payment_summary,
-                          style: TextStyles.meduim14.copyWith(
-                            color: Colors.black,
+                        _Row(
+                          icon: Icons.person_outline,
+                          title: args.doctorName,
+                          subtitle: 'الطبيب',
+                        ),
+                        const SizedBox(height: 16),
+                        _Row(
+                          icon: Icons.calendar_today,
+                          title: _formatDate(args.date),
+                          subtitle: args.session == 'morning'
+                              ? 'الفترة الصباحية'
+                              : 'الفترة المسائية',
+                        ),
+                        const SizedBox(height: 16),
+                        _Row(
+                          icon: Icons.access_time,
+                          title:
+                              '${DoctorSessionModel.formatTime(args.startTime)}'
+                              ' – '
+                              '${DoctorSessionModel.formatTime(args.endTime)}',
+                          subtitle: 'وقت الفترة',
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _Card(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(S.of(context).payment_summary,
+                            style: TextStyles.bold16.copyWith(color: Colors.black)),
+                        const SizedBox(height: 12),
+                        _AmountRow(
+                          label: S.of(context).consultation_fee,
+                          value: '${args.amount.toStringAsFixed(0)} ${S.of(context).currency}',
+                        ),
+                        Divider(height: 24, color: Colors.grey.shade300),
+                        _AmountRow(
+                          label: S.of(context).total_amount,
+                          value: '${args.amount.toStringAsFixed(0)} ${S.of(context).currency}',
+                          bold: true,
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.shade50,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.payments_outlined,
+                                  size: 20, color: Colors.orange.shade800),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'الدفع كاش في العيادة',
+                                  style: TextStyles.meduim14
+                                      .copyWith(color: Colors.orange.shade900),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              S.of(context).consultation_fee,
-                              style: TextStyles.meduim14.copyWith(
-                                color: Colors.grey.shade600,
-                              ),
-                            ),
-                            Text(
-                              " 300  جنيه",
-                              style: TextStyles.meduim14.copyWith(
-                                color: Colors.grey.shade600,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              S.of(context).discount,
-                              style: TextStyles.meduim14.copyWith(
-                                color: Colors.grey.shade600,
-                              ),
-                            ),
-                            Text(
-                              "0",
-                              style: TextStyles.meduim14.copyWith(
-                                color: Colors.grey.shade600,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Divider(height: 30, color: Colors.grey.shade300),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              S.of(context).total_amount,
-                              style: TextStyles.bold14.copyWith(
-                                color: Colors.black,
-                              ),
-                            ),
-                            Text(
-                              " 300  جنيه",
-                              style: TextStyles.bold14.copyWith(
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
                       ],
                     ),
                   ),
-
-                  const SizedBox(height: 16),
-
-                  Text(
-                    S.of(context).select_payment_method,
-                    style: TextStyles.bold16.copyWith(color: Colors.black),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  // Payment methods cards
-                  Container(
-                    height: 70,
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.grey.shade200),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  Container(
-                    height: 70,
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.grey.shade200),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                  ),
-
                   const SizedBox(height: 16),
                 ],
               ),
             ),
           ),
-
-          // Fixed button at the bottom
-          BlocListener<BookingBloc, BookingState>(
+          BlocConsumer<BookingBloc, BookingState>(
+            listenWhen: (p, c) => p.createBookingState != c.createBookingState,
             listener: (context, state) {
-              // ✅ نجح
               if (state.createBookingState == RequestState.loaded) {
-                // Navigator.pushNamedAndRemoveUntil(
-                //   context,
-                //   BookingSuccessScreen.routeName,
-                //   (route) => false,
-                // );
+                _showSuccess(context, args);
               }
-              // ❌ فشل
               if (state.createBookingState == RequestState.error) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.errorMessage ?? 'Booking failed'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(SnackBar(
+                    content: Text(state.errorMessage ?? 'تعذر إتمام الحجز'),
+                    backgroundColor: Colors.red.shade700,
+                  ));
               }
             },
-            child: CustomButton(
-              title: S.of(context).confirm_booking_payment,
+            builder: (context, state) {
+              return CustomButton(
+                title: S.of(context).confirm_booking_payment,
+                isLoading: state.createBookingState == RequestState.loading,
+                onPressed: () {
+                  context.read<BookingBloc>().add(
+                        CreateBookingEvent(
+                          doctorId: args.doctorId,
+                          amount: args.amount,
+                          paymentMethod: 'cash',
+                          bookedDate: args.date,
+                          session: args.session,
+                          startTime: args.startTime,
+                          endTime: args.endTime,
+                        ),
+                      );
+                },
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Confirmation, then back to the root. The booking screen re-reads on open,
+  /// so the patient lands on their new booking rather than a stale list.
+  void _showSuccess(BuildContext context, PaymentArgsModel args) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.green.shade50,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.check, size: 40, color: Colors.green.shade700),
+            ),
+            const SizedBox(height: 16),
+            Text('تم تأكيد الحجز', style: TextStyles.bold18),
+            const SizedBox(height: 8),
+            Text(
+              '${_formatDate(args.date)}\n'
+              '${args.session == 'morning' ? 'الفترة الصباحية' : 'الفترة المسائية'}',
+              textAlign: TextAlign.center,
+              style: TextStyles.meduim14.copyWith(color: Colors.grey.shade700),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              decoration: BoxDecoration(
+                color: AppColors.primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                'دورك رقم ${args.queueNumber}',
+                style: TextStyles.bold18.copyWith(color: AppColors.primaryColor),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'لو حد قبلك ألغى، رقمك هيقل — ومستحيل يزيد',
+              textAlign: TextAlign.center,
+              style: TextStyles.meduim12.copyWith(color: Colors.grey.shade600),
+            ),
+          ],
+        ),
+        actions: [
+          Center(
+            child: TextButton(
               onPressed: () {
-                context.read<BookingBloc>().add(
-                  CreateBookingEvent(
-                    doctorId: args.doctorId,
-                   
-                    bookedDate: args.date,
-                    startTime: args.startTime,
-                    endTime: args.endTime,
-                    amount: args.amount,
-                    paymentMethod: 'cash', // 'cash' or 'instapay'
-                  ),
-                );
+                Navigator.of(dialogContext).pop();
+                Navigator.of(context).popUntil((route) => route.isFirst);
               },
+              child: const Text('حجوزاتي'),
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _QueueCard extends StatelessWidget {
+  const _QueueCard({required this.args});
+  final PaymentArgsModel args;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.primaryColor.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.primaryColor.withOpacity(0.3)),
+      ),
+      child: Column(
+        children: [
+          Text('دورك هيكون',
+              style: TextStyles.meduim14.copyWith(color: Colors.grey.shade700)),
+          const SizedBox(height: 4),
+          Text('رقم ${args.queueNumber}',
+              style: TextStyles.bold24.copyWith(color: AppColors.primaryColor)),
+          const SizedBox(height: 6),
+          Text(
+            'الترتيب داخل الفترة، مش ميعاد محدد',
+            style: TextStyles.meduim12.copyWith(color: Colors.grey.shade600),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Card extends StatelessWidget {
+  const _Card({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: child,
+    );
+  }
+}
+
+class _Row extends StatelessWidget {
+  const _Row({required this.icon, required this.title, required this.subtitle});
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, color: AppColors.primaryColor, size: 22),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: TextStyles.bold14.copyWith(color: Colors.black)),
+              const SizedBox(height: 2),
+              Text(subtitle,
+                  style: TextStyles.meduim12.copyWith(color: Colors.grey.shade600)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _AmountRow extends StatelessWidget {
+  const _AmountRow({required this.label, required this.value, this.bold = false});
+  final String label;
+  final String value;
+  final bool bold;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = bold
+        ? TextStyles.bold14.copyWith(color: Colors.black)
+        : TextStyles.meduim14.copyWith(color: Colors.grey.shade700);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [Text(label, style: style), Text(value, style: style)],
     );
   }
 }

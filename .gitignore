@@ -49,3 +49,9 @@ app.*.map.json
 
 # Database backups produced by scripts/backup.sh
 /backups/
+
+# Build-time configuration. env/dev.json holds the Supabase keys for a
+# developer's own machine and must never be committed; the example shows the
+# shape. Run with: flutter run --dart-define-from-file=env/dev.json
+/env/*.json
+!/env/*.example.json

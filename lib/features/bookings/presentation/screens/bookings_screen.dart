@@ -2,130 +2,234 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shefaa_app/core/enums/request_state.dart';
 import 'package:shefaa_app/core/services/service_locator.dart';
+import 'package:shefaa_app/core/utils/app_colors.dart';
+import 'package:shefaa_app/core/utils/app_text_styles.dart';
 import 'package:shefaa_app/core/utils/constants.dart';
 import 'package:shefaa_app/features/bookings/domain/entites/booking.dart';
-
 import 'package:shefaa_app/features/bookings/presentation/bloc/bookings_bloc.dart';
 import 'package:shefaa_app/features/bookings/presentation/bloc/bookings_event.dart';
 import 'package:shefaa_app/features/bookings/presentation/bloc/bookings_state.dart';
 import 'package:shefaa_app/features/bookings/presentation/widgets/booking_card.dart';
-import 'package:shefaa_app/features/bookings/presentation/widgets/booking_toggle.dart';
 
-class BookingsScreen extends StatefulWidget {
+class BookingsScreen extends StatelessWidget {
   const BookingsScreen({super.key});
-
-  @override
-  State<BookingsScreen> createState() => _BookingsScreenState();
-}
-
-class _BookingsScreenState extends State<BookingsScreen> {
-  int selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<BookingBloc>()
-        ..add(const GetMyBookingsEvent()),
-      child: Padding(
-        padding: EdgeInsets.all(Constants.padding),
-        child: Column(
-          children: [
-            // BookingToggle(
-            //   selectedIndex: selectedIndex,
-            //   onToggle: (index) => setState(() => selectedIndex = index),
-            // ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: BlocBuilder<BookingBloc, BookingState>(
-                builder: (context, state) {
+      create: (context) =>
+          getIt<BookingBloc>()..add(const GetMyBookingsEvent()),
+      child: const _BookingsView(),
+    );
+  }
+}
 
-                  if (state.getBookingsState == RequestState.loading) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+class _BookingsView extends StatefulWidget {
+  const _BookingsView();
 
-                  if (state.getBookingsState == RequestState.error) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.error_outline, color: Colors.red, size: 40),
-                          const SizedBox(height: 8),
-                          Text(state.errorMessage ?? 'حدث خطأ'),
-                          const SizedBox(height: 12),
-                          TextButton(
-                            onPressed: () => context
-                                .read<BookingBloc>()
-                                .add(const GetMyBookingsEvent()),
-                            child: const Text('إعادة المحاولة'),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
+  @override
+  State<_BookingsView> createState() => _BookingsViewState();
+}
 
-                  // ✅ Data
-                  return _buildBookings(state);
-                },
+class _BookingsViewState extends State<_BookingsView> {
+  int _tab = 0;
+
+  static const _tabs = ['القادمة', 'السابقة', 'الملغاة'];
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<BookingBloc, BookingState>(
+      listenWhen: (p, c) => p.cancelBookingState != c.cancelBookingState,
+      listener: (context, state) {
+        if (state.cancelBookingState == RequestState.loaded) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(const SnackBar(content: Text('تم إلغاء الحجز')));
+        }
+        if (state.cancelBookingState == RequestState.error) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(SnackBar(
+              content: Text(state.errorMessage ?? 'تعذر إلغاء الحجز'),
+              backgroundColor: Colors.red.shade700,
+            ));
+        }
+      },
+      builder: (context, state) {
+        return Padding(
+          padding: const EdgeInsets.all(Constants.padding),
+          child: Column(
+            children: [
+              _Tabs(
+                tabs: _tabs,
+                selected: _tab,
+                onChanged: (i) => setState(() => _tab = i),
               ),
-            ),
-          ],
-        ),
-      ),
+              const SizedBox(height: 16),
+              Expanded(child: _body(context, state)),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildBookings(BookingState state) {
-    final confirmed = state.bookings
-        .where((b) => b.status == 'confirmed')
-        .toList();
+  Widget _body(BuildContext context, BookingState state) {
+    if (state.getBookingsState == RequestState.loading &&
+        state.bookings.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-    final completed = state.bookings
-        .where((b) => b.status == 'completed')
-        .toList();
-
-    final cancelled = state.bookings
-        .where((b) => b.status == 'cancelled')
-        .toList();
-
-    final List<BookingEntity> list = switch (selectedIndex) {
-      0 => confirmed,
-      1 => completed,
-      2 => cancelled,
-      _ => [],
-    };
-
-    if (list.isEmpty) {
+    if (state.getBookingsState == RequestState.error) {
       return Center(
-        child: Text(
-          selectedIndex == 0
-              ? 'لا توجد حجوزات قادمة'
-              : selectedIndex == 1
-                  ? 'لا توجد حجوزات مكتملة'
-                  : 'لا توجد حجوزات ملغاة',
-          style: const TextStyle(color: Colors.grey),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline, color: Colors.red, size: 40),
+            const SizedBox(height: 8),
+            Text(state.errorMessage ?? 'حدث خطأ', textAlign: TextAlign.center),
+            const SizedBox(height: 12),
+            TextButton(
+              onPressed: () =>
+                  context.read<BookingBloc>().add(const GetMyBookingsEvent()),
+              child: const Text('إعادة المحاولة'),
+            ),
+          ],
         ),
       );
     }
 
+    final list = switch (_tab) {
+      0 => state.upcoming,
+      1 => state.past,
+      _ => state.cancelled,
+    };
+
+    if (list.isEmpty) {
+      return _Empty(tab: _tab);
+    }
+
     return RefreshIndicator(
-      onRefresh: () async {
-        context.read<BookingBloc>().add(const GetMyBookingsEvent()); 
-      },
+      onRefresh: () async =>
+          context.read<BookingBloc>().add(const GetMyBookingsEvent()),
       child: ListView.separated(
         itemCount: list.length,
         separatorBuilder: (_, __) => const SizedBox(height: 12),
         itemBuilder: (context, index) {
           final booking = list[index];
           return BookingCard(
-            doctorName: booking.doctor.name,
-            specialty:   booking.doctor.specialaization,
-            date:        booking.bookedDate.toString().split(' ')[0],
-            time:        booking.startTime,
-            status:      booking.status,
-            amount:      booking.payment.amount,
-            paymentMethod: booking.payment.paymentMethod,
+            booking: booking,
+            // Only an upcoming booking can be cancelled.
+            onCancel: _tab == 0 ? () => _confirmCancel(context, booking) : null,
           );
         },
+      ),
+    );
+  }
+
+  Future<void> _confirmCancel(
+    BuildContext context,
+    BookingEntity booking,
+  ) async {
+    final bloc = context.read<BookingBloc>();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('إلغاء الحجز'),
+        content: Text(
+          'هتلغي حجزك مع ${booking.doctor.name}؟\n'
+          'مكانك هيروح لغيرك ومش هينفع ترجعيه.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('تراجع'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red.shade700),
+            child: const Text('إلغاء الحجز'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      bloc.add(CancelBookingEvent(booking.id));
+    }
+  }
+}
+
+class _Tabs extends StatelessWidget {
+  const _Tabs({
+    required this.tabs,
+    required this.selected,
+    required this.onChanged,
+  });
+
+  final List<String> tabs;
+  final int selected;
+  final ValueChanged<int> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          for (var i = 0; i < tabs.length; i++)
+            Expanded(
+              child: GestureDetector(
+                onTap: () => onChanged(i),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    color: selected == i ? Colors.white : Colors.transparent,
+                    borderRadius: BorderRadius.circular(11),
+                  ),
+                  child: Text(
+                    tabs[i],
+                    textAlign: TextAlign.center,
+                    style: TextStyles.meduim14.copyWith(
+                      color: selected == i
+                          ? AppColors.primaryColor
+                          : Colors.grey.shade600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Empty extends StatelessWidget {
+  const _Empty({required this.tab});
+  final int tab;
+
+  @override
+  Widget build(BuildContext context) {
+    final (icon, text) = switch (tab) {
+      0 => (Icons.event_available_outlined, 'مفيش حجوزات قادمة'),
+      1 => (Icons.history, 'مفيش حجوزات سابقة'),
+      _ => (Icons.event_busy_outlined, 'مفيش حجوزات ملغاة'),
+    };
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 44, color: Colors.grey.shade400),
+          const SizedBox(height: 10),
+          Text(text, style: TextStyles.meduim14.copyWith(color: Colors.grey)),
+        ],
       ),
     );
   }

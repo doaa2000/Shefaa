@@ -1,6 +1,3 @@
-import 'dart:developer';
-
-import 'package:shefaa_app/features/doctor_availability/data/models/doctor_availability_model.dart';
 import 'package:shefaa_app/features/doctor_availability/data/models/doctor_details_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -15,37 +12,41 @@ class DoctorAvailabilityRemoteDatasourceImpl
   DoctorAvailabilityRemoteDatasourceImpl(this.supabase);
 
   @override
-  Future<DoctorDetailsModel> getDoctorAvailability(int doctorId, DateTime date) async {
-    final String formattedDate = date.toIso8601String().split('T')[0]; // "2026-04-25"
+  Future<DoctorDetailsModel> getDoctorAvailability(
+    int doctorId,
+    DateTime date,
+  ) async {
+    // Date only: the function keys off the weekday, and a timezone-shifted
+    // timestamp would land on the wrong day.
+    final formattedDate = _dateOnly(date);
 
-    final data = await supabase
-        .from('Doctors')
-        .select('''
-          id,
-          name,
-          specialization,
-          image,
-          consultation_fee,
-          rating,
-          specialty_id,
-          clinic_id,
-          waiting_time,
-          location,
-          doctor_availability (
-            id,
-            doctor_id,
-            date,
-            start_time,
-            end_time,
-            session,
-            is_active
+    // Availability is no longer rows to be read: it is computed from the
+    // doctor's weekly schedule, minus bookings already taken, minus any
+    // exception for this date. Hence two calls rather than one nested select.
+    final results = await Future.wait([
+      supabase
+          .from('Doctors')
+          .select(
+            'id, name, specialization, image, consultation_fee, rating, '
+            'specialty_id, clinic_id, waiting_time, location, title',
           )
-        ''')
-        .eq('id', doctorId)
-        .eq('doctor_availability.date', formattedDate)        // ✅ filter by selected date
-        .eq('doctor_availability.is_active', true)            // ✅ only active slots
-        .single();
+          .eq('id', doctorId)
+          .single(),
+      supabase.rpc(
+        'doctor_sessions_on',
+        params: {'p_doctor': doctorId, 'p_date': formattedDate},
+      ),
+    ]);
 
-    return DoctorDetailsModel.fromMap(data);
+    return DoctorDetailsModel.fromParts(
+      doctorRow: results[0] as Map<String, dynamic>,
+      sessionRows: (results[1] as List?) ?? const [],
+    );
+  }
+
+  static String _dateOnly(DateTime date) {
+    final month = date.month.toString().padLeft(2, '0');
+    final day = date.day.toString().padLeft(2, '0');
+    return '${date.year}-$month-$day';
   }
 }

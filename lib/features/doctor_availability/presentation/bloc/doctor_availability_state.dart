@@ -1,73 +1,63 @@
 part of 'doctor_availability_bloc.dart';
 
 class DoctorAvailabilityState extends Equatable {
-   static const _clear = Object();
+  static const _clear = Object();
+
   final DoctorDetailsEntity? doctorDetails;
 
-  /// Kept independently of [doctorDetails] so that changing the date still
-  /// knows which doctor to load when the first load failed and there are no
-  /// details to read the id back from.
+  /// Kept independently of [doctorDetails] so changing the date still knows
+  /// which doctor to load when the first load failed.
   final int? doctorId;
 
   final String? errorMessage;
-  final RequestState getDoctorAvailabilityState;  
-  final RequestState getSlotsState;               
+  final RequestState getDoctorAvailabilityState;
+  final RequestState getSlotsState;
   final DateTime selectedDate;
-  final int? selectedMorningSlotId;
-  final int? selectedEveningSlotId;
+
+  /// 'morning' or 'evening', or null when nothing is chosen yet.
+  final String? selectedSession;
 
   DoctorAvailabilityState({
     this.doctorDetails,
     this.doctorId,
     this.errorMessage,
     this.getDoctorAvailabilityState = RequestState.initial,
-    this.getSlotsState = RequestState.initial,             
+    this.getSlotsState = RequestState.initial,
     DateTime? selectedDate,
-    this.selectedMorningSlotId,
-    this.selectedEveningSlotId,
+    this.selectedSession,
   }) : selectedDate = selectedDate ?? DateTime.now();
 
-  List<DoctorAvailabilityEntity> get morningSlots =>
-      doctorDetails?.morningSlots ?? [];
+  List<DoctorSessionEntity> get sessions => doctorDetails?.sessions ?? const [];
 
-  List<DoctorAvailabilityEntity> get eveningSlots =>
-      doctorDetails?.eveningSlots ?? [];
+  DoctorSessionEntity? get selected => selectedSession == null
+      ? null
+      : sessions.where((s) => s.session == selectedSession).firstOrNull;
 
-  DoctorAvailabilityEntity? get selectedMorningSlot =>
-      morningSlots.where((s) => s.id == selectedMorningSlotId.toString()).firstOrNull;
+  /// Only a session with room left can be booked.
+  bool get canConfirm => selected != null && !selected!.isFull;
 
-  DoctorAvailabilityEntity? get selectedEveningSlot =>
-      eveningSlots.where((s) => s.id == selectedEveningSlotId.toString()).firstOrNull;
-
-
-DoctorAvailabilityState copyWith({
-  DoctorDetailsEntity? doctorDetails,
-  int? doctorId,
-  String? errorMessage,
-  RequestState? getDoctorAvailabilityState,
-  RequestState? getSlotsState,
-  DateTime? selectedDate,
-  Object? selectedMorningSlotId = _clear, 
-  Object? selectedEveningSlotId = _clear,   
-}) {
-  return DoctorAvailabilityState(
-    doctorDetails: doctorDetails ?? this.doctorDetails,
-    doctorId: doctorId ?? this.doctorId,
-    errorMessage: errorMessage ?? this.errorMessage,
-    getDoctorAvailabilityState:
-        getDoctorAvailabilityState ?? this.getDoctorAvailabilityState,
-    getSlotsState: getSlotsState ?? this.getSlotsState,
-    selectedDate: selectedDate ?? this.selectedDate,
-
-    selectedMorningSlotId: identical(selectedMorningSlotId, _clear)
-        ? this.selectedMorningSlotId
-        : selectedMorningSlotId as int?,
-
-    selectedEveningSlotId: identical(selectedEveningSlotId, _clear)
-        ? this.selectedEveningSlotId
-        : selectedEveningSlotId as int?,
-  );
-}
+  DoctorAvailabilityState copyWith({
+    DoctorDetailsEntity? doctorDetails,
+    int? doctorId,
+    String? errorMessage,
+    RequestState? getDoctorAvailabilityState,
+    RequestState? getSlotsState,
+    DateTime? selectedDate,
+    Object? selectedSession = _clear,
+  }) {
+    return DoctorAvailabilityState(
+      doctorDetails: doctorDetails ?? this.doctorDetails,
+      doctorId: doctorId ?? this.doctorId,
+      errorMessage: errorMessage ?? this.errorMessage,
+      getDoctorAvailabilityState:
+          getDoctorAvailabilityState ?? this.getDoctorAvailabilityState,
+      getSlotsState: getSlotsState ?? this.getSlotsState,
+      selectedDate: selectedDate ?? this.selectedDate,
+      selectedSession: identical(selectedSession, _clear)
+          ? this.selectedSession
+          : selectedSession as String?,
+    );
+  }
 
   @override
   List<Object?> get props => [
@@ -75,9 +65,12 @@ DoctorAvailabilityState copyWith({
         doctorId,
         errorMessage,
         getDoctorAvailabilityState,
-        getSlotsState,                                      
+        getSlotsState,
         selectedDate,
-        selectedMorningSlotId,
-        selectedEveningSlotId,
+        selectedSession,
       ];
+}
+
+extension _FirstOrNull<T> on Iterable<T> {
+  T? get firstOrNull => isEmpty ? null : first;
 }

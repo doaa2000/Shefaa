@@ -110,6 +110,9 @@ getIt.registerLazySingleton<LogoutUseCase>(() => LogoutUseCase(getIt()));
   getIt.registerLazySingleton<GetMyBookingsUsecase>(
     () => GetMyBookingsUsecase(getIt()),
   );
+  getIt.registerLazySingleton<CancelBookingUsecase>(
+    () => CancelBookingUsecase(getIt()),
+  );
   // 5️⃣ Bloc
   getIt.registerFactory<DoctorsBloc>(
     () => DoctorsBloc(getDoctorsUseCase: getIt()),
@@ -135,6 +138,10 @@ getIt.registerFactory<DoctorAvailabilityBloc>(
     () => DoctorAvailabilityBloc(getDoctorAvailabilityUsecase: getIt()),
   );
   getIt.registerFactory<BookingBloc>(
-    () => BookingBloc(createBookingUsecase: getIt(), getMyBookingsUsecase: getIt()),
+    () => BookingBloc(
+      createBookingUsecase: getIt(),
+      getMyBookingsUsecase: getIt(),
+      cancelBookingUsecase: getIt(),
+    ),
   );
 }

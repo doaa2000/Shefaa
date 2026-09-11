@@ -2,23 +2,19 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "shefaa_app (dev)",
+      "name": "Shefaa (dev)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
-      "args": [
-        "--dart-define-from-file=dart_defines.dev.json"
-      ]
+      "toolArgs": ["--dart-define-from-file=env/dev.json"]
     },
     {
-      "name": "shefaa_app (dev, profile mode)",
+      "name": "Shefaa (dev, profile mode)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
       "flutterMode": "profile",
-      "args": [
-        "--dart-define-from-file=dart_defines.dev.json"
-      ]
+      "toolArgs": ["--dart-define-from-file=env/dev.json"]
     }
   ]
 }
