@@ -8,6 +8,11 @@ class UserEntity extends Equatable {
   final String? phone;
   final String? gender;
   final String? birthDate;
+
+  /// Public URL of the patient's own photograph, or null. Never a stock
+  /// portrait: an empty avatar shows their initial instead.
+  final String? image;
+
   final String? accessToken;
   final String? refreshToken;
 
@@ -18,6 +23,7 @@ class UserEntity extends Equatable {
     this.phone,
     this.gender,
     this.birthDate,
+    this.image,
     this.accessToken,
     this.refreshToken,
   });
@@ -30,6 +36,7 @@ class UserEntity extends Equatable {
         phone,
         gender,
         birthDate,
+        image,
         accessToken,
         refreshToken,
       ];
@@ -41,6 +48,7 @@ class UserEntity extends Equatable {
   @override
   String toString() => 'UserEntity(id: $id, email: $email, name: $name, '
       'phone: $phone, gender: $gender, birthDate: $birthDate, '
+      'image: $image, '
       'accessToken: ${accessToken == null ? 'null' : '<redacted>'}, '
       'refreshToken: ${refreshToken == null ? 'null' : '<redacted>'})';
 }

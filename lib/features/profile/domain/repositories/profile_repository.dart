@@ -12,4 +12,13 @@ abstract class ProfileRepository {
     required UserEntity user,
     String? newPassword,
   });
+
+  /// Stores a photograph and puts it on the profile. Returns the profile as it
+  /// now stands.
+  Future<Either<Failure, UserEntity>> updateAvatar({
+    required String userId,
+    required List<int> bytes,
+    required String extension,
+    String? contentType,
+  });
 }

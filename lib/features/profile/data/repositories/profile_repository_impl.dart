@@ -44,9 +44,31 @@ class ProfileRepositoryImpl implements ProfileRepository {
           phone: user.phone,
           gender: user.gender,
           birthDate: user.birthDate,
+          // Left out on purpose: the picture is written by updateAvatar, and
+          // sending it here would let a stale copy in the form overwrite one
+          // just uploaded.
         ),
       );
       return Right(updated);
+    } catch (e) {
+      return Left(ServerFailure(_messageOf(e)));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserEntity>> updateAvatar({
+    required String userId,
+    required List<int> bytes,
+    required String extension,
+    String? contentType,
+  }) async {
+    try {
+      return Right(await profileRemoteDataSource.updateAvatar(
+        userId: userId,
+        bytes: bytes,
+        extension: extension,
+        contentType: contentType,
+      ));
     } catch (e) {
       return Left(ServerFailure(_messageOf(e)));
     }
@@ -58,6 +80,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
   String _messageOf(Object error) {
     if (error is AuthException) return error.message;
     if (error is PostgrestException) return error.message;
+    if (error is StorageException) return error.message;
     return error.toString();
   }
 }

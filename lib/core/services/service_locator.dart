@@ -118,6 +118,9 @@ getIt.registerLazySingleton<ProfileRepository>(
   getIt.registerLazySingleton<UpdateProfileUseCase>(
     () => UpdateProfileUseCase(getIt()),
   );
+  getIt.registerLazySingleton<UpdateAvatarUseCase>(
+    () => UpdateAvatarUseCase(getIt()),
+  );
 getIt.registerLazySingleton<LogoutUseCase>(() => LogoutUseCase(getIt()));
   getIt.registerLazySingleton<DeleteAccountUseCase>(
     () => DeleteAccountUseCase(getIt()),
@@ -194,7 +197,11 @@ getIt.registerLazySingleton<LogoutUseCase>(() => LogoutUseCase(getIt()));
     ),
   );
   getIt.registerFactory<ProfileBloc>(
-    () => ProfileBloc(getProfileUseCase: getIt(), updateProfileUseCase: getIt()),
+    () => ProfileBloc(
+      getProfileUseCase: getIt(),
+      updateProfileUseCase: getIt(),
+      updateAvatarUseCase: getIt(),
+    ),
   );
 getIt.registerFactory<HomeBloc>(
     () => HomeBloc(getSpecialtiesUsecase: getIt()),

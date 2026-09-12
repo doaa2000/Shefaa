@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shefaa_app/core/services/selected_city_service.dart';
@@ -57,39 +58,60 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(_height);
 }
 
-/// The patient's own initial, never a photograph of somebody else.
+/// The patient's own photograph, or their initial. Never somebody else's face.
 class _Avatar extends StatelessWidget {
   const _Avatar();
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ProfileBloc, ProfileState>(
-      buildWhen: (previous, current) => previous.user?.name != current.user?.name,
+      buildWhen: (previous, current) =>
+          previous.user?.name != current.user?.name ||
+          previous.user?.image != current.user?.image,
       builder: (context, state) {
-        final initial = _initialOf(state.user?.name);
+        final url = state.user?.image;
+        final hasPhoto = url != null && url.isNotEmpty;
+        final name = state.user?.name;
 
         return Container(
           width: 44,
           height: 44,
-          alignment: Alignment.center,
+          clipBehavior: Clip.antiAlias,
           decoration: const BoxDecoration(
             color: AppColors.primaryColor,
             shape: BoxShape.circle,
           ),
-          child: initial == null
-              ? const Icon(Icons.person, color: Colors.white, size: 24)
-              : Text(
-                  initial,
-                  style: TextStyles.bold18.copyWith(color: Colors.white),
-                ),
+          child: hasPhoto
+              ? CachedNetworkImage(
+                  imageUrl: url,
+                  fit: BoxFit.cover,
+                  placeholder: (context, _) => _Initial(name: name),
+                  errorWidget: (context, _, _) => _Initial(name: name),
+                )
+              : _Initial(name: name),
         );
       },
     );
   }
+}
 
-  static String? _initialOf(String? name) {
+class _Initial extends StatelessWidget {
+  const _Initial({required this.name});
+
+  final String? name;
+
+  @override
+  Widget build(BuildContext context) {
     final trimmed = name?.trim() ?? '';
-    return trimmed.isEmpty ? null : trimmed.substring(0, 1);
+
+    return Center(
+      child: trimmed.isEmpty
+          ? const Icon(Icons.person, color: Colors.white, size: 24)
+          : Text(
+              trimmed.substring(0, 1),
+              style: TextStyles.bold18.copyWith(color: Colors.white),
+            ),
+    );
   }
 }
 

@@ -9,6 +9,7 @@ class UserModel extends UserEntity {
     super.phone,
     super.gender,
     super.birthDate,
+    super.image,
     super.accessToken,
     super.refreshToken,
   });
@@ -21,6 +22,7 @@ class UserModel extends UserEntity {
       phone: map['phone'] as String?,
       gender: map['gender'] as String?,
       birthDate: map['birth_date'] as String?,
+      image: map['image'] as String?,
       accessToken: map['accessToken'] as String?,
       refreshToken: map['refreshToken'] as String?,
     );
@@ -34,6 +36,7 @@ class UserModel extends UserEntity {
       'phone': phone,
       'gender': gender,
       'birth_date': birthDate,
+      'image': image,
       'accessToken': accessToken,
       'refreshToken': refreshToken,
     };
