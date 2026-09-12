@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dartz/dartz.dart';
 import 'package:shefaa_app/core/errors/failure.dart';
 import 'package:shefaa_app/features/auth/data/datasources/auth_remote_datasource.dart';
@@ -69,20 +71,53 @@ class AuthRepositoryImpl implements AuthRepository {
   /// point of the change this arrived with.
   static String _message(Object error) {
     if (error is AuthException) {
-      final message = error.message.toLowerCase();
-      if (message.contains('email not confirmed')) {
+      final text = _plainText(error.message);
+      final lower = text.toLowerCase();
+
+      if (lower.contains('email not confirmed')) {
         return 'لم يتم تأكيد بريدك الإلكتروني بعد. يرجى فتح رسالة التأكيد أولاً';
       }
-      if (message.contains('invalid login credentials')) {
+      if (lower.contains('invalid login credentials')) {
         return 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
       }
-      if (message.contains('already registered') ||
-          message.contains('already been registered')) {
+      if (lower.contains('already registered') ||
+          lower.contains('already been registered')) {
         return 'هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول';
       }
-      return error.message;
+      // The mail service is not reachable or not configured. Nothing the
+      // patient did, and nothing they can do about it either -- so it says so
+      // plainly instead of blaming their address.
+      if (lower.contains('error sending') ||
+          lower.contains('error confirmation') ||
+          lower.contains('smtp')) {
+        return 'تعذر إرسال رسالة التأكيد حالياً. يرجى المحاولة بعد قليل';
+      }
+      if (lower.contains('rate limit') || lower.contains('too many requests')) {
+        return 'محاولات كثيرة في وقت قصير. يرجى الانتظار قليلاً ثم المحاولة';
+      }
+
+      return text;
     }
 
     return error.toString();
+  }
+
+  /// Supabase sometimes puts a JSON body in `message`, so the field reads
+  /// `{"code":"unexpected_failure","message":"Error sending confirmation
+  /// email"}`. The sentence worth showing is inside it, and a patient must
+  /// never be handed the envelope.
+  static String _plainText(String message) {
+    final trimmed = message.trim();
+    if (!trimmed.startsWith('{')) return trimmed;
+
+    try {
+      final decoded = jsonDecode(trimmed);
+      if (decoded is Map && decoded['message'] is String) {
+        return (decoded['message'] as String).trim();
+      }
+    } catch (_) {
+      // Not JSON after all; the raw text is still better than nothing.
+    }
+    return trimmed;
   }
 }
