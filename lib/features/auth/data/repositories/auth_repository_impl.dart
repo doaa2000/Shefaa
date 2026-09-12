@@ -80,6 +80,11 @@ class AuthRepositoryImpl implements AuthRepository {
   /// being rare the moment email confirmation is switched on, which is the
   /// point of the change this arrived with.
   static String _message(Object error) {
+    if (error is NotAPatientAccountException) {
+      return 'هذا الحساب خاص بلوحة الطبيب. '
+          'لاستخدام التطبيق أنشئ حسابًا جديدًا ببريد إلكتروني آخر.';
+    }
+
     if (error is AuthException) {
       final text = _plainText(error.message);
       final lower = text.toLowerCase();
