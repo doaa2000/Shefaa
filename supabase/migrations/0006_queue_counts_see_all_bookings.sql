@@ -13,7 +13,7 @@
 --     patient who already booked   -> booked = 1, remaining = 9
 --     patient about to book        -> booked = 0, remaining = 10
 --
--- So every patient was told "دورك رقم ١" however full the session was, and
+-- So every patient was told they were first in line however full the session
 -- `remaining` never reached zero, so a full session never showed as full.
 --
 -- The fix is `security definer`. It is the right tool here and not a hole: the

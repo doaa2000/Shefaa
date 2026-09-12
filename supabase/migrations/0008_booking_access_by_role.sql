@@ -104,15 +104,15 @@ begin
      or new.patient_id  is distinct from old.patient_id
      or new.booked_date is distinct from old.booked_date
      or new.session     is distinct from old.session then
-    raise exception 'الحجز مينفعش يتنقل — إلغيه واحجزي من جديد'
-      using errcode = 'check_violation';
+    raise exception 'A booking cannot be moved; cancel and book again'
+      using errcode = 'check_violation', hint = 'booking_immutable';
   end if;
 
   -- And the only status a patient may set is cancelled. Whether they actually
   -- turned up is the doctor's to record.
   if new.status is distinct from old.status and new.status <> 'cancelled' then
-    raise exception 'إلغاء الحجز هو التغيير الوحيد المتاح ليكي'
-      using errcode = 'check_violation';
+    raise exception 'A patient may only cancel'
+      using errcode = 'check_violation', hint = 'cancel_only';
   end if;
 
   return new;
