@@ -10,12 +10,19 @@ class ProfileState extends Equatable {
   final RequestState updateState;
   final String updateMessage;
 
+  /// Tracks the photograph upload on its own: it runs while the rest of the
+  /// form sits there being edited, and must not grey the whole screen out.
+  final RequestState avatarState;
+  final String avatarMessage;
+
   const ProfileState({
     this.profileState = RequestState.initial,
     this.profileMessage = '',
     this.user,
     this.updateState = RequestState.initial,
     this.updateMessage = '',
+    this.avatarState = RequestState.initial,
+    this.avatarMessage = '',
   });
 
   ProfileState copyWith({
@@ -24,6 +31,8 @@ class ProfileState extends Equatable {
     UserEntity? user,
     RequestState? updateState,
     String? updateMessage,
+    RequestState? avatarState,
+    String? avatarMessage,
   }) {
     return ProfileState(
       profileState: profileState ?? this.profileState,
@@ -31,6 +40,8 @@ class ProfileState extends Equatable {
       user: user ?? this.user,
       updateState: updateState ?? this.updateState,
       updateMessage: updateMessage ?? this.updateMessage,
+      avatarState: avatarState ?? this.avatarState,
+      avatarMessage: avatarMessage ?? this.avatarMessage,
     );
   }
 
@@ -41,5 +52,7 @@ class ProfileState extends Equatable {
         user,
         updateState,
         updateMessage,
+        avatarState,
+        avatarMessage,
       ];
 }

@@ -47,3 +47,34 @@ class UpdateProfileUseCaseParams {
 
   UpdateProfileUseCaseParams({required this.user, this.newPassword});
 }
+
+class UpdateAvatarUseCase
+    extends BaseUsecase<UserEntity, UpdateAvatarUseCaseParams> {
+  final ProfileRepository profileRepository;
+
+  UpdateAvatarUseCase(this.profileRepository);
+
+  @override
+  Future<Either<Failure, UserEntity>> call(UpdateAvatarUseCaseParams params) {
+    return profileRepository.updateAvatar(
+      userId: params.userId,
+      bytes: params.bytes,
+      extension: params.extension,
+      contentType: params.contentType,
+    );
+  }
+}
+
+class UpdateAvatarUseCaseParams {
+  final String userId;
+  final List<int> bytes;
+  final String extension;
+  final String? contentType;
+
+  UpdateAvatarUseCaseParams({
+    required this.userId,
+    required this.bytes,
+    required this.extension,
+    this.contentType,
+  });
+}

@@ -16,6 +16,26 @@ class GetProfileEvent extends ProfileEvent {
   List<Object> get props => [userId];
 }
 
+/// A newly chosen photograph, already read into memory by the picker.
+class UpdateAvatarEvent extends ProfileEvent {
+  final String userId;
+  final List<int> bytes;
+  final String extension;
+  final String? contentType;
+
+  const UpdateAvatarEvent({
+    required this.userId,
+    required this.bytes,
+    required this.extension,
+    this.contentType,
+  });
+
+  // The bytes are left out of props: the observer logs every event, and a
+  // photograph in the device log helps nobody. The length tells two apart.
+  @override
+  List<Object> get props => [userId, bytes.length, extension];
+}
+
 class UpdateProfileEvent extends ProfileEvent {
   final String name;
   final String phone;

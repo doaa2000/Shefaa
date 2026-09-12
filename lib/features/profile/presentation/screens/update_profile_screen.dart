@@ -9,6 +9,7 @@ import 'package:shefaa_app/core/widgets/custom_app_bar.dart';
 import 'package:shefaa_app/core/widgets/custom_button.dart';
 import 'package:shefaa_app/features/auth/domain/entities/user.dart';
 import 'package:shefaa_app/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:shefaa_app/features/profile/presentation/widgets/avatar_picker.dart';
 import 'package:shefaa_app/features/profile/presentation/widgets/fields_label.dart';
 import 'package:shefaa_app/features/profile/presentation/widgets/profile_text_fields.dart';
 import 'package:shefaa_app/features/profile/presentation/widgets/section_label.dart';
@@ -43,6 +44,10 @@ class _UpdateProfileView extends StatefulWidget {
 
 class _UpdateProfileViewState extends State<_UpdateProfileView> {
   final _formKey = GlobalKey<FormState>();
+
+  /// Read once. The screen is only reachable while signed in -- the bloc above
+  /// it is created with this same id.
+  final _userId = Supabase.instance.client.auth.currentUser!.id;
 
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -217,42 +222,12 @@ class _UpdateProfileViewState extends State<_UpdateProfileView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // ─── Avatar ─────────────────────────────
-                      Center(
-                        child: Stack(
-                          alignment: Alignment.bottomRight,
-                          children: [
-                            CircleAvatar(
-                              radius: 52,
-                              backgroundColor:
-                                  colorScheme.primary.withValues(alpha: 0.12),
-                              child: Icon(
-                                CupertinoIcons.person_fill,
-                                size: 52,
-                                color: AppColors.primaryColor,
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryColor,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: theme.scaffoldBackgroundColor,
-                                  width: 2,
-                                ),
-                              ),
-                              child: const Icon(
-                                CupertinoIcons.camera_fill,
-                                size: 16,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      // The camera badge here used to be a drawing: it had
+                      // no tap handler at all, so the one obvious way to set a
+                      // photograph did nothing.
+                      AvatarPicker(userId: _userId),
 
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 24),
 
                       // ─── Personal Info ─────────────────────
                       SectionLabel(label: S.of(context).personal_info),

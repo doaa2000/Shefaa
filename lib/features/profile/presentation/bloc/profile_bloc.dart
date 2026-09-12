@@ -12,13 +12,48 @@ part 'profile_state.dart';
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   GetProfileUseCase getProfileUseCase;
   UpdateProfileUseCase updateProfileUseCase;
+  UpdateAvatarUseCase updateAvatarUseCase;
 
   ProfileBloc({
     required this.getProfileUseCase,
     required this.updateProfileUseCase,
+    required this.updateAvatarUseCase,
   }) : super(const ProfileState()) {
     on<GetProfileEvent>(_getProfile);
     on<UpdateProfileEvent>(_updateProfile);
+    on<UpdateAvatarEvent>(_updateAvatar);
+  }
+
+  FutureOr<void> _updateAvatar(
+    UpdateAvatarEvent event,
+    Emitter<ProfileState> emit,
+  ) async {
+    emit(state.copyWith(
+      avatarState: RequestState.loading,
+      avatarMessage: '',
+    ));
+
+    final result = await updateAvatarUseCase(
+      UpdateAvatarUseCaseParams(
+        userId: event.userId,
+        bytes: event.bytes,
+        extension: event.extension,
+        contentType: event.contentType,
+      ),
+    );
+
+    result.fold(
+      (failure) => emit(state.copyWith(
+        avatarState: RequestState.error,
+        avatarMessage: failure.message,
+      )),
+      // The whole profile comes back, so the picture and everything around it
+      // stay one object rather than two that can disagree.
+      (user) => emit(state.copyWith(
+        avatarState: RequestState.loaded,
+        user: user,
+      )),
+    );
   }
 
   FutureOr<void> _getProfile(

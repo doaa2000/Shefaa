@@ -41,6 +41,9 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   cached_network_image: ^3.4.1
+  # Picking a profile photograph. It was in dev_dependencies, which is not
+  # where a release build looks -- the same trap as the five packages in 0020.
+  image_picker: ^1.1.2
   carousel_slider: ^5.0.0
   country_code_picker: ^3.1.0
   cupertino_icons: ^1.0.8
@@ -95,7 +98,6 @@ dev_dependencies:
     sdk: flutter
   geocoding: ^4.0.0
   geolocator: ^14.0.1
-  image_picker: ^1.1.2
   jwt_decoder: ^2.0.1
   location: ^8.0.0
   logger: ^2.5.0
