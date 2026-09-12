@@ -7,6 +7,11 @@ import 'package:shefaa_app/features/auth/domain/usecases/login_usecase.dart';
 import 'package:shefaa_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:shefaa_app/features/auth/domain/usecases/register_usecase.dart';
 import 'package:shefaa_app/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:shefaa_app/features/banners/data/datasources/banners_remote_datasource.dart';
+import 'package:shefaa_app/features/banners/data/repositories/banners_repository_impl.dart';
+import 'package:shefaa_app/features/banners/domain/repositories/banners_repository.dart';
+import 'package:shefaa_app/features/banners/domain/usecases/get_banners_usecase.dart';
+import 'package:shefaa_app/features/banners/presentation/bloc/banners_bloc.dart';
 import 'package:shefaa_app/features/bookings/data/datasources/bookings_remote_datasource.dart';
 import 'package:shefaa_app/features/bookings/data/repositories/booking_repository_impl.dart';
 import 'package:shefaa_app/features/bookings/domain/repositories/booking_repository.dart';
@@ -65,6 +70,9 @@ getIt.registerLazySingleton<HomeRemoteDatasource>(
   getIt.registerLazySingleton<BookingRemoteDatasource>(
     () => BookingRemoteDatasourceImpl(getIt()),
   );
+  getIt.registerLazySingleton<BannersRemoteDatasource>(
+    () => BannersRemoteDatasourceImpl(getIt()),
+  );
   // 3️⃣ Repository
   getIt.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(getIt()),
@@ -86,6 +94,9 @@ getIt.registerLazySingleton<ProfileRepository>(
 
   getIt.registerLazySingleton<BookingRepository>(
     () => BookingRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton<BannersRepository>(
+    () => BannersRepositoryImpl(getIt()),
   );
   // 4️⃣ UseCases
   getIt.registerLazySingleton<LoginUseCase>(() => LoginUseCase(getIt()));
@@ -126,6 +137,9 @@ getIt.registerLazySingleton<LogoutUseCase>(() => LogoutUseCase(getIt()));
   getIt.registerLazySingleton<CancelBookingUsecase>(
     () => CancelBookingUsecase(getIt()),
   );
+  getIt.registerLazySingleton<GetBannersUseCase>(
+    () => GetBannersUseCase(getIt()),
+  );
   // 5️⃣ Bloc
   getIt.registerFactory<DoctorsBloc>(
     () => DoctorsBloc(getDoctorsUseCase: getIt()),
@@ -164,5 +178,8 @@ getIt.registerFactory<DoctorAvailabilityBloc>(
       getMyBookingsUsecase: getIt(),
       cancelBookingUsecase: getIt(),
     ),
+  );
+  getIt.registerFactory<BannersBloc>(
+    () => BannersBloc(getBannersUseCase: getIt()),
   );
 }

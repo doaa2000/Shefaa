@@ -7,6 +7,7 @@ import 'package:shefaa_app/core/widgets/custom_app_bar.dart';
 import 'package:shefaa_app/core/widgets/custom_search_bar.dart';
 import 'package:shefaa_app/features/doctors/data/models/doctors_args_model.dart';
 import 'package:shefaa_app/features/doctors/presentation/bloc/doctors_bloc.dart';
+import 'package:shefaa_app/features/doctors/presentation/screens/doctor_search_screen.dart';
 import 'package:shefaa_app/features/doctors/presentation/widgets/home_doctors_list.dart';
 
 class DoctorsScreen extends StatelessWidget {
@@ -28,7 +29,20 @@ class DoctorsScreen extends StatelessWidget {
           child: Column(
             spacing: 16,
             children: [
-              CustomSearchBar(),
+              // A doorway, not a field: the bar here took keystrokes and did
+              // nothing with them. Tapping it opens the search screen, which
+              // owns the keyboard, the debounce and the results.
+              GestureDetector(
+                onTap: () => Navigator.pushNamed(
+                  context,
+                  DoctorSearchScreen.routeName,
+                ),
+                child: const AbsorbPointer(
+                  child: CustomSearchBar(
+                    hintText: 'ابحث باسم الطبيب أو التخصص',
+                  ),
+                ),
+              ),
               Expanded(
                 child: HomeDoctorsList(specialtyName: args.specialtyName),
               ),
