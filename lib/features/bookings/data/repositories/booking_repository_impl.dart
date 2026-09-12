@@ -57,29 +57,38 @@ class BookingRepositoryImpl implements BookingRepository {
 
   /// What the patient is actually shown when a booking is refused.
   ///
-  /// create_booking and the capacity trigger raise messages already written
-  /// for a patient to read, so those are passed through as they are. The rest
-  /// is Postgres talking to itself, and only the cases a patient can cause are
-  /// worth translating; anything else would be a lie dressed as an apology.
+  /// The database raises in English and tags each refusal with a `hint`. The
+  /// hint is the contract -- a short, stable token -- and the Arabic lives
+  /// here, in the app that has an Arabic-speaking audience. A database that
+  /// held one app's wording would be wrong for the dashboard, which is in
+  /// English, and wrong again for the next language either of them gains.
+  static const Map<String, String> _byHint = {
+    'session_full': 'الفترة دي كاملة العدد، اختاري فترة تانية',
+    'session_not_offered': 'الدكتور مش بيشتغل في الفترة دي في اليوم ده',
+    'already_booked': 'لديك حجز بالفعل في هذه الفترة',
+    'not_signed_in': 'سجّلي الدخول الأول',
+    'booking_immutable': 'الحجز مينفعش يتنقل — إلغيه واحجزي من جديد',
+    'cancel_only': 'إلغاء الحجز هو التغيير الوحيد المتاح ليكي',
+  };
+
   static String _message(Object error) {
     if (error is PostgrestException) {
-      final message = error.message;
-      if (message.contains('bookings_one_place_per_session')) {
-        return 'لديك حجز بالفعل في هذه الفترة';
+      final byHint = _byHint[error.hint];
+      if (byHint != null) return byHint;
+
+      // Constraints the database enforces without a hint of their own.
+      if (error.message.contains('bookings_one_place_per_session')) {
+        return _byHint['already_booked']!;
       }
-      if (message.contains('violates row-level security')) {
+      if (error.message.contains('violates row-level security')) {
         return 'لا تملك صلاحية تنفيذ هذا الإجراء';
       }
-      return message;
+
+      // Anything else is Postgres talking to itself. Saying so is more use
+      // than a soothing sentence that hides which call failed.
+      return error.message;
     }
 
-    final raw = error.toString();
-    if (raw.contains('bookings_one_place_per_session')) {
-      return 'لديك حجز بالفعل في هذه الفترة';
-    }
-    if (raw.contains('violates row-level security')) {
-      return 'لا تملك صلاحية تنفيذ هذا الإجراء';
-    }
-    return raw;
+    return error.toString();
   }
 }

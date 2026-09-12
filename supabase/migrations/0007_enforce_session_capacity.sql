@@ -2,7 +2,7 @@
 -- Capacity was advisory. The database now enforces it.
 --
 -- 0006 made `remaining` truthful, so the app hides a full session. That is a
--- screen, not a rule: two patients tapping "احجز" at the same moment both read
+-- screen, not a rule: two patients tapping "book" at the same moment both read
 -- the last free place and both take it, because under READ COMMITTED neither
 -- transaction can see the other's uncommitted row. Nothing in the database said
 -- no.
@@ -50,8 +50,11 @@ begin
   -- No row means the doctor does not hold that session on that date at all --
   -- not on the weekly schedule, or closed by an exception.
   if v_capacity is null then
-    raise exception 'الدكتور مش بيستقبل حجوزات في الفترة دي في اليوم ده'
-      using errcode = 'check_violation';
+    -- The message is for the log; `hint` is the part callers match on, so a
+    -- patient can be told this in their own language without the database
+    -- holding a copy of one app's wording.
+    raise exception 'Doctor holds no % session on %', new.session, new.booked_date
+      using errcode = 'check_violation', hint = 'session_not_offered';
   end if;
 
   -- Counted here rather than taken from doctor_sessions_on's `booked`: that
@@ -68,8 +71,8 @@ begin
      and b.id is distinct from new.id;
 
   if v_booked >= v_capacity then
-    raise exception 'الفترة دي كاملة العدد'
-      using errcode = 'check_violation';
+    raise exception 'Session is full: % of % places taken', v_booked, v_capacity
+      using errcode = 'check_violation', hint = 'session_full';
   end if;
 
   return new;
@@ -97,7 +100,7 @@ revoke execute on function public.doctor_sessions_on(bigint, date) from anon;
 --
 -- The app made two calls: insert a payment, then insert a booking. Two calls
 -- are two transactions. Before this migration the second one practically never
--- failed; now "الفترة دي كاملة العدد" is an ordinary outcome, and the payment
+-- failed; now "this session is full" is an ordinary outcome, and the payment
 -- row from the first call would be left behind with nothing pointing at it --
 -- money recorded for a visit that was refused. A patient cannot delete it
 -- either (payments_delete_admin), so it would simply accumulate.
@@ -131,8 +134,8 @@ declare
   v_queue   integer;
 begin
   if v_patient is null then
-    raise exception 'لازم تسجّلي الدخول الأول'
-      using errcode = 'insufficient_privilege';
+    raise exception 'No authenticated user'
+      using errcode = 'insufficient_privilege', hint = 'not_signed_in';
   end if;
 
   -- Said plainly here rather than let bookings_one_place_per_session surface as
@@ -145,8 +148,8 @@ begin
        and b.session     = p_session
        and b.status     <> 'cancelled'
   ) then
-    raise exception 'إنتي حاجزة عند الدكتور ده في نفس الفترة بالفعل'
-      using errcode = 'unique_violation';
+    raise exception 'Patient already holds a place in this session'
+      using errcode = 'unique_violation', hint = 'already_booked';
   end if;
 
   insert into public.payments (patient_id, amount, payment_method, status)
