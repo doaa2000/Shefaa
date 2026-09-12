@@ -14,8 +14,11 @@ class DoctorAvailabilityState extends Equatable {
   final RequestState getSlotsState;
   final DateTime selectedDate;
 
-  /// 'morning' or 'evening', or null when nothing is chosen yet.
-  final String? selectedSession;
+  /// Which window is chosen, as 'session|start_time', or null when none is.
+  ///
+  /// Both halves, because a session can hold several windows and two sessions
+  /// could in principle begin at the same clock time.
+  final String? selectedWindow;
 
   DoctorAvailabilityState({
     this.doctorDetails,
@@ -24,16 +27,24 @@ class DoctorAvailabilityState extends Equatable {
     this.getDoctorAvailabilityState = RequestState.initial,
     this.getSlotsState = RequestState.initial,
     DateTime? selectedDate,
-    this.selectedSession,
+    this.selectedWindow,
   }) : selectedDate = selectedDate ?? DateTime.now();
 
   List<DoctorSessionEntity> get sessions => doctorDetails?.sessions ?? const [];
 
-  DoctorSessionEntity? get selected => selectedSession == null
-      ? null
-      : sessions.where((s) => s.session == selectedSession).firstOrNull;
+  static String windowKey(DoctorSessionEntity window) =>
+      '${window.session}|${window.startTime}';
 
-  /// Only a session with room left can be booked.
+  DoctorSessionEntity? get selected => selectedWindow == null
+      ? null
+      : sessions.where((s) => windowKey(s) == selectedWindow).firstOrNull;
+
+  /// How many windows this session was split into. One means the doctor offers
+  /// it whole, and the card then names both ends rather than just the start.
+  int windowsInSession(String session) =>
+      sessions.where((s) => s.session == session).length;
+
+  /// Only a window with room left can be booked.
   bool get canConfirm => selected != null && !selected!.isFull;
 
   DoctorAvailabilityState copyWith({
@@ -43,7 +54,7 @@ class DoctorAvailabilityState extends Equatable {
     RequestState? getDoctorAvailabilityState,
     RequestState? getSlotsState,
     DateTime? selectedDate,
-    Object? selectedSession = _clear,
+    Object? selectedWindow = _clear,
   }) {
     return DoctorAvailabilityState(
       doctorDetails: doctorDetails ?? this.doctorDetails,
@@ -53,9 +64,9 @@ class DoctorAvailabilityState extends Equatable {
           getDoctorAvailabilityState ?? this.getDoctorAvailabilityState,
       getSlotsState: getSlotsState ?? this.getSlotsState,
       selectedDate: selectedDate ?? this.selectedDate,
-      selectedSession: identical(selectedSession, _clear)
-          ? this.selectedSession
-          : selectedSession as String?,
+      selectedWindow: identical(selectedWindow, _clear)
+          ? this.selectedWindow
+          : selectedWindow as String?,
     );
   }
 
@@ -67,7 +78,7 @@ class DoctorAvailabilityState extends Equatable {
         getDoctorAvailabilityState,
         getSlotsState,
         selectedDate,
-        selectedSession,
+        selectedWindow,
       ];
 }
 

@@ -28,13 +28,17 @@ class SelectDateEvent extends DoctorAvailabilityEvent {
   List<Object?> get props => [date];
 }
 
-/// Picks the morning or evening session. Replaces the per-slot selection: the
-/// patient chooses a session and takes the next place in its queue, not a
-/// specific minute.
-class SelectSessionEvent extends DoctorAvailabilityEvent {
+/// Picks one bookable window.
+///
+/// Carries the start time, not just 'morning' or 'evening': a doctor who works
+/// to a clock has several windows inside one session, and keying the selection
+/// on the session name alone would light all of them up at once.
+class SelectWindowEvent extends DoctorAvailabilityEvent {
   final String session;
-  const SelectSessionEvent(this.session);
+  final String startTime;
+
+  const SelectWindowEvent({required this.session, required this.startTime});
 
   @override
-  List<Object?> get props => [session];
+  List<Object?> get props => [session, startTime];
 }
