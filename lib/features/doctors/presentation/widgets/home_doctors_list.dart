@@ -75,9 +75,9 @@ class HomeDoctorsList extends StatelessWidget {
                 waitingTime: doctor.waitingTime != null
                     ? '${doctor.waitingTime} دقيقة'
                     : '—',
-                // The card opens the doctor's page; the button skips straight
-                // to booking, which is what it says it does.
-                onTap: () => Navigator.pushNamed(
+                // Two named buttons and an inert card body: nothing happens by
+                // brushing the card while scrolling a list of them.
+                onDetailsTap: () => Navigator.pushNamed(
                   context,
                   DoctorDetailsScreen.routeName,
                   arguments: doctor,

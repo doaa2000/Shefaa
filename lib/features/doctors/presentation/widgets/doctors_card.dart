@@ -15,7 +15,11 @@ class DoctorCard extends StatelessWidget {
   final dynamic consultationFee;
   final String waitingTime;
   final double rating;
-  final VoidCallback? onTap;
+
+  /// Opens the doctor's page. The card body itself does nothing -- the two
+  /// buttons are the only way out of it, so neither can be hit by accident
+  /// while scrolling.
+  final VoidCallback onDetailsTap;
 
   /// What "احجز الآن" does. Required, because a card that cannot say which
   /// doctor it shows must not be the thing deciding where the button goes --
@@ -28,7 +32,7 @@ class DoctorCard extends StatelessWidget {
     required this.specialty,
     required this.imageUrl,
     this.rating = 4.5,
-    this.onTap, required this.location, required this.consultationFee, required this.waitingTime,
+    required this.onDetailsTap, required this.location, required this.consultationFee, required this.waitingTime,
     required this.onBookTap,
   });
 
@@ -42,25 +46,22 @@ class DoctorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(20),
-      onTap: onTap,
-      child: Container(
-        height: 255,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.grey.shade200),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
+    return Container(
+      height: 255,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,9 +184,8 @@ class DoctorCard extends StatelessWidget {
             // a card that does nothing.
             Row(
               children: [
-                if (onTap != null)
-                  TextButton(
-                    onPressed: onTap,
+                TextButton(
+                  onPressed: onDetailsTap,
                     style: TextButton.styleFrom(
                       foregroundColor: AppColors.primaryColor,
                       padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -210,8 +210,7 @@ class DoctorCard extends StatelessWidget {
                 ),
               ],
             ),
-          ],
-        ),
+        ],
       ),
     );
   }
