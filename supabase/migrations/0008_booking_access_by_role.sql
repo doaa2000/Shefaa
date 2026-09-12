@@ -11,9 +11,41 @@
 -- exactly "the patient, an admin, or the doctor this booking is with".
 -- =============================================================================
 
+-- -----------------------------------------------------------------------------
+-- Preconditions. Run out of order, this file fails deep inside a function body
+-- with `relation "public.Doctors" does not exist`, which says nothing about
+-- which migration is actually missing. Say it plainly instead.
+-- -----------------------------------------------------------------------------
+do $$
+declare missing text[] := '{}';
+begin
+  if to_regclass('public.bookings') is null then
+    missing := missing || 'bookings (migration 0000)'::text;
+  end if;
+  if to_regclass('public.profiles') is null then
+    missing := missing || 'profiles (migration 0000)'::text;
+  end if;
+  if to_regproc('public.is_admin') is null then
+    missing := missing || 'is_admin() (migration 0000)'::text;
+  end if;
+  if to_regproc('public.current_doctor_id') is null then
+    missing := missing || 'current_doctor_id() (migration 0005)'::text;
+  end if;
+
+  if array_length(missing, 1) is not null then
+    raise exception
+      'Run the earlier migrations first. Missing: %', array_to_string(missing, ', ')
+      using hint = 'run_migrations_in_order';
+  end if;
+end $$;
+
 -- Answering "is this one of my patients?" means reading bookings that the
 -- caller's own policies may hide, so it is asked by a definer function that
 -- returns nothing but a boolean about the caller's own practice.
+--
+-- It asks current_doctor_id() who the caller is rather than joining "Doctors"
+-- again: one definition of "which doctor am I", and one less table this file
+-- has to know the name of.
 create or replace function public.is_my_patient(p_patient uuid)
 returns boolean
 language sql
@@ -23,9 +55,8 @@ set search_path = public
 as $$
   select exists (
     select 1
-      from public."Doctors" d
-      join public.bookings b on b.doctor_id = d.id
-     where d.user_id = auth.uid()
+      from public.bookings b
+     where b.doctor_id = public.current_doctor_id()
        and b.patient_id = p_patient
   );
 $$;
