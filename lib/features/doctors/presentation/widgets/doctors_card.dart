@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shefaa_app/core/utils/app_colors.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:shefaa_app/core/utils/app_images.dart';
 import 'package:shefaa_app/core/utils/app_text_styles.dart';
@@ -29,6 +31,14 @@ class DoctorCard extends StatelessWidget {
     this.onTap, required this.location, required this.consultationFee, required this.waitingTime,
     required this.onBookTap,
   });
+
+  /// consultation_fee is a Postgres numeric, so it arrives as a double and
+  /// printed itself as "500.0". Nobody writes a clinic fee with a decimal.
+  String get _fee {
+    final fee = consultationFee;
+    if (fee is num) return fee.toStringAsFixed(0);
+    return '${fee ?? 0}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,10 +122,13 @@ class DoctorCard extends StatelessWidget {
 ),
              const SizedBox(width: 6),
 
- Text(
-                        location,
-                        style: TextStyles.meduim14,
-                      ),
+ Expanded(
+                    child: Text(
+                      location,
+                      style: TextStyles.meduim14,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
 
                       
                 ],),
@@ -130,10 +143,13 @@ class DoctorCard extends StatelessWidget {
 ),
              const SizedBox(width: 6),
 
- Text(
-                        "${S.of(context).consultation_fee}: $consultationFee ${S.of(context).currency}",
-                        style: TextStyles.meduim14,
-                      ),
+ Expanded(
+                    child: Text(
+                      "${S.of(context).consultation_fee}: $_fee ${S.of(context).currency}",
+                      style: TextStyles.meduim14,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
 
                       
                 ],),
@@ -148,22 +164,51 @@ class DoctorCard extends StatelessWidget {
 ),
              const SizedBox(width: 6),
 
- Text(
-                        "${S.of(context).waiting_time}: $waitingTime ${S.of(context).minutes}",
-                        style: TextStyles.meduim14,
-                      ),
+ Expanded(
+                    child: Text(
+                      "${S.of(context).waiting_time}: $waitingTime ${S.of(context).minutes}",
+                      style: TextStyles.meduim14,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
 
                       
                 ],)
               ]),
             const SizedBox(height: 12),
 
-            Align(
-              alignment: Alignment.centerLeft,
-              child: CustomMiniButton(
-                title: S.of(context).book_now,
-                onPressed: onBookTap,
-              ),
+            // Two taps that go to different places, so both are spelled out.
+            // The whole card opens the doctor's page as well -- this row is
+            // what says so, because a card that is silently tappable reads as
+            // a card that does nothing.
+            Row(
+              children: [
+                if (onTap != null)
+                  TextButton(
+                    onPressed: onTap,
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.primaryColor,
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('عرض التفاصيل', style: TextStyles.meduim14),
+                        const SizedBox(width: 2),
+                        // Cupertino's chevron mirrors itself in a right to
+                        // left layout, so it points the way the page opens.
+                        const Icon(CupertinoIcons.chevron_forward, size: 14),
+                      ],
+                    ),
+                  ),
+                const Spacer(),
+                CustomMiniButton(
+                  title: S.of(context).book_now,
+                  onPressed: onBookTap,
+                ),
+              ],
             ),
           ],
         ),
