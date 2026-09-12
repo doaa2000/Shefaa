@@ -136,6 +136,14 @@ class _Facts extends StatelessWidget {
   const _Facts({required this.doctor});
   final DoctorEntity doctor;
 
+  /// A numeric column reaches Dart as a double; "500.0 جنيه" is not how a fee
+  /// is written.
+  String get _fee {
+    final fee = doctor.consultationFee;
+    if (fee is num) return fee.toStringAsFixed(0);
+    return '${fee ?? 0}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -150,7 +158,7 @@ class _Facts extends StatelessWidget {
           _Fact(
             icon: Icons.payments_outlined,
             label: S.of(context).consultation_fee,
-            value: '${doctor.consultationFee ?? 0} ${S.of(context).currency}',
+            value: '$_fee ${S.of(context).currency}',
           ),
           if (doctor.waitingTime != null) ...[
             const SizedBox(height: 12),
