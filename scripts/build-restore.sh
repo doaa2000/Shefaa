@@ -19,6 +19,7 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ADMIN_REPO="${1:-$REPO_ROOT/../Shefaa_Admin_Panel}"
 
 SEED="$REPO_ROOT/supabase/seed.sql"
+ADMIN_BASE="$ADMIN_REPO/supabase/migrations/001_admin_integration.sql"
 RLS="$ADMIN_REPO/supabase/migrations/002_fix_rls_policies.sql"
 OUT="$REPO_ROOT/supabase/RESTORE_ALL.sql"
 
@@ -29,6 +30,14 @@ OUT="$REPO_ROOT/supabase/RESTORE_ALL.sql"
 # left 0004's tables out, which the seed then failed to insert into.
 mapfile -t MIGRATIONS < <(find "$REPO_ROOT/supabase/migrations" -name '*.sql' | sort)
 [[ ${#MIGRATIONS[@]} -gt 0 ]] || { echo "error: no migrations found" >&2; exit 1; }
+
+# 001 was left out until it cost something: a function defined only there was
+# missing from every rebuilt database, so a check against one reported it
+# missing from the live database too, which it was not.
+if [[ ! -f "$ADMIN_BASE" ]]; then
+  echo "error: cannot find the admin base migration at $ADMIN_BASE" >&2
+  exit 1
+fi
 
 if [[ ! -f "$RLS" ]]; then
   echo "error: cannot find the RLS migration at $RLS" >&2
@@ -47,6 +56,7 @@ fi
 -- Sources:
 --   supabase/migrations/*.sql   (in order)
 --   supabase/seed.sql
+--   ../Shefaa_Admin_Panel/supabase/migrations/001_admin_integration.sql
 --   ../Shefaa_Admin_Panel/supabase/migrations/002_fix_rls_policies.sql
 --
 -- Safe to re-run: every statement is if-not-exists / on-conflict-do-nothing.
@@ -55,10 +65,19 @@ fi
 
 HEADER
   echo "-- ############## 1 of 3 — SCHEMA ##############"
+  # The admin panel's baseline is additive -- it expects the app's tables to be
+  # there already -- so it goes after 0000 and before the rest. Before 0000 it
+  # fails on the first table it touches; after everything, it would put back the
+  # older definitions that later migrations here deliberately replace.
   for m in "${MIGRATIONS[@]}"; do
     echo
     echo "-- ---- $(basename "$m") ----"
     cat "$m"
+    if [[ "$(basename "$m")" == 0000_* ]]; then
+      echo
+      echo "-- ---- 001_admin_integration.sql (admin panel) ----"
+      cat "$ADMIN_BASE"
+    fi
   done
   echo
   echo "-- ############## 2 of 3 — REFERENCE DATA ##############"

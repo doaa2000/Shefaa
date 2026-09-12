@@ -7,6 +7,7 @@
 -- Sources:
 --   supabase/migrations/*.sql   (in order)
 --   supabase/seed.sql
+--   ../Shefaa_Admin_Panel/supabase/migrations/001_admin_integration.sql
 --   ../Shefaa_Admin_Panel/supabase/migrations/002_fix_rls_policies.sql
 --
 -- Safe to re-run: every statement is if-not-exists / on-conflict-do-nothing.
@@ -260,6 +261,94 @@ alter default privileges in schema public
   grant all on tables to service_role;
 alter default privileges in schema public
   grant usage, select on sequences to anon, authenticated, service_role;
+
+-- ---- 001_admin_integration.sql (admin panel) ----
+-- ============================================================
+-- Shefaa Admin ↔ App integration migration
+-- Safe / additive only. Adapts the EXISTING app database so the
+-- admin panel can manage the same data the app reads.
+-- Run once in the Supabase SQL editor.
+-- ============================================================
+
+-- ---------- 1. Specializations: enrich for the admin form ----
+-- The app keeps using specialties.name + specialties.icon.
+-- These extra columns are nullable so the app is unaffected.
+alter table specialties add column if not exists name_ar     text;
+alter table specialties add column if not exists description text;
+alter table specialties add column if not exists color       text;
+alter table specialties add column if not exists base_fee    numeric(10,2) default 0;
+
+-- ---------- 2. Status columns (activate / block) -------------
+-- Needed for "activate/deactivate doctor" and "block patient".
+alter table "Doctors" add column if not exists status text not null default 'active';
+alter table profiles  add column if not exists status text not null default 'active';
+
+-- ---------- 3. Realtime: live updates in the app -------------
+-- After this, an INSERT from the admin shows up instantly in the app
+-- (if the app subscribes to the table — see app snippet in README).
+do $$ begin alter publication supabase_realtime add table specialties; exception when duplicate_object then null; end $$;
+do $$ begin alter publication supabase_realtime add table "Doctors";   exception when duplicate_object then null; end $$;
+do $$ begin alter publication supabase_realtime add table bookings;    exception when duplicate_object then null; end $$;
+
+-- ---------- 4. RLS policies for the admin (authenticated) ----
+-- These are ADDITIVE — they do not remove your existing policies and
+-- are only enforced if RLS is already enabled on the table. They let a
+-- signed-in admin (Supabase Auth user) manage the master data.
+do $$
+declare tbl text;
+begin
+  foreach tbl in array array['specialties','"Doctors"','"Governorates"','"Cities"','"Clinics"','profiles']
+  loop
+    execute format('drop policy if exists admin_manage on %s;', tbl);
+    execute format(
+      'create policy admin_manage on %s for all to authenticated using (true) with check (true);',
+      tbl
+    );
+  end loop;
+end $$;
+
+-- ---------- 5. Dashboard aggregate (real numbers) ------------
+create or replace function admin_dashboard_stats()
+returns jsonb
+language sql
+security definer
+set search_path = public
+as $$
+  with months as (
+    select generate_series(date_trunc('month', now()) - interval '5 months',
+                           date_trunc('month', now()), interval '1 month') as m
+  ),
+  trend as (
+    select m,
+           to_char(m, 'Mon') as en,
+           (array['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'])[extract(month from m)::int] as ar,
+           (select count(*) from bookings b where date_trunc('month', b.booked_date) = m) as cnt
+    from months
+  )
+  select jsonb_build_object(
+    'bookings', jsonb_build_object('value', (select count(*) from bookings), 'trend', 12.4),
+    'doctors',  jsonb_build_object('value', (select count(*) from "Doctors" where status = 'active'), 'trend', 4.2),
+    'revenue',  jsonb_build_object('value', coalesce((select sum(amount) from payments), 0), 'trend', 18.7),
+    'patients', jsonb_build_object('value', (select count(*) from profiles), 'trend', 6.1),
+    'trend', jsonb_build_object(
+      'monthsEn', (select jsonb_agg(en order by m) from trend),
+      'monthsAr', (select jsonb_agg(ar order by m) from trend),
+      'values',   (select jsonb_agg(cnt order by m) from trend)
+    ),
+    'byCity', coalesce((
+      select jsonb_agg(jsonb_build_object('en', name, 'ar', name, 'value', cnt) order by cnt desc)
+      from (
+        select g.name, count(b.id) as cnt
+        from "Governorates" g
+        left join "Cities" ci on ci.governorate_id = g.id
+        left join "Clinics" cl on cl.city_id = ci.id
+        left join "Doctors" d on d.clinic_id = cl.id
+        left join bookings b on b.doctor_id = d.id
+        group by g.name
+      ) t
+    ), '[]'::jsonb)
+  );
+$$;
 
 -- ---- 0002_allow_no_show_status.sql ----
 -- =============================================================================
@@ -2491,20 +2580,27 @@ grant execute on function public.bookings_trend(integer) to authenticated;
 
 -- ---- 0020_admin_dashboard_stats.sql ----
 -- =============================================================================
--- The admin panel's home page was showing invented numbers.
+-- The admin panel's home page, counted properly.
 --
--- It calls admin_dashboard_stats, which was never written, and the repository
--- falls back to the seed figures when the call fails -- silently. So the front
--- page of the panel read 1,437 bookings, 3,219 patients and EGP 684,500 of
--- revenue, none of which had ever happened, with nothing on screen to say so.
+-- admin_dashboard_stats exists already, in the admin panel's own
+-- 001_admin_integration.sql. This replaces it, for four reasons:
 --
--- That is worse than a page that breaks. A broken page is obviously broken; a
--- page of confident numbers that are fiction is believed, and decisions get
--- made on it.
+--   * Its growth percentages were literals -- 12.4, 4.2, 18.7, 6.1, copied
+--     from the seed data and written into the SQL. Every month, for every
+--     clinic, the front page reported the same four numbers as though it had
+--     measured something.
+--   * It counted cancelled bookings among the bookings.
+--   * It summed every payment row as revenue, including the pending and the
+--     failed ones, which overstates every month.
+--   * It had no is_admin() guard, so any signed-in patient who knew the name
+--     could read the whole network's takings.
 --
--- Everything below is counted from bookings, payments, profiles and the
--- location tree. The trend is by booking month, so a month with no bookings
--- appears as a zero rather than as a gap in the line.
+--   * byCity left-joined from every governorate, so places with no clinic at
+--     all appeared in the chart on zero.
+--
+-- The counts it did make were real; what follows keeps those and fixes the
+-- rest. Everything is counted from bookings, payments, profiles and the
+-- location tree.
 --
 -- Safe to re-run.
 -- =============================================================================
@@ -2543,6 +2639,10 @@ as $$
     'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
   ])[greatest(least(p_month, 12), 1)];
 $$;
+
+-- The function that exists returns jsonb, and a return type cannot be changed
+-- in place. Dropped by its exact signature so nothing else is caught by it.
+drop function if exists public.admin_dashboard_stats();
 
 create or replace function public.admin_dashboard_stats()
 returns json
