@@ -24,6 +24,21 @@ class BookingCard extends StatelessWidget {
 
   String get _date => shortArabicDate(booking.bookedDate);
 
+  /// What to say beside the ticket number.
+  ///
+  /// This used to read `queueNumber - 1` as "people ahead of you", which
+  /// counts everyone who booked earlier -- including the ones the doctor has
+  /// already finished with. Once the doctor starts calling patients through,
+  /// that is simply wrong. `nowServing` is the number being seen, so the
+  /// difference is the real answer.
+  String get _queueNote {
+    final ahead = booking.peopleAhead;
+    if (ahead == null) return 'ترتيبك داخل الفترة';
+    if (ahead == 0) return '· دورك دلوقتي';
+    if (ahead == 1) return '· قدامك شخص واحد';
+    return '· قدامك $ahead';
+  }
+
   String get _sessionLabel =>
       booking.session == 'morning' ? 'الفترة الصباحية' : 'الفترة المسائية';
 
@@ -109,12 +124,15 @@ class BookingCard extends StatelessWidget {
                     Text('دورك رقم ${booking.queueNumber}',
                         style: TextStyles.bold14
                             .copyWith(color: AppColors.primaryColor)),
-                    if (booking.queueNumber! > 1) ...[
-                      const SizedBox(width: 8),
-                      Text('· قدامك ${booking.queueNumber! - 1}',
-                          style: TextStyles.meduim12
-                              .copyWith(color: Colors.grey.shade600)),
-                    ],
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _queueNote,
+                        style: TextStyles.meduim12
+                            .copyWith(color: Colors.grey.shade600),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ],
                 ),
               ),

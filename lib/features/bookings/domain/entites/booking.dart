@@ -21,6 +21,27 @@ class BookingEntity {
   /// the patient is told.
   final int? queueNumber;
 
+  /// The number the doctor is on right now in this session, or null once
+  /// everyone has been seen.
+  ///
+  /// [queueNumber] is a ticket and never moves; this is what moves. Without it
+  /// the card could only say "everyone who booked before you", which counts
+  /// people the doctor has already finished with.
+  final int? nowServing;
+
+  /// How many patients are still in front of this one. Null when either number
+  /// is unknown; 0 means it is their turn.
+  int? get peopleAhead {
+    final mine = queueNumber;
+    final serving = nowServing;
+    if (mine == null || serving == null) return null;
+    final ahead = mine - serving;
+    return ahead < 0 ? 0 : ahead;
+  }
+
+  /// Their turn: the doctor is on their number.
+  bool get isBeingSeen => peopleAhead == 0;
+
   final PaymentEntity payment;
   final DoctorEntity doctor;
 
@@ -35,6 +56,7 @@ class BookingEntity {
     required this.payment,
     required this.doctor,
     this.queueNumber,
+    this.nowServing,
   });
 
   bool get isUpcoming =>
