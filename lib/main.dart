@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shefaa_app/core/helper_functions/on_generate_route.dart';
 import 'package:shefaa_app/core/services/custom_bloc_observer.dart';
 import 'package:shefaa_app/core/services/secure_storage_service.dart';
+import 'package:shefaa_app/core/services/selected_city_service.dart';
 import 'package:shefaa_app/core/services/service_locator.dart';
 import 'package:shefaa_app/core/utils/app_router.dart';
 import 'package:shefaa_app/core/utils/app_colors.dart';
@@ -26,7 +27,12 @@ void main() async {
     url: AppConfig.supabaseUrl,
     anonKey: AppConfig.supabaseAnonKey,
   );
-  setupServiceLocator();
+  // Read before the first frame so no screen has to wait on it, and the app
+  // bar never flashes "all cities" over a city the patient already picked.
+  final selectedCityService = SelectedCityService();
+  await selectedCityService.load();
+
+  setupServiceLocator(selectedCityService);
   runApp(const MyApp());
 }
 

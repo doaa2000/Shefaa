@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:shefaa_app/core/enums/request_state.dart';
+import 'package:shefaa_app/core/services/selected_city_service.dart';
 import 'package:shefaa_app/features/doctors/domain/entities/doctor.dart';
 import 'package:shefaa_app/features/doctors/domain/usecases/get_doctors_usecase.dart';
 
@@ -11,9 +12,12 @@ part 'doctor_search_state.dart';
 
 class DoctorSearchBloc extends Bloc<DoctorSearchEvent, DoctorSearchState> {
   final SearchDoctorsUseCase searchDoctorsUseCase;
+  final SelectedCityService selectedCityService;
 
-  DoctorSearchBloc({required this.searchDoctorsUseCase})
-      : super(const DoctorSearchState()) {
+  DoctorSearchBloc({
+    required this.searchDoctorsUseCase,
+    required this.selectedCityService,
+  }) : super(const DoctorSearchState()) {
     on<SearchDoctorsEvent>(_search);
   }
 
@@ -32,7 +36,12 @@ class DoctorSearchBloc extends Bloc<DoctorSearchEvent, DoctorSearchState> {
 
     emit(state.copyWith(searchState: RequestState.loading, query: query));
 
-    final result = await searchDoctorsUseCase(query);
+    final result = await searchDoctorsUseCase(
+      SearchDoctorsUsecaseParameters(
+        query: query,
+        cityId: selectedCityService.cityId,
+      ),
+    );
 
     // Typing moved on while this was in flight, so its answer is about a
     // question nobody is asking any more.

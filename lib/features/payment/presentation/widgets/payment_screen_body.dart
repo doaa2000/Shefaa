@@ -128,13 +128,7 @@ class PaymentScreenBody extends StatelessWidget {
             listenWhen: (p, c) => p.createBookingState != c.createBookingState,
             listener: (context, state) {
               if (state.createBookingState == RequestState.loaded) {
-                // The number the database assigned, not the one predicted on
-                // the session card before anyone else had committed.
-                _showSuccess(
-                  context,
-                  args,
-                  state.bookedQueueNumber ?? args.queueNumber,
-                );
+                _showSuccess(context, args);
               }
               if (state.createBookingState == RequestState.error) {
                 ScaffoldMessenger.of(context)
@@ -176,11 +170,7 @@ class PaymentScreenBody extends StatelessWidget {
   /// doing nothing. The whole stack is replaced instead, so back does not lead
   /// into a payment flow that is already finished, and BookingsScreen re-reads
   /// on open so the new booking is there.
-  void _showSuccess(
-    BuildContext context,
-    PaymentArgsModel args,
-    int queueNumber,
-  ) {
+  void _showSuccess(BuildContext context, PaymentArgsModel args) {
     showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -201,12 +191,14 @@ class PaymentScreenBody extends StatelessWidget {
             Text('تم تأكيد الحجز', style: TextStyles.bold18),
             const SizedBox(height: 8),
             Text(
-              '${_formatDate(args.date)}\n'
-              '${args.session == 'morning' ? 'الفترة الصباحية' : 'الفترة المسائية'}',
+              _formatDate(args.date),
               textAlign: TextAlign.center,
               style: TextStyles.meduim14.copyWith(color: Colors.grey.shade700),
             ),
             const SizedBox(height: 16),
+            // The window, which is the whole promise. The app deliberately
+            // hands out no position: the clinic sees people in the order they
+            // walk in, and most of them never booked through the app.
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               decoration: BoxDecoration(
@@ -214,13 +206,15 @@ class PaymentScreenBody extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                'دورك رقم $queueNumber',
+                '${DoctorSessionModel.formatTime(args.startTime)}'
+                ' - '
+                '${DoctorSessionModel.formatTime(args.endTime)}',
                 style: TextStyles.bold18.copyWith(color: AppColors.primaryColor),
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'إذا ألغى أحد قبلك يقل رقمك — ولا يزيد أبداً',
+              'يرجى الحضور في بداية الموعد',
               textAlign: TextAlign.center,
               style: TextStyles.meduim12.copyWith(color: Colors.grey.shade600),
             ),
@@ -262,84 +256,22 @@ class _QueueCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text('دورك سيكون',
+          Text('موعدك',
               style: TextStyles.meduim14.copyWith(color: Colors.grey.shade700)),
           const SizedBox(height: 4),
-          Text('رقم ${args.queueNumber}',
-              style: TextStyles.bold24.copyWith(color: AppColors.primaryColor)),
+          Text(
+            '${DoctorSessionModel.formatTime(args.startTime)}'
+            ' - '
+            '${DoctorSessionModel.formatTime(args.endTime)}',
+            style: TextStyles.bold24.copyWith(color: AppColors.primaryColor),
+          ),
           const SizedBox(height: 6),
           Text(
-            'ترتيبك داخل الفترة، وليس موعداً محدداً',
+            'يرجى الحضور في بداية الموعد',
             style: TextStyles.meduim12.copyWith(color: Colors.grey.shade600),
           ),
         ],
       ),
-    );
-  }
-}
-
-class _Card extends StatelessWidget {
-  const _Card({required this.child});
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: child,
-    );
-  }
-}
-
-class _Row extends StatelessWidget {
-  const _Row({required this.icon, required this.title, required this.subtitle});
-  final IconData icon;
-  final String title;
-  final String subtitle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, color: AppColors.primaryColor, size: 22),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: TextStyles.bold14.copyWith(color: Colors.black)),
-              const SizedBox(height: 2),
-              Text(subtitle,
-                  style: TextStyles.meduim12.copyWith(color: Colors.grey.shade600)),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _AmountRow extends StatelessWidget {
-  const _AmountRow({required this.label, required this.value, this.bold = false});
-  final String label;
-  final String value;
-  final bool bold;
-
-  @override
-  Widget build(BuildContext context) {
-    final style = bold
-        ? TextStyles.bold14.copyWith(color: Colors.black)
-        : TextStyles.meduim14.copyWith(color: Colors.grey.shade700);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [Text(label, style: style), Text(value, style: style)],
     );
   }
 }

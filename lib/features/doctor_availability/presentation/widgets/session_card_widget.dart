@@ -75,6 +75,9 @@ class SessionCardWidget extends StatelessWidget {
                 '${DoctorSessionModel.formatTime(session.endTime)}',
                 style: TextStyles.meduim14.copyWith(color: Colors.grey.shade700),
               ),
+              // What the patient is agreeing to: come inside this window. No
+              // number -- the clinic sees people in the order they arrive, and
+              // most of them never booked through the app.
               if (isSelected && !full) ...[
                 const SizedBox(height: 12),
                 Container(
@@ -86,13 +89,15 @@ class SessionCardWidget extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.confirmation_number_outlined,
+                      const Icon(Icons.access_time,
                           size: 18, color: AppColors.primaryColor),
                       const SizedBox(width: 8),
-                      Text(
-                        'دورك سيكون رقم ${session.nextQueueNumber}',
-                        style: TextStyles.bold14
-                            .copyWith(color: AppColors.primaryColor),
+                      Expanded(
+                        child: Text(
+                          'يرجى الحضور في بداية الموعد',
+                          style: TextStyles.bold14
+                              .copyWith(color: AppColors.primaryColor),
+                        ),
                       ),
                     ],
                   ),
@@ -119,7 +124,7 @@ class _RemainingChip extends StatelessWidget {
     final almostFull = !full && session.remaining <= 3;
 
     final label = full
-        ? 'اكتملت الفترة'
+        ? 'مكتمل'
         : almostFull
             ? 'أماكن متبقية: ${session.remaining}'
             : 'متاح';

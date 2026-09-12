@@ -14,15 +14,9 @@ class BookingModel extends BookingEntity {
     required super.endTime,
     required super.payment,
     required super.doctor,
-    super.queueNumber,
-    super.nowServing,
   });
 
-  factory BookingModel.fromMap(
-    Map<String, dynamic> map, {
-    int? queueNumber,
-    int? nowServing,
-  }) {
+  factory BookingModel.fromMap(Map<String, dynamic> map) {
     final payment = map['payments'];
 
     return BookingModel(
@@ -33,8 +27,6 @@ class BookingModel extends BookingEntity {
       session: map['session'] as String? ?? 'morning',
       startTime: map['start_time'] as String? ?? '',
       endTime: map['end_time'] as String? ?? '',
-      queueNumber: queueNumber,
-      nowServing: nowServing,
       // A booking can exist without a payment row; the old code assumed one and
       // threw while parsing the list.
       payment: payment == null

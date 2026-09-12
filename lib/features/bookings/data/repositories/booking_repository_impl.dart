@@ -21,7 +21,7 @@ class BookingRepositoryImpl implements BookingRepository {
     required String endTime,
   }) async {
     try {
-      final queueNumber = await remoteDatasource.createBooking(
+      final bookingId = await remoteDatasource.createBooking(
         doctorId: doctorId,
         amount: amount,
         paymentMethod: paymentMethod,
@@ -30,7 +30,7 @@ class BookingRepositoryImpl implements BookingRepository {
         startTime: startTime,
         endTime: endTime,
       );
-      return Right(queueNumber);
+      return Right(bookingId);
     } catch (e) {
       return Left(ServerFailure(_message(e)));
     }

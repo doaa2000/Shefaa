@@ -13,11 +13,12 @@ class DoctorsRepositoryImpl implements DoctorsRepository {
 
   @override
   Future<Either<Failure, List<DoctorEntity>>> getDoctors(
-    int specialtyId,
-  ) async {
+    int specialtyId, {
+    int? cityId,
+  }) async {
     try {
       final doctors =
-          await remoteDatasource.getDoctors(specialtyId);
+          await remoteDatasource.getDoctors(specialtyId, cityId: cityId);
       return Right(doctors);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -25,9 +26,12 @@ class DoctorsRepositoryImpl implements DoctorsRepository {
   }
 
   @override
-  Future<Either<Failure, List<DoctorEntity>>> searchDoctors(String query) async {
+  Future<Either<Failure, List<DoctorEntity>>> searchDoctors(
+    String query, {
+    int? cityId,
+  }) async {
     try {
-      return Right(await remoteDatasource.searchDoctors(query));
+      return Right(await remoteDatasource.searchDoctors(query, cityId: cityId));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

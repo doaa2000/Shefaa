@@ -1,18 +1,19 @@
-/// One bookable session of a doctor's day, as returned by the
+/// One bookable window of a doctor's day, as returned by the
 /// `doctor_sessions_on` function.
 ///
-/// This replaces the old per-slot entity. The clinic runs a queue, not a
-/// timetable: a patient takes a place in a session rather than a specific
-/// 30-minute appointment the doctor was never going to keep to.
+/// How long a window is belongs to the doctor: a session left whole is one
+/// window from its start to its end, and a session with a slot length set is
+/// cut into windows of that length. Either way it is a window to arrive in,
+/// not a minute the doctor promises to be free.
 class DoctorSessionEntity {
   /// 'morning' or 'evening'.
   final String session;
 
-  /// The window the session runs, e.g. 17:00:00 – 21:00:00.
+  /// The window itself, e.g. 17:00:00 – 21:00:00.
   final String startTime;
   final String endTime;
 
-  /// How many patients the doctor takes in this session.
+  /// How many patients the doctor takes in this window.
   final int capacity;
 
   /// How many places are already taken.
@@ -33,8 +34,4 @@ class DoctorSessionEntity {
   bool get isFull => remaining <= 0;
 
   bool get isMorning => session == 'morning';
-
-  /// The place this patient would take if they booked now: everyone already
-  /// booked is ahead of them.
-  int get nextQueueNumber => booked + 1;
 }

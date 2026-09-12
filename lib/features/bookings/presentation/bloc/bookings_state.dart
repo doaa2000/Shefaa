@@ -9,10 +9,6 @@ class BookingState extends Equatable {
   final List<BookingEntity> bookings;
   final String? errorMessage;
 
-  /// The place the booking just made actually got, as the database assigned
-  /// it. Not the number predicted on the session card -- that was read before
-  /// anyone else had committed, and two patients can be shown the same one.
-  final int? bookedQueueNumber;
 
   const BookingState({
     this.createBookingState = RequestState.initial,
@@ -20,7 +16,6 @@ class BookingState extends Equatable {
     this.cancelBookingState = RequestState.initial,
     this.bookings = const [],
     this.errorMessage,
-    this.bookedQueueNumber,
   });
 
   /// Still to come: a place the patient still holds, on today or later.
@@ -56,7 +51,6 @@ class BookingState extends Equatable {
     RequestState? cancelBookingState,
     List<BookingEntity>? bookings,
     String? errorMessage,
-    int? bookedQueueNumber,
   }) {
     return BookingState(
       createBookingState: createBookingState ?? this.createBookingState,
@@ -64,7 +58,6 @@ class BookingState extends Equatable {
       cancelBookingState: cancelBookingState ?? this.cancelBookingState,
       bookings: bookings ?? this.bookings,
       errorMessage: errorMessage ?? this.errorMessage,
-      bookedQueueNumber: bookedQueueNumber ?? this.bookedQueueNumber,
     );
   }
 
@@ -75,6 +68,5 @@ class BookingState extends Equatable {
         cancelBookingState,
         bookings,
         errorMessage,
-        bookedQueueNumber,
       ];
 }

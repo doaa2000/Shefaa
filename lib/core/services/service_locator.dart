@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:shefaa_app/core/services/secure_storage_service.dart';
+import 'package:shefaa_app/core/services/selected_city_service.dart';
 import 'package:shefaa_app/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:shefaa_app/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:shefaa_app/features/auth/domain/repositories/auth_repository.dart';
@@ -35,6 +36,10 @@ import 'package:shefaa_app/features/home/data/repositories/home_repository_impl.
 import 'package:shefaa_app/features/home/domain/repositories/home_repository.dart';
 import 'package:shefaa_app/features/home/domain/usecases/get_specialties_usecase.dart';
 import 'package:shefaa_app/features/home/presentation/bloc/home_bloc.dart';
+import 'package:shefaa_app/features/location/data/datasources/location_remote_datasource.dart';
+import 'package:shefaa_app/features/location/data/repositories/location_repository_impl.dart';
+import 'package:shefaa_app/features/location/domain/repositories/location_repository.dart';
+import 'package:shefaa_app/features/location/domain/usecases/get_places_usecase.dart';
 import 'package:shefaa_app/features/location/presentation/bloc/location_bloc.dart';
 import 'package:shefaa_app/features/profile/data/datasources/profile_remote_datasource.dart';
 import 'package:shefaa_app/features/profile/data/repositories/profile_repository_impl.dart';
@@ -45,7 +50,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 final getIt = GetIt.instance;
 
-void setupServiceLocator() {
+void setupServiceLocator(SelectedCityService selectedCityService) {
   // 1️⃣ SupabaseClient
   getIt.registerLazySingleton<SupabaseClient>(() => Supabase.instance.client);
 
@@ -73,6 +78,9 @@ getIt.registerLazySingleton<HomeRemoteDatasource>(
   getIt.registerLazySingleton<BannersRemoteDatasource>(
     () => BannersRemoteDatasourceImpl(getIt()),
   );
+  getIt.registerLazySingleton<LocationRemoteDatasource>(
+    () => LocationRemoteDatasourceImpl(getIt()),
+  );
   // 3️⃣ Repository
   getIt.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(getIt()),
@@ -97,6 +105,9 @@ getIt.registerLazySingleton<ProfileRepository>(
   );
   getIt.registerLazySingleton<BannersRepository>(
     () => BannersRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton<LocationRepository>(
+    () => LocationRepositoryImpl(getIt()),
   );
   // 4️⃣ UseCases
   getIt.registerLazySingleton<LoginUseCase>(() => LoginUseCase(getIt()));
@@ -140,9 +151,15 @@ getIt.registerLazySingleton<LogoutUseCase>(() => LogoutUseCase(getIt()));
   getIt.registerLazySingleton<GetBannersUseCase>(
     () => GetBannersUseCase(getIt()),
   );
+  getIt.registerLazySingleton<GetGovernoratesUseCase>(
+    () => GetGovernoratesUseCase(getIt()),
+  );
+  getIt.registerLazySingleton<GetCitiesUseCase>(
+    () => GetCitiesUseCase(getIt()),
+  );
   // 5️⃣ Bloc
   getIt.registerFactory<DoctorsBloc>(
-    () => DoctorsBloc(getDoctorsUseCase: getIt()),
+    () => DoctorsBloc(getDoctorsUseCase: getIt(), selectedCityService: getIt()),
   );
 
   getIt.registerFactory<DoctorDetailsBloc>(
@@ -150,14 +167,21 @@ getIt.registerLazySingleton<LogoutUseCase>(() => LogoutUseCase(getIt()));
   );
 
   getIt.registerFactory<DoctorSearchBloc>(
-    () => DoctorSearchBloc(searchDoctorsUseCase: getIt()),
+    () => DoctorSearchBloc(
+      searchDoctorsUseCase: getIt(),
+      selectedCityService: getIt(),
+    ),
   );
   getIt.registerFactory<AuthBloc>(
     () => AuthBloc(loginUseCase: getIt(), registerUseCase: getIt(), secureStorageService: getIt(), logoutUseCase: getIt()),
   );
 
   getIt.registerFactory<LocationBloc>(
-    () => LocationBloc(),
+    () => LocationBloc(
+      getGovernoratesUseCase: getIt(),
+      getCitiesUseCase: getIt(),
+      selectedCityService: getIt(),
+    ),
   );
   getIt.registerFactory<ProfileBloc>(
     () => ProfileBloc(getProfileUseCase: getIt(), updateProfileUseCase: getIt()),
@@ -168,6 +192,9 @@ getIt.registerFactory<HomeBloc>(
   getIt.registerLazySingleton<SecureStorageService>(
   () => SecureStorageService(),
 );
+  // Registered as a value, not a factory: main() loads it from disk before the
+  // app starts, so every later read is a plain field access.
+  getIt.registerSingleton<SelectedCityService>(selectedCityService);
 
 getIt.registerFactory<DoctorAvailabilityBloc>(
     () => DoctorAvailabilityBloc(getDoctorAvailabilityUsecase: getIt()),

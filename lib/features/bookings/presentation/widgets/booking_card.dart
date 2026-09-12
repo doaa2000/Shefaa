@@ -24,20 +24,6 @@ class BookingCard extends StatelessWidget {
 
   String get _date => shortArabicDate(booking.bookedDate);
 
-  /// What to say beside the ticket number.
-  ///
-  /// This used to read `queueNumber - 1` as "people ahead of you", which
-  /// counts everyone who booked earlier -- including the ones the doctor has
-  /// already finished with. Once the doctor starts calling patients through,
-  /// that is simply wrong. `nowServing` is the number being seen, so the
-  /// difference is the real answer.
-  String get _queueNote {
-    final ahead = booking.peopleAhead;
-    if (ahead == null) return 'ترتيبك داخل الفترة';
-    if (ahead == 0) return '· دورك الآن';
-    if (ahead == 1) return '· أمامك شخص واحد';
-    return '· أمامك $ahead';
-  }
 
   String get _sessionLabel =>
       booking.session == 'morning' ? 'الفترة الصباحية' : 'الفترة المسائية';
@@ -98,16 +84,18 @@ class BookingCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     '$_sessionLabel · '
-                    '${DoctorSessionModel.formatTime(booking.startTime)}',
+                    '${DoctorSessionModel.formatTime(booking.startTime)}'
+                    ' - ${DoctorSessionModel.formatTime(booking.endTime)}',
                     style: TextStyles.meduim14,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
-            // Only worth showing while the visit is still ahead: a queue position
-            // on a booking that has already happened means nothing.
-            if (booking.queueNumber != null && booking.isUpcoming) ...[
+            // The card says when to come, not what number you are: the clinic
+            // sees people in the order they arrive and most of them never
+            // booked here, so no number this app computed would be true.
+            if (booking.isUpcoming) ...[
               const SizedBox(height: 12),
               Container(
                 width: double.infinity,
@@ -118,18 +106,14 @@ class BookingCard extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.confirmation_number_outlined,
+                    const Icon(Icons.access_time,
                         size: 18, color: AppColors.primaryColor),
-                    const SizedBox(width: 8),
-                    Text('دورك رقم ${booking.queueNumber}',
-                        style: TextStyles.bold14
-                            .copyWith(color: AppColors.primaryColor)),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        _queueNote,
+                        'يرجى الحضور في بداية الموعد',
                         style: TextStyles.meduim12
-                            .copyWith(color: Colors.grey.shade600),
+                            .copyWith(color: Colors.grey.shade700),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),

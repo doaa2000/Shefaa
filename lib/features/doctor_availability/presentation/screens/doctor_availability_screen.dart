@@ -116,7 +116,7 @@ class DoctorAvailabilityScreen extends StatelessWidget {
                                 .add(SelectDateEvent(days[index])),
                           ),
                           const SizedBox(height: 24),
-                          Text('اختر الفترة', style: TextStyles.bold18),
+                          Text('اختر الموعد', style: TextStyles.bold18),
                           const SizedBox(height: 12),
                           _SessionsArea(state: state),
                         ],
@@ -139,7 +139,6 @@ class DoctorAvailabilityScreen extends StatelessWidget {
                                 session: session.session,
                                 startTime: session.startTime,
                                 endTime: session.endTime,
-                                queueNumber: session.nextQueueNumber,
                                 amount:
                                     (doctor?.consultationFee as num?)?.toDouble() ??
                                         0,

@@ -150,24 +150,22 @@ class _Card extends StatelessWidget {
                       ),
                     ],
                   ),
-                  // The number is the point of a queue booking, so it belongs
-                  // on the card that tells you the visit is coming.
-                  if (booking.queueNumber != null) ...[
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        'دورك رقم ${booking.queueNumber}',
-                        style: TextStyles.bold14
-                            .copyWith(color: AppColors.primaryColor),
-                      ),
+                  // When to come, which is the whole promise. There is no
+                  // number: the clinic sees people in the order they arrive.
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                  ],
+                    child: Text(
+                      'يرجى الحضور في بداية الموعد',
+                      style: TextStyles.bold14
+                          .copyWith(color: AppColors.primaryColor),
+                    ),
+                  ),
                 ],
               ),
             ),

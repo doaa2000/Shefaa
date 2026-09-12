@@ -15,14 +15,17 @@ class GetDoctorsUseCase
   Future<Either<Failure, List<DoctorEntity>>> call(
     GetDoctorsUsecaseParameters params,
   ) {
-    return repository.getDoctors(params.specialtyId);
+    return repository.getDoctors(params.specialtyId, cityId: params.cityId);
   }
 }
 
 class GetDoctorsUsecaseParameters {
   final int specialtyId;
 
-  GetDoctorsUsecaseParameters({required this.specialtyId});
+  /// The city the patient is looking in, or null for all of them.
+  final int? cityId;
+
+  GetDoctorsUsecaseParameters({required this.specialtyId, this.cityId});
 }
 
 class GetDoctorScheduleUseCase
@@ -37,13 +40,23 @@ class GetDoctorScheduleUseCase
   }
 }
 
-class SearchDoctorsUseCase extends BaseUsecase<List<DoctorEntity>, String> {
+class SearchDoctorsUseCase
+    extends BaseUsecase<List<DoctorEntity>, SearchDoctorsUsecaseParameters> {
   final DoctorsRepository repository;
 
   SearchDoctorsUseCase(this.repository);
 
   @override
-  Future<Either<Failure, List<DoctorEntity>>> call(String query) {
-    return repository.searchDoctors(query);
+  Future<Either<Failure, List<DoctorEntity>>> call(
+    SearchDoctorsUsecaseParameters params,
+  ) {
+    return repository.searchDoctors(params.query, cityId: params.cityId);
   }
+}
+
+class SearchDoctorsUsecaseParameters {
+  final String query;
+  final int? cityId;
+
+  SearchDoctorsUsecaseParameters({required this.query, this.cityId});
 }
