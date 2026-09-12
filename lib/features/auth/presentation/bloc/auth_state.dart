@@ -7,6 +7,11 @@ class AuthState extends Equatable {
   final RequestState registerState;
   final String registerMessage;
 
+  /// The account was created but nobody is signed in: the address still has
+  /// to be confirmed. Registering is finished either way -- what differs is
+  /// where the patient goes next.
+  final bool registerNeedsConfirmation;
+
    final RequestState logoutState;
   final String logoutMessage;
 
@@ -16,6 +21,7 @@ class AuthState extends Equatable {
     this.user,
     this.registerState = RequestState.initial,
     this.registerMessage = '',
+    this.registerNeedsConfirmation = false,
       this.logoutState = RequestState.initial,
       this.logoutMessage = '',
   });
@@ -26,6 +32,7 @@ class AuthState extends Equatable {
     UserEntity? user,
     RequestState? registerState,
     String? registerMessage,
+    bool? registerNeedsConfirmation,
     RequestState? logoutState,
     String? logoutMessage,
   }) {
@@ -35,6 +42,8 @@ class AuthState extends Equatable {
       user: user ?? this.user,
       registerState: registerState ?? this.registerState,
       registerMessage: registerMessage ?? this.registerMessage,
+      registerNeedsConfirmation:
+          registerNeedsConfirmation ?? this.registerNeedsConfirmation,
       logoutState: logoutState ?? this.logoutState,
       logoutMessage: logoutMessage ?? this.logoutMessage,
     );
@@ -47,6 +56,7 @@ class AuthState extends Equatable {
     user,
     registerState,
     registerMessage,
+    registerNeedsConfirmation,
     logoutState,
     logoutMessage,
   ];

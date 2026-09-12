@@ -61,6 +61,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  /// A dialog rather than a snackbar: this is an instruction the patient has
+  /// to act on, not a note that they can miss while it slides away.
+  void _showConfirmEmail(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('تم إنشاء الحساب'),
+        content: const Text(
+          'أرسلنا رسالة تأكيد إلى بريدك الإلكتروني.\n'
+          'يرجى فتح الرسالة وتأكيد البريد، ثم تسجيل الدخول.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                AppRoutes.login,
+                (route) => false,
+              );
+            },
+            child: const Text('تسجيل الدخول'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,6 +98,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
             previous.registerState != current.registerState,
         listener: (context, state) {
           if (state.registerState == RequestState.loaded) {
+            // Two different endings. With email confirmation on, the account
+            // exists but nobody is signed in -- sending them to the home
+            // screen would mean a screen with no session behind it, which row
+            // level security answers with empty lists rather than an error.
+            if (state.registerNeedsConfirmation) {
+              _showConfirmEmail(context);
+              return;
+            }
+
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
