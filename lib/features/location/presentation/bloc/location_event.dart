@@ -4,26 +4,44 @@ sealed class LocationEvent extends Equatable {
   const LocationEvent();
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
-class ToggleGovernorateDropdownEvent extends LocationEvent {}
+class LoadLocationEvent extends LocationEvent {
+  const LoadLocationEvent();
+}
 
-class ToggleCityDropdown extends LocationEvent {}
+class ToggleGovernorateDropdownEvent extends LocationEvent {
+  const ToggleGovernorateDropdownEvent();
+}
+
+class ToggleCityDropdownEvent extends LocationEvent {
+  const ToggleCityDropdownEvent();
+}
 
 class SelectGovernorateEvent extends LocationEvent {
-  final String value;
+  final PlaceEntity governorate;
 
-  const SelectGovernorateEvent(this.value);
+  const SelectGovernorateEvent(this.governorate);
 
   @override
-  List<Object> get props => [value];
+  List<Object?> get props => [governorate];
 }
-class SelectCityEvent extends LocationEvent {
-  final String value;
 
-  const SelectCityEvent(this.value);
+class SelectCityEvent extends LocationEvent {
+  final PlaceEntity city;
+
+  const SelectCityEvent(this.city);
 
   @override
-  List<Object> get props => [value];
+  List<Object?> get props => [city];
+}
+
+class SaveLocationEvent extends LocationEvent {
+  const SaveLocationEvent();
+}
+
+/// Back to every city.
+class ClearLocationEvent extends LocationEvent {
+  const ClearLocationEvent();
 }

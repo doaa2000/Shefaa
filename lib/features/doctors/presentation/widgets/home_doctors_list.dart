@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shefaa_app/core/enums/request_state.dart';
+import 'package:shefaa_app/core/services/selected_city_service.dart';
+import 'package:shefaa_app/core/services/service_locator.dart';
 import 'package:shefaa_app/features/doctors/presentation/bloc/doctors_bloc.dart';
 import 'package:shefaa_app/features/doctor_availability/data/models/doctor_availability_args_model.dart';
 import 'package:shefaa_app/features/doctor_availability/presentation/screens/doctor_availability_screen.dart';
@@ -41,12 +43,31 @@ class HomeDoctorsList extends StatelessWidget {
         }
 
         if (state.doctors.isEmpty) {
+          final cityService = getIt<SelectedCityService>();
+          final city = cityService.value;
+          final where = specialtyName == null
+              ? 'لا يوجد أطباء متاحون حالياً'
+              : 'لا يوجد أطباء في $specialtyName حالياً';
+
+          // A filter the patient cannot see is a filter they cannot undo. If a
+          // city is narrowing this list, the empty state has to say so and
+          // offer the way out, or the app simply looks as though it has no
+          // dentists.
           return _Message(
             icon: Icons.person_search_outlined,
             color: Colors.grey,
-            text: specialtyName == null
-                ? 'لا يوجد أطباء متاحون حالياً'
-                : 'لا يوجد أطباء في $specialtyName حالياً',
+            text: city == null ? where : '$where في ${city.cityName}',
+            actionLabel: city == null ? null : 'البحث في جميع المدن',
+            onAction: city == null
+                ? null
+                : () async {
+                    final bloc = context.read<DoctorsBloc>();
+                    final specialtyId = state.specialtyId;
+                    await cityService.clear();
+                    if (specialtyId != null) {
+                      bloc.add(GetDoctorsEvent(specialtyId: specialtyId));
+                    }
+                  },
           );
         }
 
