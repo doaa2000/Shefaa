@@ -4,6 +4,7 @@ import 'package:shefaa_app/core/enums/request_state.dart';
 import 'package:shefaa_app/features/doctors/presentation/bloc/doctors_bloc.dart';
 import 'package:shefaa_app/features/doctor_availability/data/models/doctor_availability_args_model.dart';
 import 'package:shefaa_app/features/doctor_availability/presentation/screens/doctor_availability_screen.dart';
+import 'package:shefaa_app/features/doctors/presentation/screens/doctor_details_screen.dart';
 import 'package:shefaa_app/features/doctors/presentation/widgets/doctors_card.dart';
 
 class HomeDoctorsList extends StatelessWidget {
@@ -74,9 +75,13 @@ class HomeDoctorsList extends StatelessWidget {
                 waitingTime: doctor.waitingTime != null
                     ? '${doctor.waitingTime} دقيقة'
                     : '—',
-                // Both go to the slots for now. Once F4 exists, tapping the
-                // card opens the doctor's page while the button still books.
-                onTap: openSlots,
+                // The card opens the doctor's page; the button skips straight
+                // to booking, which is what it says it does.
+                onTap: () => Navigator.pushNamed(
+                  context,
+                  DoctorDetailsScreen.routeName,
+                  arguments: doctor,
+                ),
                 onBookTap: openSlots,
               ),
             );

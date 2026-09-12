@@ -12,6 +12,7 @@ class DoctorModel extends DoctorEntity {
     required super.specialaization,
     super.consultationFee,
     super.waitingTime, required super.location,
+    super.bio,
   });
 factory DoctorModel.fromMap(Map<String, dynamic> json) {
     return DoctorModel(
@@ -26,6 +27,7 @@ factory DoctorModel.fromMap(Map<String, dynamic> json) {
     clinicId:        (json['clinic_id'] as num?)?.toInt(),      // ✅
     waitingTime:     (json['waiting_time'] as num?)?.toInt(),   // ✅  
     location:        json['location'] as String?,
+    bio:             json['bio'] as String?,
   );
 }
 
@@ -42,6 +44,7 @@ factory DoctorModel.fromMap(Map<String, dynamic> json) {
       'consultation_fee': consultationFee,
       'waiting_time': waitingTime,
       'location': location,
+      'bio': bio,
     };
   }
 }

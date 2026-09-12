@@ -6,6 +6,8 @@ import 'package:shefaa_app/features/doctor_availability/presentation/screens/doc
 import 'package:shefaa_app/features/bookings/domain/entites/booking.dart';
 import 'package:shefaa_app/features/bookings/presentation/screens/bookings_details_screen.dart';
 import 'package:shefaa_app/features/doctors/data/models/doctors_args_model.dart';
+import 'package:shefaa_app/features/doctors/domain/entities/doctor.dart';
+import 'package:shefaa_app/features/doctors/presentation/screens/doctor_details_screen.dart';
 import 'package:shefaa_app/features/doctors/presentation/screens/doctors_screen.dart';
 import 'package:shefaa_app/features/home/presentation/screens/home_screen.dart';
 import 'package:shefaa_app/features/location/presentation/screens/location_screen.dart';
@@ -62,6 +64,18 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case UpdateProfileScreen.routeName:
       return MaterialPageRoute(
         builder: (context) => const UpdateProfileScreen(),
+        settings: settings,
+      );
+
+    case DoctorDetailsScreen.routeName:
+      // The list already holds every field the page shows, so the doctor
+      // travels with the route rather than being fetched again by id.
+      final detailsDoctor = settings.arguments;
+      if (detailsDoctor is! DoctorEntity) {
+        return _errorRoute('لم يتم تحديد الطبيب');
+      }
+      return MaterialPageRoute(
+        builder: (context) => DoctorDetailsScreen(doctor: detailsDoctor),
         settings: settings,
       );
 

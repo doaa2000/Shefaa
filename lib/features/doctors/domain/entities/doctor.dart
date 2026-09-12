@@ -13,6 +13,11 @@ class DoctorEntity extends Equatable {
   final int ? waitingTime;
   final String? location;
 
+  /// A short note the doctor writes about themselves. The column has existed
+  /// since doctors got accounts; nothing read it until there was a page to put
+  /// it on.
+  final String? bio;
+
   const DoctorEntity({
     required this.id,
     required this.name,
@@ -21,6 +26,7 @@ class DoctorEntity extends Equatable {
     this.image,
     this.title,
     this.rating, required this.specialaization, this.consultationFee, this.waitingTime,required this.location,
+    this.bio,
   });
 
   @override
@@ -36,5 +42,6 @@ class DoctorEntity extends Equatable {
     consultationFee,
     waitingTime,
     location,
+    bio,
   ];
 }
