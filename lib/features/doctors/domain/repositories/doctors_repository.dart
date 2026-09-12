@@ -8,6 +8,8 @@ abstract class DoctorsRepository {
     int specialtyId,
   );
 
+  Future<Either<Failure, List<DoctorEntity>>> searchDoctors(String query);
+
   Future<Either<Failure, List<DoctorScheduleEntity>>> getWeeklySchedule(
     int doctorId,
   );
