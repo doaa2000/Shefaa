@@ -71,7 +71,8 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
     // A new name each time rather than a fixed one. Overwriting would leave
     // every cache -- the CDN's and the phone's -- serving the old picture from
     // the unchanged URL, which reads as the upload having failed.
-    final path = '\$userId/\${DateTime.now().millisecondsSinceEpoch}.\$extension';
+    final stamp = DateTime.now().millisecondsSinceEpoch;
+    final path = '$userId/$stamp.$extension';
 
     await supabase.storage.from(_avatarsBucket).uploadBinary(
           path,
