@@ -17,7 +17,10 @@ abstract class AuthRepository {
   required  String phone,
   });
 
-Future<Either<Failure, Unit>> logout();}
+Future<Either<Failure, Unit>> logout();
+
+  Future<Either<Failure, Unit>> deleteAccount();
+}
 
 
 

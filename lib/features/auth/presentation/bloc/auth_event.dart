@@ -31,3 +31,7 @@ class RegisterEvent extends AuthEvent {
 }
 
 class LogoutEvent extends AuthEvent {}
+
+/// Deletes the account for good. Separate from logging out because it is not
+/// the same decision and must not be reachable by the same tap.
+class DeleteAccountEvent extends AuthEvent {}

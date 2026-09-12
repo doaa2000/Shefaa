@@ -13,6 +13,9 @@ abstract class AuthRemoteDataSource {
     required String phone,
   });
   Future<Unit> logout();
+
+  /// Deletes the signed-in account, then signs out.
+  Future<Unit> deleteAccount();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -120,6 +123,19 @@ Future<UserModel> register({
 
   @override
   Future<Unit> logout() async {
+    await supabase.auth.signOut();
+    return unit;
+  }
+
+  @override
+  Future<Unit> deleteAccount() async {
+    // The function takes no arguments on purpose: it acts on auth.uid() and
+    // there is no account it could be pointed at but the caller's own.
+    await supabase.rpc('delete_my_account');
+
+    // The session outlives the account it belonged to -- the token is still in
+    // memory and still looks valid until it expires. Signing out here means the
+    // app never sits on a session with nothing behind it.
     await supabase.auth.signOut();
     return unit;
   }

@@ -62,6 +62,16 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, Unit>> deleteAccount() async {
+    try {
+      await authRemoteDataSource.deleteAccount();
+      return const Right(unit);
+    } catch (e) {
+      return Left(ServerFailure(_message(e)));
+    }
+  }
+
   /// What the patient reads when signing in or up fails.
   ///
   /// Supabase raises in English and stringifies as

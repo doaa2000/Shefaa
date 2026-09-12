@@ -4,6 +4,7 @@ import 'package:shefaa_app/core/services/selected_city_service.dart';
 import 'package:shefaa_app/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:shefaa_app/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:shefaa_app/features/auth/domain/repositories/auth_repository.dart';
+import 'package:shefaa_app/features/auth/domain/usecases/delete_account_usecase.dart';
 import 'package:shefaa_app/features/auth/domain/usecases/login_usecase.dart';
 import 'package:shefaa_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:shefaa_app/features/auth/domain/usecases/register_usecase.dart';
@@ -118,6 +119,9 @@ getIt.registerLazySingleton<ProfileRepository>(
     () => UpdateProfileUseCase(getIt()),
   );
 getIt.registerLazySingleton<LogoutUseCase>(() => LogoutUseCase(getIt()));
+  getIt.registerLazySingleton<DeleteAccountUseCase>(
+    () => DeleteAccountUseCase(getIt()),
+  );
 
   getIt.registerLazySingleton<GetSpecialtiesUsecase>(
     () => GetSpecialtiesUsecase(getIt()),
@@ -173,7 +177,13 @@ getIt.registerLazySingleton<LogoutUseCase>(() => LogoutUseCase(getIt()));
     ),
   );
   getIt.registerFactory<AuthBloc>(
-    () => AuthBloc(loginUseCase: getIt(), registerUseCase: getIt(), secureStorageService: getIt(), logoutUseCase: getIt()),
+    () => AuthBloc(
+      loginUseCase: getIt(),
+      registerUseCase: getIt(),
+      secureStorageService: getIt(),
+      logoutUseCase: getIt(),
+      deleteAccountUseCase: getIt(),
+    ),
   );
 
   getIt.registerFactory<LocationBloc>(

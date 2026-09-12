@@ -6,6 +6,7 @@ import 'package:shefaa_app/core/domain/use_cases.dart';
 import 'package:shefaa_app/core/enums/request_state.dart';
 import 'package:shefaa_app/core/services/secure_storage_service.dart';
 import 'package:shefaa_app/features/auth/domain/entities/user.dart';
+import 'package:shefaa_app/features/auth/domain/usecases/delete_account_usecase.dart';
 import 'package:shefaa_app/features/auth/domain/usecases/login_usecase.dart';
 import 'package:shefaa_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:shefaa_app/features/auth/domain/usecases/register_usecase.dart';
@@ -18,11 +19,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final RegisterUseCase registerUseCase;
   final SecureStorageService secureStorageService;
   final LogoutUseCase logoutUseCase;
+  final DeleteAccountUseCase deleteAccountUseCase;
 
-  AuthBloc({required this.loginUseCase, required this.registerUseCase, required this.secureStorageService, required this.logoutUseCase}) : super(const AuthState()) {
+  AuthBloc({
+    required this.loginUseCase,
+    required this.registerUseCase,
+    required this.secureStorageService,
+    required this.logoutUseCase,
+    required this.deleteAccountUseCase,
+  }) : super(const AuthState()) {
     on<LoginEvent>(_login);
     on<RegisterEvent>(_register);
     on<LogoutEvent>(_logout);
+    on<DeleteAccountEvent>(_deleteAccount);
 
   }
 Future<void> _login(LoginEvent event, Emitter<AuthState> emit) async {
@@ -123,6 +132,32 @@ Future<void> _login(LoginEvent event, Emitter<AuthState> emit) async {
         ),
       ),
       (_) => emit(const AuthState(logoutState: RequestState.loaded)),
+    );
+  }
+
+  FutureOr<void> _deleteAccount(
+    DeleteAccountEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(state.copyWith(deleteAccountState: RequestState.loading));
+
+    final result = await deleteAccountUseCase(const NoParameters());
+
+    await result.fold(
+      (failure) async => emit(state.copyWith(
+        deleteAccountState: RequestState.error,
+        deleteAccountMessage: failure.message,
+      )),
+      (_) async {
+        // Same reasoning as logging out: the splash screen reads these, and a
+        // token left behind would send the next launch to a home screen with
+        // no account behind it at all.
+        await secureStorageService.clearTokens();
+
+        // A fresh state rather than copyWith. Nothing of the deleted account
+        // may survive into the screens that come next.
+        emit(const AuthState(deleteAccountState: RequestState.loaded));
+      },
     );
   }
 
