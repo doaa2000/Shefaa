@@ -19,23 +19,11 @@ class AppointmentCard extends StatelessWidget {
     'no_show': ('لم يحضر', Colors.brown),
   };
 
-  /// The ticket, and how far off it is. `queueNumber - 1` would count patients
-  /// the doctor has already seen, so the gap is measured against the number
-  /// actually being served.
-  String get _queueValue {
-    final mine = 'رقم ${booking.queueNumber}';
-    final ahead = booking.peopleAhead;
-    if (ahead == null) return mine;
-    if (ahead == 0) return '$mine · دورك الآن';
-    if (ahead == 1) return '$mine · أمامك شخص واحد';
-    return '$mine · أمامك $ahead';
-  }
-
   String get _sessionLabel =>
       booking.session == 'morning' ? 'الفترة الصباحية' : 'الفترة المسائية';
 
-  /// The window the doctor sees patients in. There is no per-patient time --
-  /// the queue number is what says when it is your turn.
+  /// The window the patient is asked to arrive in. Inside it the clinic sees
+  /// people in the order they arrive, which is why there is no number here.
   String get _window {
     final start = DoctorSessionModel.formatTime(booking.startTime);
     final end = DoctorSessionModel.formatTime(booking.endTime);
@@ -91,14 +79,14 @@ class AppointmentCard extends StatelessWidget {
             title: 'الفترة',
             value: _window,
           ),
-          // A queue position on a visit that has already been and gone means
-          // nothing, so it is only shown while the booking is still ahead.
-          if (booking.queueNumber != null && booking.isUpcoming) ...[
+          // Only while the visit is still ahead: telling someone to arrive on
+          // time for an appointment they already attended reads as an error.
+          if (booking.isUpcoming) ...[
             const SizedBox(height: 12),
-            _AppointmentRow(
-              icon: Icons.confirmation_number_outlined,
-              title: 'دورك',
-              value: _queueValue,
+            const _AppointmentRow(
+              icon: Icons.info_outline,
+              title: 'الحضور',
+              value: 'يرجى الحضور في بداية الموعد',
             ),
           ],
           const SizedBox(height: 12),

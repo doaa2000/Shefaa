@@ -5,17 +5,14 @@ class PaymentArgsModel {
 
   final DateTime date;
 
-  /// 'morning' or 'evening'. Replaces the slot id: a patient books a place in
-  /// a session, not a specific minute.
+  /// 'morning' or 'evening'.
   final String session;
 
-  /// The session window, kept so the booking records the times it was made
-  /// against even if the doctor later changes their schedule.
+  /// The window the patient is asked to arrive in, kept so the booking records
+  /// the times it was made against even if the doctor later changes their
+  /// schedule.
   final String startTime;
   final String endTime;
-
-  /// The place the patient will hold if they confirm.
-  final int queueNumber;
 
   final double amount;
 
@@ -26,7 +23,6 @@ class PaymentArgsModel {
     required this.session,
     required this.startTime,
     required this.endTime,
-    required this.queueNumber,
     required this.amount,
   });
 }
