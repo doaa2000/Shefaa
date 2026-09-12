@@ -90,7 +90,7 @@ class SessionCardWidget extends StatelessWidget {
                           size: 18, color: AppColors.primaryColor),
                       const SizedBox(width: 8),
                       Text(
-                        'دورك هيكون رقم ${session.nextQueueNumber}',
+                        'دورك سيكون رقم ${session.nextQueueNumber}',
                         style: TextStyles.bold14
                             .copyWith(color: AppColors.primaryColor),
                       ),
@@ -119,9 +119,9 @@ class _RemainingChip extends StatelessWidget {
     final almostFull = !full && session.remaining <= 3;
 
     final label = full
-        ? 'الفترة كاملة'
+        ? 'اكتملت الفترة'
         : almostFull
-            ? 'باقي ${session.remaining} أماكن'
+            ? 'أماكن متبقية: ${session.remaining}'
             : 'متاح';
 
     final color = full

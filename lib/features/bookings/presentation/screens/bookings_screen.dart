@@ -155,8 +155,8 @@ class _BookingsViewState extends State<_BookingsView> {
       builder: (dialogContext) => AlertDialog(
         title: const Text('إلغاء الحجز'),
         content: Text(
-          'هتلغي حجزك مع ${booking.doctor.name}؟\n'
-          'مكانك هيروح لغيرك ومش هينفع ترجعيه.',
+          'إلغاء حجزك مع ${booking.doctor.name}؟\n'
+          'سيصبح مكانك متاحاً لغيرك، ولا يمكن التراجع.',
         ),
         actions: [
           TextButton(
@@ -235,9 +235,9 @@ class _Empty extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (icon, text) = switch (tab) {
-      0 => (Icons.event_available_outlined, 'مفيش حجوزات قادمة'),
-      1 => (Icons.history, 'مفيش حجوزات سابقة'),
-      _ => (Icons.event_busy_outlined, 'مفيش حجوزات ملغاة'),
+      0 => (Icons.event_available_outlined, 'لا توجد حجوزات قادمة'),
+      1 => (Icons.history, 'لا توجد حجوزات سابقة'),
+      _ => (Icons.event_busy_outlined, 'لا توجد حجوزات ملغاة'),
     };
 
     return Center(

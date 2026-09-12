@@ -81,7 +81,7 @@ class _SignedOut extends StatelessWidget {
             Icon(Icons.lock_outline, size: 44, color: Colors.grey.shade400),
             const SizedBox(height: 12),
             const Text(
-              'الجلسة انتهت. سجّلي الدخول تاني.',
+              'انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى.',
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),

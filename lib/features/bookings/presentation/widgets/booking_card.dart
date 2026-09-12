@@ -34,9 +34,9 @@ class BookingCard extends StatelessWidget {
   String get _queueNote {
     final ahead = booking.peopleAhead;
     if (ahead == null) return 'ترتيبك داخل الفترة';
-    if (ahead == 0) return '· دورك دلوقتي';
-    if (ahead == 1) return '· قدامك شخص واحد';
-    return '· قدامك $ahead';
+    if (ahead == 0) return '· دورك الآن';
+    if (ahead == 1) return '· أمامك شخص واحد';
+    return '· أمامك $ahead';
   }
 
   String get _sessionLabel =>

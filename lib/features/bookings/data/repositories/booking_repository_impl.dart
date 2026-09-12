@@ -63,12 +63,12 @@ class BookingRepositoryImpl implements BookingRepository {
   /// held one app's wording would be wrong for the dashboard, which is in
   /// English, and wrong again for the next language either of them gains.
   static const Map<String, String> _byHint = {
-    'session_full': 'الفترة دي كاملة العدد، اختاري فترة تانية',
-    'session_not_offered': 'الدكتور مش بيشتغل في الفترة دي في اليوم ده',
+    'session_full': 'اكتمل عدد هذه الفترة. يرجى اختيار فترة أخرى',
+    'session_not_offered': 'الطبيب لا يعمل في هذه الفترة في هذا اليوم',
     'already_booked': 'لديك حجز بالفعل في هذه الفترة',
-    'not_signed_in': 'سجّلي الدخول الأول',
-    'booking_immutable': 'الحجز مينفعش يتنقل — إلغيه واحجزي من جديد',
-    'cancel_only': 'إلغاء الحجز هو التغيير الوحيد المتاح ليكي',
+    'not_signed_in': 'يرجى تسجيل الدخول أولاً',
+    'booking_immutable': 'لا يمكن نقل الحجز. يرجى إلغاؤه والحجز من جديد',
+    'cancel_only': 'إلغاء الحجز هو التغيير الوحيد المتاح',
   };
 
   static String _message(Object error) {
