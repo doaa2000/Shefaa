@@ -9,5 +9,6 @@ class AppRoutes {
   static const String bookingsDetails = '/bookings-details';
   static const String payment = '/payment';
   static const String updateProfile = '/update-profile';
+  static const String healthConsent = '/health-consent';
 
 }

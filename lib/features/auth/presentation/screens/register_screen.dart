@@ -3,12 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:shefaa_app/core/enums/request_state.dart';
 import 'package:shefaa_app/core/utils/app_colors.dart';
+import 'package:shefaa_app/core/utils/app_consent.dart';
 import 'package:shefaa_app/core/utils/app_router.dart';
 import 'package:shefaa_app/core/utils/app_text_styles.dart';
 import 'package:shefaa_app/core/widgets/app_text_field.dart';
 import 'package:shefaa_app/core/widgets/custom_button.dart';
 import 'package:shefaa_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:shefaa_app/features/auth/presentation/widgets/birth_date_field.dart';
+import 'package:shefaa_app/features/consent/presentation/widgets/health_consent_checkbox.dart';
 import 'package:shefaa_app/generated/l10n.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -31,6 +33,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   DateTime? _selectedBirthDate;
   String? selectedGender;
 
+  /// Unticked to begin with, always. A box that starts ticked is not consent,
+  /// and both stores say so.
+  bool _healthConsent = false;
+
   @override
   void dispose() {
     nameController.dispose();
@@ -43,6 +49,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
+
+    if (!_healthConsent) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(const SnackBar(
+          content: Text('يلزم الموافقة على معالجة البيانات الصحية للمتابعة.'),
+        ));
+      return;
+    }
 
     FocusScope.of(context).unfocus();
     context.read<AuthBloc>().add(
@@ -57,6 +72,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ? null
             : DateFormat('yyyy-MM-dd').format(_selectedBirthDate!),
         gender: selectedGender,
+        healthConsentVersion: AppConsent.healthDataVersion,
       ),
     );
   }
@@ -230,7 +246,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       },
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 20),
+
+                    HealthConsentCheckbox(
+                      value: _healthConsent,
+                      onChanged: (value) =>
+                          setState(() => _healthConsent = value),
+                    ),
+
+                    const SizedBox(height: 20),
 
                     BlocBuilder<AuthBloc, AuthState>(
                       buildWhen: (previous, current) =>

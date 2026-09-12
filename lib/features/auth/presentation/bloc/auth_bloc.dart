@@ -77,6 +77,7 @@ Future<void> _login(LoginEvent event, Emitter<AuthState> emit) async {
         phone: event.phone,
         birthDate: event.birthDate,
         gender: event.gender,
+        healthConsentVersion: event.healthConsentVersion,
       ),
     );
 

@@ -18,6 +18,7 @@ class RegisterUseCase extends BaseUsecase<UserEntity, RegisterUseCaseParameters>
         phone: params.phone,
         birthDate: params.birthDate,
         gender: params.gender,
+        healthConsentVersion: params.healthConsentVersion,
       );
 }
 
@@ -29,5 +30,17 @@ class RegisterUseCaseParameters {
   final String ?birthDate;
   final String ?gender;
 
-  RegisterUseCaseParameters({required this.email, required this.password, required this.name, required this.phone,  this.birthDate,  this.gender});
+  /// Sent as signup metadata; the database trigger turns it into the consent
+  /// row, because there is no session to write one with.
+  final String healthConsentVersion;
+
+  RegisterUseCaseParameters({
+    required this.email,
+    required this.password,
+    required this.name,
+    required this.phone,
+    required this.healthConsentVersion,
+    this.birthDate,
+    this.gender,
+  });
 }
