@@ -108,7 +108,7 @@ class PaymentScreenBody extends StatelessWidget {
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  'الدفع كاش في العيادة',
+                                  'الدفع نقداً في العيادة',
                                   style: TextStyles.meduim14
                                       .copyWith(color: Colors.orange.shade900),
                                 ),
@@ -220,7 +220,7 @@ class PaymentScreenBody extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'لو حد قبلك ألغى، رقمك هيقل — ومستحيل يزيد',
+              'إذا ألغى أحد قبلك يقل رقمك — ولا يزيد أبداً',
               textAlign: TextAlign.center,
               style: TextStyles.meduim12.copyWith(color: Colors.grey.shade600),
             ),
@@ -262,14 +262,14 @@ class _QueueCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text('دورك هيكون',
+          Text('دورك سيكون',
               style: TextStyles.meduim14.copyWith(color: Colors.grey.shade700)),
           const SizedBox(height: 4),
           Text('رقم ${args.queueNumber}',
               style: TextStyles.bold24.copyWith(color: AppColors.primaryColor)),
           const SizedBox(height: 6),
           Text(
-            'الترتيب داخل الفترة، مش ميعاد محدد',
+            'ترتيبك داخل الفترة، وليس موعداً محدداً',
             style: TextStyles.meduim12.copyWith(color: Colors.grey.shade600),
           ),
         ],

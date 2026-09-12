@@ -26,9 +26,9 @@ class AppointmentCard extends StatelessWidget {
     final mine = 'رقم ${booking.queueNumber}';
     final ahead = booking.peopleAhead;
     if (ahead == null) return mine;
-    if (ahead == 0) return '$mine · دورك دلوقتي';
-    if (ahead == 1) return '$mine · قدامك شخص واحد';
-    return '$mine · قدامك $ahead';
+    if (ahead == 0) return '$mine · دورك الآن';
+    if (ahead == 1) return '$mine · أمامك شخص واحد';
+    return '$mine · أمامك $ahead';
   }
 
   String get _sessionLabel =>

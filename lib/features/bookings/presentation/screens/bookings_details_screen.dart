@@ -25,8 +25,8 @@ class BookingsDetailsScreen extends StatelessWidget {
       builder: (dialogContext) => AlertDialog(
         title: Text(S.of(context).cancel_booking),
         content: Text(
-          'هتلغي حجزك مع ${booking.doctor.name}؟\n'
-          'مكانك هيروح لغيرك ومش هينفع ترجعيه.',
+          'إلغاء حجزك مع ${booking.doctor.name}؟\n'
+          'سيصبح مكانك متاحاً لغيرك، ولا يمكن التراجع.',
         ),
         actions: [
           TextButton(

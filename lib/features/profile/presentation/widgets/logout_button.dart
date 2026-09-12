@@ -17,8 +17,8 @@ class LogoutButton extends StatelessWidget {
       builder: (dialogContext) => AlertDialog(
         title: const Text('تسجيل الخروج'),
         content: const Text(
-          'هتخرجي من حسابك؟\n'
-          'هتحتاجي تسجّلي الدخول تاني علشان تشوفي حجوزاتك.',
+          'هل تريد تسجيل الخروج من حسابك؟\n'
+          'سيلزم تسجيل الدخول مرة أخرى لعرض الحجوزات.',
         ),
         actions: [
           TextButton(

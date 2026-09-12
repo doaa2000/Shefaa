@@ -123,7 +123,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       validator: (value) {
                         final name = value?.trim() ?? '';
                         if (name.isEmpty) return "اكتب الاسم بالكامل";
-                        if (name.length < 3) return "الاسم قصير جداً";
+                        if (name.length < 3) return "الاسم قصير جداً، اكتب الاسم بالكامل";
                         return null;
                       },
                     ),
@@ -186,7 +186,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         // Supabase Auth rejects anything shorter than 6, so
                         // catch it here instead of after a round trip.
                         if (password.length < 6) {
-                          return "كلمة المرور ٦ حروف على الأقل";
+                          return "كلمة المرور ٦ أحرف على الأقل";
                         }
                         return null;
                       },

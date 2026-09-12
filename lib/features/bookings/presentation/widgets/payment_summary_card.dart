@@ -8,7 +8,7 @@ class PaymentSummaryCard extends StatelessWidget {
   final BookingEntity booking;
 
   static const Map<String, String> _methodLabels = {
-    'cash': 'كاش في العيادة',
+    'cash': 'نقداً في العيادة',
     'vodafone_cash': 'فودافون كاش',
     'card': 'بطاقة',
   };
@@ -47,7 +47,7 @@ class PaymentSummaryCard extends StatelessWidget {
             child: Text(
               payment.isPaid
                   ? 'تم الدفع'
-                  : 'المبلغ يتدفع في العيادة يوم الكشف',
+                  : 'يُدفع المبلغ في العيادة يوم الكشف',
               style: TextStyle(
                 color: payment.isPaid
                     ? Colors.green.shade800

@@ -52,7 +52,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       emit(
         state.copyWith(
           updateState: RequestState.error,
-          updateMessage: 'تعذر تحميل البيانات، حاولي مرة أخرى',
+          updateMessage: 'تعذر تحميل البيانات. يرجى المحاولة مرة أخرى',
         ),
       );
       return;
