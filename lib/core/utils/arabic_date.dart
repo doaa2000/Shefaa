@@ -30,6 +30,10 @@ const List<String> _monthNames = [
   'ديسمبر',
 ];
 
+/// The day name for a weekday index as Postgres stores it: 0 = Sunday .. 6 =
+/// Saturday, which is what `doctor_schedule.weekday` holds.
+String arabicWeekdayName(int weekday) => _dayNames[weekday % 7];
+
 /// DateTime.weekday is Monday = 1 .. Sunday = 7, so `% 7` lands Sunday on 0.
 String arabicDayName(DateTime date) => _dayNames[date.weekday % 7];
 

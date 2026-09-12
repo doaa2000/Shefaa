@@ -22,6 +22,7 @@ import 'package:shefaa_app/features/doctors/data/datasources/doctors_remote_data
 import 'package:shefaa_app/features/doctors/data/repositories/doctors_repository_impl.dart';
 import 'package:shefaa_app/features/doctors/domain/repositories/doctors_repository.dart';
 import 'package:shefaa_app/features/doctors/domain/usecases/get_doctors_usecase.dart';
+import 'package:shefaa_app/features/doctors/presentation/bloc/doctor_details_bloc.dart';
 import 'package:shefaa_app/features/doctors/presentation/bloc/doctors_bloc.dart';
 import 'package:shefaa_app/features/home/data/datasources/home_remote_datasource.dart';
 import 'package:shefaa_app/features/home/data/repositories/home_repository_impl.dart';
@@ -103,6 +104,10 @@ getIt.registerLazySingleton<LogoutUseCase>(() => LogoutUseCase(getIt()));
     () => GetDoctorsUseCase(getIt()),
   );
 
+  getIt.registerLazySingleton<GetDoctorScheduleUseCase>(
+    () => GetDoctorScheduleUseCase(getIt()),
+  );
+
   getIt.registerLazySingleton<GetDoctorAvailabilityUsecase>(
     () => GetDoctorAvailabilityUsecase(getIt()),
   );
@@ -119,6 +124,10 @@ getIt.registerLazySingleton<LogoutUseCase>(() => LogoutUseCase(getIt()));
   // 5️⃣ Bloc
   getIt.registerFactory<DoctorsBloc>(
     () => DoctorsBloc(getDoctorsUseCase: getIt()),
+  );
+
+  getIt.registerFactory<DoctorDetailsBloc>(
+    () => DoctorDetailsBloc(getDoctorScheduleUseCase: getIt()),
   );
   getIt.registerFactory<AuthBloc>(
     () => AuthBloc(loginUseCase: getIt(), registerUseCase: getIt(), secureStorageService: getIt(), logoutUseCase: getIt()),
