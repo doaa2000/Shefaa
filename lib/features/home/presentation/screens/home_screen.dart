@@ -9,7 +9,9 @@ import 'package:shefaa_app/features/home/presentation/widgets/home_page_widget.d
 import 'package:shefaa_app/features/home/presentation/widgets/custom_bottom_nav_bar.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shefaa_app/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:shefaa_app/features/profile/presentation/screens/profile_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key, this.initialTab = homeTab});
@@ -35,10 +37,26 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<HomeBloc>()
-        ..add(GetSpecialtiesEvent())
-        ..add(HomePageChanged(initialTab)),
+    final userId = Supabase.instance.client.auth.currentUser?.id;
+
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => getIt<HomeBloc>()
+            ..add(GetSpecialtiesEvent())
+            ..add(HomePageChanged(initialTab)),
+        ),
+        // Above the tab switch, not inside the app bar: the bar is thrown away
+        // and rebuilt every time the patient leaves the home tab, and a bloc
+        // created there would re-read the profile on every trip back.
+        BlocProvider(
+          create: (_) {
+            final bloc = getIt<ProfileBloc>();
+            if (userId != null) bloc.add(GetProfileEvent(userId: userId));
+            return bloc;
+          },
+        ),
+      ],
       child: BlocBuilder<HomeBloc, HomeState>(
         builder: (context, state) {
           final pages = _pages(context);

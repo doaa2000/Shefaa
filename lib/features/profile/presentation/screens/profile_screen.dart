@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shefaa_app/core/services/service_locator.dart';
 import 'package:shefaa_app/core/utils/app_router.dart';
 import 'package:shefaa_app/core/utils/constants.dart';
 import 'package:shefaa_app/features/profile/presentation/bloc/profile_bloc.dart';
@@ -26,40 +25,35 @@ class ProfileScreen extends StatelessWidget {
     // and no hint as to why.
     if (userId == null) return const _SignedOut();
 
-    return BlocProvider(
-      create: (context) =>
-          getIt<ProfileBloc>()..add(GetProfileEvent(userId: userId)),
-      child: Padding(
-        padding: const EdgeInsets.all(Constants.padding),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Builder so the tap handler gets a context below BlocProvider
-              // and can refresh the header with whatever was just saved.
-              Builder(
-                builder: (innerContext) => GestureDetector(
-                  onTap: () async {
-                    await Navigator.pushNamed(
-                      innerContext,
-                      UpdateProfileScreen.routeName,
-                    );
-                    if (!innerContext.mounted) return;
-                    innerContext
-                        .read<ProfileBloc>()
-                        .add(GetProfileEvent(userId: userId));
-                  },
-                  child: const ProfileHeaderCard(),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const SettingsCard(),
-              const SizedBox(height: 20),
-              const SupportCard(),
-              const SizedBox(height: 25),
-              const LogoutButton(),
-            ],
-          ),
+    // The bloc comes from HomeScreen rather than being created here. Two of
+    // them meant the name in the home bar stayed as it was until the app was
+    // restarted, because the copy that reloaded after an edit was this one.
+    return Padding(
+      padding: const EdgeInsets.all(Constants.padding),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            GestureDetector(
+              onTap: () async {
+                await Navigator.pushNamed(
+                  context,
+                  UpdateProfileScreen.routeName,
+                );
+                if (!context.mounted) return;
+                context
+                    .read<ProfileBloc>()
+                    .add(GetProfileEvent(userId: userId));
+              },
+              child: const ProfileHeaderCard(),
+            ),
+            const SizedBox(height: 20),
+            const SettingsCard(),
+            const SizedBox(height: 20),
+            const SupportCard(),
+            const SizedBox(height: 25),
+            const LogoutButton(),
+          ],
         ),
       ),
     );
