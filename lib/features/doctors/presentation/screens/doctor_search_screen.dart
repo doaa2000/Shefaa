@@ -13,6 +13,7 @@ import 'package:shefaa_app/features/doctor_availability/presentation/screens/doc
 import 'package:shefaa_app/features/doctors/presentation/bloc/doctor_search_bloc.dart';
 import 'package:shefaa_app/features/doctors/presentation/screens/doctor_details_screen.dart';
 import 'package:shefaa_app/features/doctors/presentation/widgets/doctors_card.dart';
+import 'package:shefaa_app/features/location/presentation/widgets/city_filter_bar.dart';
 
 class DoctorSearchScreen extends StatelessWidget {
   const DoctorSearchScreen({super.key});
@@ -71,7 +72,12 @@ class _SearchViewState extends State<_SearchView> {
                 onChanged: _onChanged,
                 hintText: 'ابحث باسم الطبيب أو التخصص',
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
+              // Search is narrowed by city too, so the filter has to be here as
+              // well -- otherwise a patient searching inside a city they picked
+              // days ago sees a short list and no reason for it.
+              CityFilterBar(onChanged: _reSearch),
+              const SizedBox(height: 12),
               Expanded(
                 child: BlocBuilder<DoctorSearchBloc, DoctorSearchState>(
                   builder: (context, state) => _results(context, state),
@@ -82,6 +88,13 @@ class _SearchViewState extends State<_SearchView> {
         ),
       ),
     );
+  }
+
+  /// Runs the last query again, against whatever city is now in force.
+  void _reSearch() {
+    final query = _controller.text.trim();
+    if (query.isEmpty) return;
+    context.read<DoctorSearchBloc>().add(SearchDoctorsEvent(query));
   }
 
   Widget _results(BuildContext context, DoctorSearchState state) {

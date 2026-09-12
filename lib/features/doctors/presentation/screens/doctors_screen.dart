@@ -9,6 +9,7 @@ import 'package:shefaa_app/features/doctors/data/models/doctors_args_model.dart'
 import 'package:shefaa_app/features/doctors/presentation/bloc/doctors_bloc.dart';
 import 'package:shefaa_app/features/doctors/presentation/screens/doctor_search_screen.dart';
 import 'package:shefaa_app/features/doctors/presentation/widgets/home_doctors_list.dart';
+import 'package:shefaa_app/features/location/presentation/widgets/city_filter_bar.dart';
 
 class DoctorsScreen extends StatelessWidget {
   const DoctorsScreen({super.key, required this.args});
@@ -41,6 +42,16 @@ class DoctorsScreen extends StatelessWidget {
                   child: CustomSearchBar(
                     hintText: 'ابحث باسم الطبيب أو التخصص',
                   ),
+                ),
+              ),
+              // The filter sits with the list it filters. On the home screen it
+              // would be narrowing specialties, which it does not do, and the
+              // patient would have no way to see whether it had worked.
+              Builder(
+                builder: (context) => CityFilterBar(
+                  onChanged: () => context
+                      .read<DoctorsBloc>()
+                      .add(GetDoctorsEvent(specialtyId: args.specialtyId)),
                 ),
               ),
               Expanded(
