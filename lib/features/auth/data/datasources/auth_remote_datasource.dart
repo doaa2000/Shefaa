@@ -53,33 +53,53 @@ Future<UserModel> register({
   final response = await supabase.auth.signUp(
     email: email,
     password: password,
+    // The handle_new_user trigger reads these, so the profile is complete
+    // whether or not a session comes back. With email confirmation on there
+    // is no session and the app cannot write to profiles at all -- it would
+    // fail on row level security -- so this is the only route the details
+    // have.
+    data: {
+      'name': name,
+      'phone': phone,
+      if (gender != null) 'gender': gender,
+      if (birthDate != null) 'birth_date': birthDate,
+    },
   );
 
-  final user = response.user!;
-  final session = response.session!; 
+  final user = response.user;
+  if (user == null) {
+    throw const AuthException('لم يتم إنشاء الحساب. يرجى المحاولة مرة أخرى');
+  }
 
-  // upsert, not insert: the handle_new_user trigger on auth.users has already
-  // created this profile row by the time signUp returns, so a plain insert
-  // fails with 23505 duplicate key and registration dies. The trigger only
-  // knows the name, so this is also what puts the phone, gender and birth
-  // date on the row.
-  await supabase.from('profiles').upsert({
-    'id': user.id,
-    'name': name,
-    'phone': phone,
-    'gender': gender,
-    'birth_date': birthDate,
-  });
+  // Null with email confirmation on: the account exists, nobody is signed in
+  // yet. `response.session!` here is what made registration crash outright the
+  // moment confirmation was switched on.
+  final session = response.session;
+
+  if (session != null) {
+    // Signed in already, so the details can be written directly -- which also
+    // covers an account created before the trigger read metadata. upsert, not
+    // insert: the trigger has already made this row.
+    await supabase.from('profiles').upsert({
+      'id': user.id,
+      'name': name,
+      'phone': phone,
+      'gender': gender,
+      'birth_date': birthDate,
+    });
+  }
 
   return UserModel(
     id: user.id,
-    email: user.email!,
+    email: user.email ?? email,
     name: name,
     phone: phone,
     gender: gender,
     birthDate: birthDate,
-    accessToken: session.accessToken,
-    refreshToken: session.refreshToken,
+    // Both null when the address still has to be confirmed. The bloc reads
+    // that as "created, not signed in".
+    accessToken: session?.accessToken,
+    refreshToken: session?.refreshToken,
   );
 }
 

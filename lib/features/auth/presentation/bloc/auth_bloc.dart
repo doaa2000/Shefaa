@@ -86,7 +86,13 @@ Future<void> _login(LoginEvent event, Emitter<AuthState> emit) async {
         // account's -- and the splash screen trusted it.
         await _persistTokens(user);
 
-        emit(state.copyWith(registerState: RequestState.loaded, user: user));
+        emit(state.copyWith(
+          registerState: RequestState.loaded,
+          user: user,
+          // No token means signUp returned no session, which means the address
+          // has to be confirmed before this account can do anything.
+          registerNeedsConfirmation: user.accessToken == null,
+        ));
       },
     );
     
