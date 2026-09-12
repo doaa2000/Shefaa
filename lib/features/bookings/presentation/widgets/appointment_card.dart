@@ -19,6 +19,18 @@ class AppointmentCard extends StatelessWidget {
     'no_show': ('لم يحضر', Colors.brown),
   };
 
+  /// The ticket, and how far off it is. `queueNumber - 1` would count patients
+  /// the doctor has already seen, so the gap is measured against the number
+  /// actually being served.
+  String get _queueValue {
+    final mine = 'رقم ${booking.queueNumber}';
+    final ahead = booking.peopleAhead;
+    if (ahead == null) return mine;
+    if (ahead == 0) return '$mine · دورك دلوقتي';
+    if (ahead == 1) return '$mine · قدامك شخص واحد';
+    return '$mine · قدامك $ahead';
+  }
+
   String get _sessionLabel =>
       booking.session == 'morning' ? 'الفترة الصباحية' : 'الفترة المسائية';
 
@@ -86,9 +98,7 @@ class AppointmentCard extends StatelessWidget {
             _AppointmentRow(
               icon: Icons.confirmation_number_outlined,
               title: 'دورك',
-              value: booking.queueNumber! > 1
-                  ? 'رقم ${booking.queueNumber} · قدامك ${booking.queueNumber! - 1}'
-                  : 'رقم ${booking.queueNumber} · مفيش حد قدامك',
+              value: _queueValue,
             ),
           ],
           const SizedBox(height: 12),
