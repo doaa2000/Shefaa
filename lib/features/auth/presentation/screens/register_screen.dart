@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:shefaa_app/core/enums/request_state.dart';
 import 'package:shefaa_app/core/utils/app_colors.dart';
 import 'package:shefaa_app/core/utils/app_consent.dart';
+import 'package:shefaa_app/core/utils/app_legal.dart';
 import 'package:shefaa_app/core/utils/app_router.dart';
 import 'package:shefaa_app/core/utils/app_text_styles.dart';
 import 'package:shefaa_app/core/widgets/app_text_field.dart';
@@ -11,6 +12,7 @@ import 'package:shefaa_app/core/widgets/custom_button.dart';
 import 'package:shefaa_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:shefaa_app/features/auth/presentation/widgets/birth_date_field.dart';
 import 'package:shefaa_app/features/consent/presentation/widgets/health_consent_checkbox.dart';
+import 'package:shefaa_app/features/legal/presentation/widgets/legal_accept_checkbox.dart';
 import 'package:shefaa_app/generated/l10n.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -37,6 +39,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   /// and both stores say so.
   bool _healthConsent = false;
 
+  /// And the same for the terms and the privacy notice, ticked separately.
+  bool _legalAccepted = false;
+
   @override
   void dispose() {
     nameController.dispose();
@@ -49,6 +54,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
+
+    if (!_legalAccepted) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(const SnackBar(
+          content: Text('يلزم الموافقة على شروط الاستخدام وسياسة الخصوصية للمتابعة.'),
+        ));
+      return;
+    }
 
     if (!_healthConsent) {
       ScaffoldMessenger.of(context)
@@ -73,6 +87,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             : DateFormat('yyyy-MM-dd').format(_selectedBirthDate!),
         gender: selectedGender,
         healthConsentVersion: AppConsent.healthDataVersion,
+        termsVersion: AppLegal.termsVersion,
+        privacyVersion: AppLegal.privacyVersion,
       ),
     );
   }
@@ -247,6 +263,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
 
                     const SizedBox(height: 20),
+
+                    LegalAcceptCheckbox(
+                      value: _legalAccepted,
+                      onChanged: (value) =>
+                          setState(() => _legalAccepted = value),
+                    ),
+
+                    const SizedBox(height: 10),
 
                     HealthConsentCheckbox(
                       value: _healthConsent,

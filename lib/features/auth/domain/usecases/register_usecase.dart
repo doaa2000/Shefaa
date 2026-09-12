@@ -19,6 +19,8 @@ class RegisterUseCase extends BaseUsecase<UserEntity, RegisterUseCaseParameters>
         birthDate: params.birthDate,
         gender: params.gender,
         healthConsentVersion: params.healthConsentVersion,
+        termsVersion: params.termsVersion,
+        privacyVersion: params.privacyVersion,
       );
 }
 
@@ -34,12 +36,18 @@ class RegisterUseCaseParameters {
   /// row, because there is no session to write one with.
   final String healthConsentVersion;
 
+  /// Likewise for the two documents the patient accepted on the same form.
+  final String termsVersion;
+  final String privacyVersion;
+
   RegisterUseCaseParameters({
     required this.email,
     required this.password,
     required this.name,
     required this.phone,
     required this.healthConsentVersion,
+    required this.termsVersion,
+    required this.privacyVersion,
     this.birthDate,
     this.gender,
   });

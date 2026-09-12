@@ -21,6 +21,8 @@ abstract class AuthRemoteDataSource {
     required String name,
     required String phone,
     required String healthConsentVersion,
+    required String termsVersion,
+    required String privacyVersion,
   });
   Future<Unit> logout();
 
@@ -65,6 +67,8 @@ Future<UserModel> register({
   required String name,
   required String phone,
   required String healthConsentVersion,
+  required String termsVersion,
+  required String privacyVersion,
 }) async {
   final response = await supabase.auth.signUp(
     email: email,
@@ -83,6 +87,8 @@ Future<UserModel> register({
       // recorded in the same breath as the account, not after a sign-in that
       // may not happen for days.
       'health_consent_version': healthConsentVersion,
+      'terms_version': termsVersion,
+      'privacy_version': privacyVersion,
     },
   );
 
