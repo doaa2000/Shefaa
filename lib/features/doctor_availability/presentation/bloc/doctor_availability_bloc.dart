@@ -18,7 +18,7 @@ class DoctorAvailabilityBloc
       : super(DoctorAvailabilityState(selectedDate: DateTime.now())) {
     on<GetDoctorAvailabilityEvent>(_getDoctorAvailability);
     on<SelectDateEvent>(_onSelectDate);
-    on<SelectSessionEvent>(_onSelectSession);
+    on<SelectWindowEvent>(_onSelectWindow);
   }
 
   Future<void> _getDoctorAvailability(
@@ -29,7 +29,7 @@ class DoctorAvailabilityBloc
       getDoctorAvailabilityState: RequestState.loading,
       doctorId: event.doctorId,
       selectedDate: event.date,
-      selectedSession: null,
+      selectedWindow: null,
     ));
 
     final result = await getDoctorAvailabilityUsecase(
@@ -48,7 +48,7 @@ class DoctorAvailabilityBloc
         getDoctorAvailabilityState: RequestState.loaded,
         getSlotsState: RequestState.loaded,
         doctorDetails: details,
-        selectedSession: _onlyOpenSession(details),
+        selectedWindow: _onlyOpenWindow(details),
       )),
     );
   }
@@ -60,7 +60,7 @@ class DoctorAvailabilityBloc
     emit(state.copyWith(
       selectedDate: event.date,
       getSlotsState: RequestState.loading,
-      selectedSession: null,
+      selectedWindow: null,
     ));
 
     // Not doctorDetails!.doctor.id: when the first load failed there are no
@@ -89,22 +89,26 @@ class DoctorAvailabilityBloc
       (details) => emit(state.copyWith(
         getSlotsState: RequestState.loaded,
         doctorDetails: details,
-        selectedSession: _onlyOpenSession(details),
+        selectedWindow: _onlyOpenWindow(details),
       )),
     );
   }
 
-  void _onSelectSession(
-    SelectSessionEvent event,
+  void _onSelectWindow(
+    SelectWindowEvent event,
     Emitter<DoctorAvailabilityState> emit,
   ) {
-    emit(state.copyWith(selectedSession: event.session));
+    emit(state.copyWith(
+      selectedWindow: '${event.session}|${event.startTime}',
+    ));
   }
 
-  /// With one session open there is nothing to choose, so choose it. Picking it
+  /// With one window open there is nothing to choose, so choose it. Picking it
   /// for the patient saves a tap that has only one possible outcome.
-  static String? _onlyOpenSession(DoctorDetailsEntity details) {
+  static String? _onlyOpenWindow(DoctorDetailsEntity details) {
     final open = details.sessions.where((s) => !s.isFull).toList();
-    return open.length == 1 ? open.first.session : null;
+    return open.length == 1
+        ? DoctorAvailabilityState.windowKey(open.first)
+        : null;
   }
 }

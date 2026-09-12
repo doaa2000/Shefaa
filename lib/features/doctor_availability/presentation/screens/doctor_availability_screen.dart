@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shefaa_app/core/enums/request_state.dart';
 import 'package:shefaa_app/core/services/service_locator.dart';
+import 'package:shefaa_app/core/utils/app_colors.dart';
 import 'package:shefaa_app/core/utils/app_router.dart';
 import 'package:shefaa_app/core/utils/app_text_styles.dart';
 import 'package:shefaa_app/core/utils/constants.dart';
 import 'package:shefaa_app/core/widgets/custom_app_bar.dart';
 import 'package:shefaa_app/core/widgets/custom_button.dart';
 import 'package:shefaa_app/features/doctor_availability/data/models/doctor_availability_args_model.dart';
+import 'package:shefaa_app/features/doctor_availability/data/models/doctor_availability_model.dart';
+import 'package:shefaa_app/features/doctor_availability/domain/entities/doctor_availability.dart';
 import 'package:shefaa_app/features/doctor_availability/presentation/bloc/doctor_availability_bloc.dart';
+import 'package:shefaa_app/features/doctor_availability/presentation/widgets/appointment_chip.dart';
 import 'package:shefaa_app/features/doctor_availability/presentation/widgets/date_card_list_view.dart';
 import 'package:shefaa_app/features/doctor_availability/presentation/widgets/doctor_details_widget.dart';
-import 'package:shefaa_app/features/doctor_availability/presentation/widgets/session_card_widget.dart';
 import 'package:shefaa_app/features/payment/data/models/payment_args_model.dart';
 import 'package:shefaa_app/features/payment/presentation/screens/payment_screen.dart';
 import 'package:shefaa_app/generated/l10n.dart';
@@ -119,6 +122,10 @@ class DoctorAvailabilityScreen extends StatelessWidget {
                           Text('اختر الموعد', style: TextStyles.bold18),
                           const SizedBox(height: 12),
                           _SessionsArea(state: state),
+                          if (state.selected != null) ...[
+                            const SizedBox(height: 16),
+                            _ChosenNote(window: state.selected!),
+                          ],
                         ],
                       ),
                     ),
@@ -128,7 +135,7 @@ class DoctorAvailabilityScreen extends StatelessWidget {
                     title: S.of(context).confirm_booking,
                     onPressed: state.canConfirm
                         ? () {
-                            final session = state.selected!;
+                            final window = state.selected!;
                             Navigator.pushNamed(
                               context,
                               PaymentScreen.routeName,
@@ -136,9 +143,9 @@ class DoctorAvailabilityScreen extends StatelessWidget {
                                 doctorId: args.doctorId,
                                 doctorName: doctor?.name ?? '',
                                 date: state.selectedDate,
-                                session: session.session,
-                                startTime: session.startTime,
-                                endTime: session.endTime,
+                                session: window.session,
+                                startTime: window.startTime,
+                                endTime: window.endTime,
                                 amount:
                                     (doctor?.consultationFee as num?)?.toDouble() ??
                                         0,
@@ -204,19 +211,64 @@ class _SessionsArea extends StatelessWidget {
       );
     }
 
-    return Column(
+    // A wrap rather than a column: a doctor working to a clock can offer a
+    // dozen times, and a dozen full-width cards is a page of scrolling to read
+    // twelve numbers.
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
       children: [
-        for (final session in state.sessions) ...[
-          SessionCardWidget(
-            session: session,
-            isSelected: state.selectedSession == session.session,
-            onTap: () => context
-                .read<DoctorAvailabilityBloc>()
-                .add(SelectSessionEvent(session.session)),
+        for (final window in state.sessions)
+          AppointmentChip(
+            window: window,
+            isSelected:
+                state.selectedWindow == DoctorAvailabilityState.windowKey(window),
+            // Only where the session was not split. One window is a stretch of
+            // the evening and needs both ends; one of twelve is a time.
+            showEndTime: state.windowsInSession(window.session) == 1,
+            onTap: () => context.read<DoctorAvailabilityBloc>().add(
+                  SelectWindowEvent(
+                    session: window.session,
+                    startTime: window.startTime,
+                  ),
+                ),
           ),
-          const SizedBox(height: 12),
-        ],
       ],
+    );
+  }
+}
+
+/// What the patient is about to agree to, said once, above the button that
+/// agrees to it.
+class _ChosenNote extends StatelessWidget {
+  const _ChosenNote({required this.window});
+
+  final DoctorSessionEntity window;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.primaryColor.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.access_time,
+              size: 18, color: AppColors.primaryColor),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'موعدك ${DoctorSessionModel.formatTime(window.startTime)}'
+              ' - ${DoctorSessionModel.formatTime(window.endTime)}'
+              ' · يرجى الحضور في بدايته',
+              style: TextStyles.meduim12.copyWith(color: Colors.grey.shade800),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
