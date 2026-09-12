@@ -1,18 +1,25 @@
 -- =============================================================================
--- The admin panel's home page was showing invented numbers.
+-- The admin panel's home page, counted properly.
 --
--- It calls admin_dashboard_stats, which was never written, and the repository
--- falls back to the seed figures when the call fails -- silently. So the front
--- page of the panel read 1,437 bookings, 3,219 patients and EGP 684,500 of
--- revenue, none of which had ever happened, with nothing on screen to say so.
+-- admin_dashboard_stats exists already, in the admin panel's own
+-- 001_admin_integration.sql. This replaces it, for four reasons:
 --
--- That is worse than a page that breaks. A broken page is obviously broken; a
--- page of confident numbers that are fiction is believed, and decisions get
--- made on it.
+--   * Its growth percentages were literals -- 12.4, 4.2, 18.7, 6.1, copied
+--     from the seed data and written into the SQL. Every month, for every
+--     clinic, the front page reported the same four numbers as though it had
+--     measured something.
+--   * It counted cancelled bookings among the bookings.
+--   * It summed every payment row as revenue, including the pending and the
+--     failed ones, which overstates every month.
+--   * It had no is_admin() guard, so any signed-in patient who knew the name
+--     could read the whole network's takings.
 --
--- Everything below is counted from bookings, payments, profiles and the
--- location tree. The trend is by booking month, so a month with no bookings
--- appears as a zero rather than as a gap in the line.
+--   * byCity left-joined from every governorate, so places with no clinic at
+--     all appeared in the chart on zero.
+--
+-- The counts it did make were real; what follows keeps those and fixes the
+-- rest. Everything is counted from bookings, payments, profiles and the
+-- location tree.
 --
 -- Safe to re-run.
 -- =============================================================================
@@ -51,6 +58,10 @@ as $$
     'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
   ])[greatest(least(p_month, 12), 1)];
 $$;
+
+-- The function that exists returns jsonb, and a return type cannot be changed
+-- in place. Dropped by its exact signature so nothing else is caught by it.
+drop function if exists public.admin_dashboard_stats();
 
 create or replace function public.admin_dashboard_stats()
 returns json
