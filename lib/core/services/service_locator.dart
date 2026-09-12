@@ -20,6 +20,11 @@ import 'package:shefaa_app/features/bookings/domain/repositories/booking_reposit
 import 'package:shefaa_app/features/bookings/domain/usecases/create_booking_usecase.dart';
 import 'package:shefaa_app/features/bookings/domain/usecases/get_booking_usecase.dart';
 import 'package:shefaa_app/features/bookings/presentation/bloc/bookings_bloc.dart';
+import 'package:shefaa_app/features/consent/data/datasources/consent_remote_datasource.dart';
+import 'package:shefaa_app/features/consent/data/repositories/consent_repository_impl.dart';
+import 'package:shefaa_app/features/consent/domain/repositories/consent_repository.dart';
+import 'package:shefaa_app/features/consent/domain/usecases/consent_usecases.dart';
+import 'package:shefaa_app/features/consent/presentation/bloc/consent_bloc.dart';
 import 'package:shefaa_app/features/doctor_availability/data/datasources/doctor_availability_remote_datasource.dart';
 import 'package:shefaa_app/features/doctor_availability/data/repositories/doctor_availability_repository_impl.dart';
 import 'package:shefaa_app/features/doctor_availability/domain/repositories/doctor_availability_repository.dart';
@@ -82,6 +87,9 @@ getIt.registerLazySingleton<HomeRemoteDatasource>(
   getIt.registerLazySingleton<LocationRemoteDatasource>(
     () => LocationRemoteDatasourceImpl(getIt()),
   );
+  getIt.registerLazySingleton<ConsentRemoteDatasource>(
+    () => ConsentRemoteDatasourceImpl(getIt()),
+  );
   // 3️⃣ Repository
   getIt.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(getIt()),
@@ -109,6 +117,9 @@ getIt.registerLazySingleton<ProfileRepository>(
   );
   getIt.registerLazySingleton<LocationRepository>(
     () => LocationRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton<ConsentRepository>(
+    () => ConsentRepositoryImpl(getIt()),
   );
   // 4️⃣ UseCases
   getIt.registerLazySingleton<LoginUseCase>(() => LoginUseCase(getIt()));
@@ -163,6 +174,12 @@ getIt.registerLazySingleton<LogoutUseCase>(() => LogoutUseCase(getIt()));
   );
   getIt.registerLazySingleton<GetCitiesUseCase>(
     () => GetCitiesUseCase(getIt()),
+  );
+  getIt.registerLazySingleton<HasAcceptedConsentUseCase>(
+    () => HasAcceptedConsentUseCase(getIt()),
+  );
+  getIt.registerLazySingleton<AcceptConsentUseCase>(
+    () => AcceptConsentUseCase(getIt()),
   );
   // 5️⃣ Bloc
   getIt.registerFactory<DoctorsBloc>(
@@ -225,5 +242,8 @@ getIt.registerFactory<DoctorAvailabilityBloc>(
   );
   getIt.registerFactory<BannersBloc>(
     () => BannersBloc(getBannersUseCase: getIt()),
+  );
+  getIt.registerFactory<ConsentBloc>(
+    () => ConsentBloc(acceptConsentUseCase: getIt()),
   );
 }

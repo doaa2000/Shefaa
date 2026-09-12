@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shefaa_app/core/enums/request_state.dart';
+import 'package:shefaa_app/core/services/service_locator.dart';
 import 'package:shefaa_app/core/utils/app_colors.dart';
+import 'package:shefaa_app/core/utils/app_consent.dart';
 import 'package:shefaa_app/core/utils/app_router.dart';
 import 'package:shefaa_app/core/widgets/custom_button.dart';
 import 'package:shefaa_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:shefaa_app/features/auth/presentation/screens/register_screen.dart';
 import 'package:shefaa_app/features/auth/presentation/widgets/auth_footer.dart';
+import 'package:shefaa_app/features/consent/domain/usecases/consent_usecases.dart';
 import 'package:shefaa_app/core/widgets/app_text_field.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -41,6 +44,34 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  /// Home, unless this account still owes the health-data consent.
+  ///
+  /// The splash screen makes the same check for a session it restored; this is
+  /// the other door into the app, and an account that signed in today has to
+  /// pass through the same gate as one that was already signed in.
+  Future<void> _goOn(BuildContext context) async {
+    final result = await getIt<HasAcceptedConsentUseCase>()(
+      const ConsentParams(
+        kind: 'health_data',
+        version: AppConsent.healthDataVersion,
+      ),
+    );
+
+    // A failure counts as accepted, as it does on the splash: a round trip
+    // that did not come back should not lock somebody out of their account.
+    final accepted = result.fold((_) => true, (value) => value);
+
+    if (!context.mounted) return;
+
+    // Clear the stack: pressing back after signing in must not return to the
+    // login screen.
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      accepted ? AppRoutes.home : AppRoutes.healthConsent,
+      (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
@@ -48,13 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
           previous.loginState != current.loginState,
       listener: (context, state) {
         if (state.loginState == RequestState.loaded) {
-          // Clear the stack: pressing back after signing in must not return
-          // to the login screen.
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            AppRoutes.home,
-            (route) => false,
-          );
+          _goOn(context);
         } else if (state.loginState == RequestState.error) {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()

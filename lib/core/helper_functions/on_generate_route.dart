@@ -8,6 +8,7 @@ import 'package:shefaa_app/features/bookings/presentation/screens/bookings_detai
 import 'package:shefaa_app/features/doctors/data/models/doctors_args_model.dart';
 import 'package:shefaa_app/features/doctors/domain/entities/doctor.dart';
 import 'package:shefaa_app/features/doctors/presentation/screens/doctor_details_screen.dart';
+import 'package:shefaa_app/features/consent/presentation/screens/health_consent_screen.dart';
 import 'package:shefaa_app/features/doctors/presentation/screens/doctor_search_screen.dart';
 import 'package:shefaa_app/features/doctors/presentation/screens/doctors_screen.dart';
 import 'package:shefaa_app/features/home/presentation/screens/home_screen.dart';
@@ -29,6 +30,12 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case RegisterScreen.routeName:
       return MaterialPageRoute(
         builder: (context) => const RegisterScreen(),
+        settings: settings,
+      );
+
+    case HealthConsentScreen.routeName:
+      return MaterialPageRoute(
+        builder: (context) => const HealthConsentScreen(),
         settings: settings,
       );
 
