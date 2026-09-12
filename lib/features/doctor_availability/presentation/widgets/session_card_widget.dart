@@ -41,7 +41,7 @@ class SessionCardWidget extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: isSelected && !full
-                ? AppColors.primaryColor.withOpacity(0.06)
+                ? AppColors.primaryColor.withValues(alpha: 0.06)
                 : Colors.white,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
@@ -81,7 +81,7 @@ class SessionCardWidget extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryColor.withOpacity(0.1),
+                    color: AppColors.primaryColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -133,7 +133,7 @@ class _RemainingChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(

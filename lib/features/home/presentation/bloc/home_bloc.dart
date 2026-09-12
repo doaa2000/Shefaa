@@ -35,11 +35,9 @@ FutureOr<void> _onGetSpecialtiesEvent(
 
   result.fold(
     (failure) {
-      print('❌ ERROR: ${failure.message}');
       emit(state.copyWith(specialtiesState: RequestState.error));
     },
     (specialties) {
-      print('✅ SUCCESS: ${specialties.length}');
       emit(state.copyWith(
         specialties: specialties,
         specialtiesState: RequestState.loaded,

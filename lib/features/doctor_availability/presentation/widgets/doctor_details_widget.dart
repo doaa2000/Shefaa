@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:shefaa_app/core/utils/app_images.dart';
 import 'package:shefaa_app/core/utils/app_text_styles.dart';
-import 'package:shefaa_app/core/widgets/custom_mini_button.dart';
-import 'package:shefaa_app/features/doctor_availability/presentation/screens/doctor_availability_screen.dart';
 import 'package:shefaa_app/generated/l10n.dart';
 
 class DoctorDetailsWidget extends StatelessWidget {
@@ -39,7 +37,7 @@ class DoctorDetailsWidget extends StatelessWidget {
           border: Border.all(color: Colors.grey.shade200),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),

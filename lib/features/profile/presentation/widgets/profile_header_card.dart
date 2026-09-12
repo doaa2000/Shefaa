@@ -34,7 +34,7 @@ class ProfileHeaderCard extends StatelessWidget {
             boxShadow: [
               BoxShadow(
                 blurRadius: 10,
-                color: Colors.black.withOpacity(.05),
+                color: Colors.black.withValues(alpha: .05),
               ),
             ],
           ),
@@ -110,7 +110,7 @@ class ProfileHeaderCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(.05),
+        color: Colors.red.withValues(alpha: .05),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(

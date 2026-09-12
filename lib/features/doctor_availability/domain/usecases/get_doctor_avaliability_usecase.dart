@@ -1,9 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:shefaa_app/core/domain/use_cases.dart';
 import 'package:shefaa_app/core/errors/failure.dart';
-import 'package:shefaa_app/features/doctor_availability/data/models/doctor_details_model.dart';
 import 'package:shefaa_app/features/doctor_availability/domain/entities/doctor_details_entity.dart';
-import '../entities/doctor_availability.dart';
 import '../repositories/doctor_availability_repository.dart';
 
 class GetDoctorAvailabilityUsecase

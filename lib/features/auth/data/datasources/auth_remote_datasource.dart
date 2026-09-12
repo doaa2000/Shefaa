@@ -1,6 +1,5 @@
 import 'package:dartz/dartz.dart';
 import 'package:shefaa_app/features/auth/data/models/user_model.dart';
-import 'package:shefaa_app/features/auth/domain/entities/user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class AuthRemoteDataSource {
