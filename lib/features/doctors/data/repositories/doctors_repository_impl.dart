@@ -25,6 +25,15 @@ class DoctorsRepositoryImpl implements DoctorsRepository {
   }
 
   @override
+  Future<Either<Failure, List<DoctorEntity>>> searchDoctors(String query) async {
+    try {
+      return Right(await remoteDatasource.searchDoctors(query));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, List<DoctorScheduleEntity>>> getWeeklySchedule(
     int doctorId,
   ) async {

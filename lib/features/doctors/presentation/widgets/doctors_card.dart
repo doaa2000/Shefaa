@@ -10,7 +10,10 @@ import 'package:shefaa_app/generated/l10n.dart';
 class DoctorCard extends StatelessWidget {
   final String name;
   final String specialty;
-  final String imageUrl;
+  /// Empty or null when the doctor has no photo. It is not filled in with a
+  /// stand-in face: this used to fall back to a random portrait from
+  /// pravatar.cc, so a doctor with no photo was shown a stranger's.
+  final String? imageUrl;
   final String location;
   final dynamic consultationFee;
   final String waitingTime;
@@ -30,11 +33,13 @@ class DoctorCard extends StatelessWidget {
     super.key,
     required this.name,
     required this.specialty,
-    required this.imageUrl,
+    this.imageUrl,
     this.rating = 4.5,
     required this.onDetailsTap, required this.location, required this.consultationFee, required this.waitingTime,
     required this.onBookTap,
   });
+
+  bool get _hasImage => imageUrl != null && imageUrl!.isNotEmpty;
 
   /// consultation_fee is a Postgres numeric, so it arrives as a double and
   /// printed itself as "500.0". Nobody writes a clinic fee with a decimal.
@@ -69,7 +74,11 @@ class DoctorCard extends StatelessWidget {
                 CircleAvatar(
                   radius: 36,
                   backgroundColor: const Color(0xffE8F3FF),
-                  backgroundImage: NetworkImage(imageUrl),
+                  backgroundImage: _hasImage ? NetworkImage(imageUrl!) : null,
+                  child: _hasImage
+                      ? null
+                      : const Icon(Icons.person,
+                          size: 32, color: AppColors.primaryColor),
                 ),
                 const SizedBox(height: 10),
                 Padding(

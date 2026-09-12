@@ -36,3 +36,14 @@ class GetDoctorScheduleUseCase
     return repository.getWeeklySchedule(doctorId);
   }
 }
+
+class SearchDoctorsUseCase extends BaseUsecase<List<DoctorEntity>, String> {
+  final DoctorsRepository repository;
+
+  SearchDoctorsUseCase(this.repository);
+
+  @override
+  Future<Either<Failure, List<DoctorEntity>>> call(String query) {
+    return repository.searchDoctors(query);
+  }
+}

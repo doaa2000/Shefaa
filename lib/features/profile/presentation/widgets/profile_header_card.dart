@@ -42,10 +42,14 @@ class ProfileHeaderCard extends StatelessWidget {
             children: [
               Stack(
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 35,
-                    backgroundImage: NetworkImage(
-                      "https://i.pravatar.cc/150?img=4",
+                    backgroundColor:
+                        AppColors.primaryColor.withValues(alpha: 0.1),
+                    child: const Icon(
+                      Icons.person,
+                      size: 34,
+                      color: AppColors.primaryColor,
                     ),
                   ),
                   Positioned(

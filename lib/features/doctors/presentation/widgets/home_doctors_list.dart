@@ -68,8 +68,7 @@ class HomeDoctorsList extends StatelessWidget {
               child: DoctorCard(
                 name: doctor.name,
                 specialty: doctor.title ?? doctor.specialaization,
-                imageUrl: doctor.image ??
-                    'https://i.pravatar.cc/150?img=${index + 3}',
+                imageUrl: doctor.image,
                 consultationFee: doctor.consultationFee ?? 0,
                 location: doctor.location ?? 'غير محدد',
                 waitingTime: doctor.waitingTime != null
