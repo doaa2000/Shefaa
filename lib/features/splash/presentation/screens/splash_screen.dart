@@ -61,6 +61,15 @@ class _SplashScreenState extends State<SplashScreen> {
       return AppRoutes.login;
     }
 
+    // A session is not the same as permission to be in this app. A doctor who
+    // signed in here before the app started refusing them still has a working
+    // token on the device, and it would walk straight past the login screen.
+    if (!await _isPatientAccount()) {
+      await Supabase.instance.client.auth.signOut();
+      await secureStorage.clearTokens();
+      return AppRoutes.login;
+    }
+
     // Keep our copy in step with the session that actually works.
     final refreshToken = session.refreshToken;
     if (refreshToken != null) {
@@ -71,6 +80,22 @@ class _SplashScreenState extends State<SplashScreen> {
     }
 
     return AppRoutes.home;
+  }
+
+  /// Whether the restored session belongs to one of this app's own accounts.
+  ///
+  /// A failure here is treated as "yes". The check is a tidy-up for a handful
+  /// of accounts, and the alternative -- a patient offline on a plane being
+  /// shown the login screen because a round trip did not come back -- is worse
+  /// than the thing it guards against.
+  Future<bool> _isPatientAccount() async {
+    try {
+      final allowed =
+          await Supabase.instance.client.rpc('is_patient_account');
+      return allowed != false;
+    } catch (_) {
+      return true;
+    }
   }
 
   /// A refresh that fails means no session, not a crash on the splash screen:

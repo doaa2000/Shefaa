@@ -4,6 +4,7 @@ import 'package:shefaa_app/core/utils/app_router.dart';
 import 'package:shefaa_app/core/utils/constants.dart';
 import 'package:shefaa_app/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:shefaa_app/features/profile/presentation/screens/update_profile_screen.dart';
+import 'package:shefaa_app/features/profile/presentation/widgets/delete_account_button.dart';
 import 'package:shefaa_app/features/profile/presentation/widgets/logout_button.dart';
 import 'package:shefaa_app/features/profile/presentation/widgets/profile_header_card.dart';
 import 'package:shefaa_app/features/profile/presentation/widgets/settings_card.dart';
@@ -53,6 +54,8 @@ class ProfileScreen extends StatelessWidget {
             const SupportCard(),
             const SizedBox(height: 25),
             const LogoutButton(),
+            const SizedBox(height: 8),
+            const DeleteAccountButton(),
           ],
         ),
       ),

@@ -15,6 +15,9 @@ class AuthState extends Equatable {
    final RequestState logoutState;
   final String logoutMessage;
 
+  final RequestState deleteAccountState;
+  final String deleteAccountMessage;
+
   const AuthState({
     this.loginState = RequestState.initial,
     this.loginMessage = '',
@@ -24,6 +27,8 @@ class AuthState extends Equatable {
     this.registerNeedsConfirmation = false,
       this.logoutState = RequestState.initial,
       this.logoutMessage = '',
+    this.deleteAccountState = RequestState.initial,
+    this.deleteAccountMessage = '',
   });
 
   AuthState copyWith({
@@ -35,6 +40,8 @@ class AuthState extends Equatable {
     bool? registerNeedsConfirmation,
     RequestState? logoutState,
     String? logoutMessage,
+    RequestState? deleteAccountState,
+    String? deleteAccountMessage,
   }) {
     return AuthState(
       loginState: loginState ??this. loginState,
@@ -46,6 +53,9 @@ class AuthState extends Equatable {
           registerNeedsConfirmation ?? this.registerNeedsConfirmation,
       logoutState: logoutState ?? this.logoutState,
       logoutMessage: logoutMessage ?? this.logoutMessage,
+      deleteAccountState: deleteAccountState ?? this.deleteAccountState,
+      deleteAccountMessage:
+          deleteAccountMessage ?? this.deleteAccountMessage,
     );
   }
 
@@ -59,5 +69,7 @@ class AuthState extends Equatable {
     registerNeedsConfirmation,
     logoutState,
     logoutMessage,
+    deleteAccountState,
+    deleteAccountMessage,
   ];
 }

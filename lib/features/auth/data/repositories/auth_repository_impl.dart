@@ -62,6 +62,16 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, Unit>> deleteAccount() async {
+    try {
+      await authRemoteDataSource.deleteAccount();
+      return const Right(unit);
+    } catch (e) {
+      return Left(ServerFailure(_message(e)));
+    }
+  }
+
   /// What the patient reads when signing in or up fails.
   ///
   /// Supabase raises in English and stringifies as
@@ -70,6 +80,11 @@ class AuthRepositoryImpl implements AuthRepository {
   /// being rare the moment email confirmation is switched on, which is the
   /// point of the change this arrived with.
   static String _message(Object error) {
+    if (error is NotAPatientAccountException) {
+      return 'هذا الحساب خاص بلوحة الطبيب. '
+          'لاستخدام التطبيق أنشئ حسابًا جديدًا ببريد إلكتروني آخر.';
+    }
+
     if (error is AuthException) {
       final text = _plainText(error.message);
       final lower = text.toLowerCase();

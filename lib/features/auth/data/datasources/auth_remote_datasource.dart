@@ -2,6 +2,15 @@ import 'package:dartz/dartz.dart';
 import 'package:shefaa_app/features/auth/data/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+/// Raised when the account exists and the password is right, but the account
+/// is not one of this app's: a doctor's or an administrator's.
+///
+/// A class of its own rather than a message, so the repository decides the
+/// wording and the data layer stays out of the patient's language.
+class NotAPatientAccountException implements Exception {
+  const NotAPatientAccountException();
+}
+
 abstract class AuthRemoteDataSource {
   Future<UserModel> login({required String email, required String password});
   Future<UserModel> register({
@@ -13,6 +22,9 @@ abstract class AuthRemoteDataSource {
     required String phone,
   });
   Future<Unit> logout();
+
+  /// Deletes the signed-in account, then signs out.
+  Future<Unit> deleteAccount();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -29,6 +41,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       email: email,
       password: password,
     );
+
+    await _requirePatientAccount();
 
     final user = response.user!;
     final session = response.session!;
@@ -118,8 +132,33 @@ Future<UserModel> register({
   }
 }
 
+  /// All three apps sign in through the same auth, so a correct password is
+  /// not on its own permission to be here. An account linked to a doctor or an
+  /// administrator belongs to the dashboard or the admin panel; it is signed
+  /// straight back out rather than left holding a session it should not have.
+  Future<void> _requirePatientAccount() async {
+    final allowed = await supabase.rpc('is_patient_account');
+    if (allowed == true) return;
+
+    await supabase.auth.signOut();
+    throw const NotAPatientAccountException();
+  }
+
   @override
   Future<Unit> logout() async {
+    await supabase.auth.signOut();
+    return unit;
+  }
+
+  @override
+  Future<Unit> deleteAccount() async {
+    // The function takes no arguments on purpose: it acts on auth.uid() and
+    // there is no account it could be pointed at but the caller's own.
+    await supabase.rpc('delete_my_account');
+
+    // The session outlives the account it belonged to -- the token is still in
+    // memory and still looks valid until it expires. Signing out here means the
+    // app never sits on a session with nothing behind it.
     await supabase.auth.signOut();
     return unit;
   }
