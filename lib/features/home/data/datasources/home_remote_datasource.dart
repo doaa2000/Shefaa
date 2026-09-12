@@ -1,4 +1,3 @@
-import 'package:shefaa_app/core/model/specialty_model.dart';
 import 'package:shefaa_app/features/home/data/models/specialty_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

@@ -225,7 +225,7 @@ class _UpdateProfileViewState extends State<_UpdateProfileView> {
                             CircleAvatar(
                               radius: 52,
                               backgroundColor:
-                                  colorScheme.primary.withOpacity(0.12),
+                                  colorScheme.primary.withValues(alpha: 0.12),
                               child: Icon(
                                 CupertinoIcons.person_fill,
                                 size: 52,

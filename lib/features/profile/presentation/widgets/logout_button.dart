@@ -79,7 +79,7 @@ class LogoutButton extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 16),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(.1),
+                color: Colors.red.withValues(alpha: .1),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Center(

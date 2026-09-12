@@ -1,7 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:shefaa_app/core/domain/use_cases.dart';
 import 'package:shefaa_app/core/errors/failure.dart';
-import 'package:shefaa_app/features/auth/domain/entities/user.dart';
 import 'package:shefaa_app/features/auth/domain/repositories/auth_repository.dart';
 
 class LogoutUseCase extends BaseUsecase<Unit, NoParameters> {

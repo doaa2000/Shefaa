@@ -90,12 +90,4 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       ),
     );
   }
-
-  void setUser(UserEntity user) {
-    emit(state.copyWith(user: user));
-  }
-
-  void clearUser() {
-    emit(const ProfileState());
-  }
 }

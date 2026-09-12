@@ -1,4 +1,6 @@
 import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 class AppLogger {
@@ -12,7 +14,9 @@ class AppLogger {
       await file.writeAsString("[$timestamp] $message\n",
           mode: FileMode.append);
     } catch (e) {
-      print('Error logging: $e');
+      // The logger failing is not worth crashing over, but swallowing it
+      // silently means never finding out the log file was never written.
+      debugPrint('AppLogger could not write: $e');
     }
   }
 }

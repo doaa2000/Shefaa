@@ -210,7 +210,7 @@ class PaymentScreenBody extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               decoration: BoxDecoration(
-                color: AppColors.primaryColor.withOpacity(0.1),
+                color: AppColors.primaryColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
@@ -256,9 +256,9 @@ class _QueueCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.primaryColor.withOpacity(0.08),
+        color: AppColors.primaryColor.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.primaryColor.withOpacity(0.3)),
+        border: Border.all(color: AppColors.primaryColor.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [

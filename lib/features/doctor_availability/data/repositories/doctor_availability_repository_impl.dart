@@ -1,7 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:shefaa_app/core/errors/failure.dart';
 import 'package:shefaa_app/features/doctor_availability/data/datasources/doctor_availability_remote_datasource.dart';
-import 'package:shefaa_app/features/doctor_availability/domain/entities/doctor_availability.dart';
 import 'package:shefaa_app/features/doctor_availability/domain/entities/doctor_details_entity.dart';
 import 'package:shefaa_app/features/doctor_availability/domain/repositories/doctor_availability_repository.dart';
 

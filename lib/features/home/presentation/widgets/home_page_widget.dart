@@ -4,7 +4,6 @@ import 'package:shefaa_app/core/utils/constants.dart';
 import 'package:shefaa_app/core/widgets/custom_search_bar.dart';
 import 'package:shefaa_app/features/home/presentation/widgets/specialties_grid.dart';
 import 'package:shefaa_app/features/home/presentation/widgets/upcoming_appointment_card.dart';
-import 'package:shefaa_app/features/home/presentation/widgets/home_app_bar.dart';
 import 'package:shefaa_app/generated/l10n.dart';
 
 class HomePageWidget extends StatelessWidget {
@@ -29,9 +28,6 @@ class HomePageWidget extends StatelessWidget {
               specialty: "أطفال",
               date: "12 فبراير 2026",
               time: "10:00 صباحًا",
-              onTap: () {
-                print("Pressed appointment card");
-              },
             ),
           ],
         ),

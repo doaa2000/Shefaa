@@ -36,7 +36,7 @@ class CustomButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           elevation: 0,
           backgroundColor: _isDisabled
-              ? AppColors.primaryColor.withOpacity(0.4) // ✅ faded when disabled
+              ? AppColors.primaryColor.withValues(alpha: 0.4) // ✅ faded when disabled
               : backgroundColor,
           foregroundColor: textColor,
           padding: const EdgeInsets.symmetric(horizontal: 20),
