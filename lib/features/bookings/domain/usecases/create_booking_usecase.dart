@@ -11,7 +11,6 @@ class CreateBookingUsecase extends BaseUsecase<int, CreateBookingParams> {
   Future<Either<Failure, int>> call(CreateBookingParams params) {
     return repository.createBooking(
       doctorId: params.doctorId,
-      amount: params.amount,
       paymentMethod: params.paymentMethod,
       bookedDate: params.bookedDate,
       session: params.session,
@@ -23,7 +22,6 @@ class CreateBookingUsecase extends BaseUsecase<int, CreateBookingParams> {
 
 class CreateBookingParams {
   final int doctorId;
-  final double amount;
   final String paymentMethod;
   final DateTime bookedDate;
   final String session;
@@ -32,7 +30,6 @@ class CreateBookingParams {
 
   const CreateBookingParams({
     required this.doctorId,
-    required this.amount,
     required this.paymentMethod,
     required this.bookedDate,
     required this.session,

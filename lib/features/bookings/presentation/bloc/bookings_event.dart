@@ -9,7 +9,6 @@ abstract class BookingEvent extends Equatable {
 
 class CreateBookingEvent extends BookingEvent {
   final int doctorId;
-  final double amount;
   final String paymentMethod;
   final DateTime bookedDate;
   final String session;
@@ -18,7 +17,6 @@ class CreateBookingEvent extends BookingEvent {
 
   const CreateBookingEvent({
     required this.doctorId,
-    required this.amount,
     required this.paymentMethod,
     required this.bookedDate,
     required this.session,
@@ -28,7 +26,7 @@ class CreateBookingEvent extends BookingEvent {
 
   @override
   List<Object?> get props =>
-      [doctorId, amount, bookedDate, session, startTime, endTime];
+      [doctorId, bookedDate, session, startTime, endTime];
 }
 
 class GetMyBookingsEvent extends BookingEvent {

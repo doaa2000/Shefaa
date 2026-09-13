@@ -5,7 +5,6 @@ abstract class BookingRemoteDatasource {
   /// Returns the id of the booking that was created.
   Future<int> createBooking({
     required int doctorId,
-    required double amount,
     required String paymentMethod,
     required DateTime bookedDate,
     required String session,
@@ -25,7 +24,6 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
   @override
   Future<int> createBooking({
     required int doctorId,
-    required double amount,
     required String paymentMethod,
     required DateTime bookedDate,
     required String session,
@@ -44,7 +42,9 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
         'p_session': session,
         'p_start': startTime,
         'p_end': endTime,
-        'p_amount': amount,
+        // No amount: the fee is the doctor's, and create_booking reads it from
+        // Doctors.consultation_fee. Sending it from here meant a booking could
+        // be made at any price the client chose.
         'p_method': paymentMethod,
       },
     );
