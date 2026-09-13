@@ -13,7 +13,6 @@ class BookingRepositoryImpl implements BookingRepository {
   @override
   Future<Either<Failure, int>> createBooking({
     required int doctorId,
-    required double amount,
     required String paymentMethod,
     required DateTime bookedDate,
     required String session,
@@ -23,7 +22,6 @@ class BookingRepositoryImpl implements BookingRepository {
     try {
       final bookingId = await remoteDatasource.createBooking(
         doctorId: doctorId,
-        amount: amount,
         paymentMethod: paymentMethod,
         bookedDate: bookedDate,
         session: session,

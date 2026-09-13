@@ -6,7 +6,6 @@ abstract class BookingRepository {
   /// Returns the place in the queue the booking got.
   Future<Either<Failure, int>> createBooking({
     required int doctorId,
-    required double amount,
     required String paymentMethod,
     required DateTime bookedDate,
     required String session,

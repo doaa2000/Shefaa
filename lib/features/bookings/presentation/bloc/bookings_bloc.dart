@@ -32,7 +32,6 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     final result = await createBookingUsecase(
       CreateBookingParams(
         doctorId: event.doctorId,
-        amount: event.amount,
         paymentMethod: event.paymentMethod,
         bookedDate: event.bookedDate,
         session: event.session,
