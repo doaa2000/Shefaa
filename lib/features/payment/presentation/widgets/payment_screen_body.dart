@@ -147,7 +147,6 @@ class PaymentScreenBody extends StatelessWidget {
                   context.read<BookingBloc>().add(
                         CreateBookingEvent(
                           doctorId: args.doctorId,
-                          amount: args.amount,
                           paymentMethod: 'cash',
                           bookedDate: args.date,
                           session: args.session,
