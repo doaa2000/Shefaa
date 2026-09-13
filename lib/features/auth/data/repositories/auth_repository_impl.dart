@@ -37,6 +37,8 @@ class AuthRepositoryImpl implements AuthRepository {
     required String name,
     required String phone,
     required String healthConsentVersion,
+    required String termsVersion,
+    required String privacyVersion,
   }) async {
     try {
       final user = await authRemoteDataSource.register(
@@ -47,6 +49,8 @@ class AuthRepositoryImpl implements AuthRepository {
         name: name,
         phone: phone,
         healthConsentVersion: healthConsentVersion,
+        termsVersion: termsVersion,
+        privacyVersion: privacyVersion,
       );
       return Right(user);
     } catch (e) {

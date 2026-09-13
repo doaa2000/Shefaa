@@ -10,5 +10,7 @@ class AppRoutes {
   static const String payment = '/payment';
   static const String updateProfile = '/update-profile';
   static const String healthConsent = '/health-consent';
+  static const String legal = '/legal';
+  static const String legalAcceptance = '/legal-acceptance';
 
 }

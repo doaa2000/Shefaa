@@ -4,53 +4,46 @@ import 'package:shefaa_app/core/enums/request_state.dart';
 import 'package:shefaa_app/core/services/consent_gate.dart';
 import 'package:shefaa_app/core/services/service_locator.dart';
 import 'package:shefaa_app/core/utils/app_colors.dart';
-import 'package:shefaa_app/core/utils/app_consent.dart';
+import 'package:shefaa_app/core/utils/app_legal.dart';
 import 'package:shefaa_app/core/utils/app_router.dart';
 import 'package:shefaa_app/core/utils/app_text_styles.dart';
 import 'package:shefaa_app/core/utils/constants.dart';
 import 'package:shefaa_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:shefaa_app/features/consent/presentation/bloc/consent_bloc.dart';
 
-/// Asks for the consent the app could not record at signup.
+/// Asks for the terms and the privacy notice when the account has not accepted
+/// the current wording of both.
 ///
-/// Reached by patients who registered before this was asked for, and by anyone
-/// whose agreement is to an older version of the wording. Registering today
-/// records it with the account itself and never lands here.
+/// Reached by everyone who registered before the app asked for them, and by
+/// anyone whose agreement is to an older version. Registering today records
+/// both with the account itself and never lands here.
 ///
-/// It is deliberately a dead end: there is no back button and no way past it
-/// but accepting or signing out. A screen that can be skipped is not consent.
-class HealthConsentScreen extends StatelessWidget {
-  const HealthConsentScreen({super.key});
+/// Like the health-data screen, it is a dead end on purpose: the only ways out
+/// are accepting and signing out, and both are a decision.
+class LegalAcceptanceScreen extends StatelessWidget {
+  const LegalAcceptanceScreen({super.key});
 
-  static const String routeName = '/health-consent';
+  static const String routeName = AppRoutes.legalAcceptance;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => getIt<ConsentBloc>(),
-      child: const _ConsentView(),
+      child: const _AcceptanceView(),
     );
   }
 }
 
-class _ConsentView extends StatelessWidget {
-  const _ConsentView();
-
-  Future<void> _goOn(BuildContext context) async {
-    final route = await ConsentGate.nextRoute();
-    if (!context.mounted) return;
-    Navigator.pushNamedAndRemoveUntil(context, route, (route) => false);
-  }
+class _AcceptanceView extends StatelessWidget {
+  const _AcceptanceView();
 
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      // Not dismissible by the back gesture: the only ways out are the two
-      // buttons, and both of them are a decision.
       canPop: false,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text(AppConsent.healthDataTitle),
+          title: const Text('قبل المتابعة'),
           automaticallyImplyLeading: false,
         ),
         body: BlocListener<ConsentBloc, ConsentState>(
@@ -73,8 +66,9 @@ class _ConsentView extends StatelessWidget {
 
             if (state.acceptState != RequestState.loaded) return;
 
-            // Through the gate, not straight home: this is the last agreement
-            // in the order, but the gate is the one place that says so.
+            // Through the gate rather than straight to the home screen: this
+            // account may still owe the health-data consent, and that is the
+            // gate's question to answer, not this screen's.
             _goOn(context);
           },
           child: SafeArea(
@@ -83,9 +77,23 @@ class _ConsentView extends StatelessWidget {
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(Constants.padding),
-                    child: Text(
-                      AppConsent.healthDataBody.trim(),
-                      style: TextStyles.meduim14.copyWith(height: 1.9),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(AppLegal.termsTitle, style: TextStyles.bold18),
+                        const SizedBox(height: 8),
+                        Text(
+                          AppLegal.termsBody.trim(),
+                          style: TextStyles.meduim14.copyWith(height: 1.9),
+                        ),
+                        const SizedBox(height: 24),
+                        Text(AppLegal.privacyTitle, style: TextStyles.bold18),
+                        const SizedBox(height: 8),
+                        Text(
+                          AppLegal.privacyBody.trim(),
+                          style: TextStyles.meduim14.copyWith(height: 1.9),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -96,6 +104,12 @@ class _ConsentView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _goOn(BuildContext context) async {
+    final route = await ConsentGate.nextRoute();
+    if (!context.mounted) return;
+    Navigator.pushNamedAndRemoveUntil(context, route, (route) => false);
   }
 }
 
@@ -137,7 +151,7 @@ class _Actions extends StatelessWidget {
                       ? null
                       : () => context
                           .read<ConsentBloc>()
-                          .add(const AcceptHealthConsentEvent()),
+                          .add(const AcceptLegalConsentEvent()),
                   child: saving
                       ? const SizedBox(
                           height: 20,
@@ -152,8 +166,6 @@ class _Actions extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 6),
-              // Refusing has to lead somewhere. Without this the only way out
-              // of the screen would be to uninstall the app.
               TextButton(
                 onPressed: saving ? null : () => _declineAndSignOut(context),
                 child: Text(
@@ -171,9 +183,6 @@ class _Actions extends StatelessWidget {
   }
 
   void _declineAndSignOut(BuildContext context) {
-    // Through AuthBloc rather than Supabase directly, so the stored tokens go
-    // with the session -- otherwise the next launch restores it and lands
-    // straight back on this screen.
     context.read<AuthBloc>().add(LogoutEvent());
     Navigator.pushNamedAndRemoveUntil(
       context,

@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shefaa_app/core/enums/request_state.dart';
-import 'package:shefaa_app/core/services/service_locator.dart';
+import 'package:shefaa_app/core/services/consent_gate.dart';
 import 'package:shefaa_app/core/utils/app_colors.dart';
-import 'package:shefaa_app/core/utils/app_consent.dart';
 import 'package:shefaa_app/core/utils/app_router.dart';
 import 'package:shefaa_app/core/widgets/custom_button.dart';
 import 'package:shefaa_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:shefaa_app/features/auth/presentation/screens/register_screen.dart';
 import 'package:shefaa_app/features/auth/presentation/widgets/auth_footer.dart';
-import 'package:shefaa_app/features/consent/domain/usecases/consent_usecases.dart';
 import 'package:shefaa_app/core/widgets/app_text_field.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -44,32 +42,19 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  /// Home, unless this account still owes the health-data consent.
+  /// Home, unless this account still owes one of the agreements.
   ///
-  /// The splash screen makes the same check for a session it restored; this is
+  /// The splash screen asks the same gate for a session it restored; this is
   /// the other door into the app, and an account that signed in today has to
   /// pass through the same gate as one that was already signed in.
   Future<void> _goOn(BuildContext context) async {
-    final result = await getIt<HasAcceptedConsentUseCase>()(
-      const ConsentParams(
-        kind: 'health_data',
-        version: AppConsent.healthDataVersion,
-      ),
-    );
-
-    // A failure counts as accepted, as it does on the splash: a round trip
-    // that did not come back should not lock somebody out of their account.
-    final accepted = result.fold((_) => true, (value) => value);
+    final route = await ConsentGate.nextRoute();
 
     if (!context.mounted) return;
 
     // Clear the stack: pressing back after signing in must not return to the
     // login screen.
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      accepted ? AppRoutes.home : AppRoutes.healthConsent,
-      (route) => false,
-    );
+    Navigator.pushNamedAndRemoveUntil(context, route, (route) => false);
   }
 
   @override

@@ -26,12 +26,20 @@ class RegisterEvent extends AuthEvent {
   /// app cannot write the consent row itself, so the trigger does.
   final String healthConsentVersion;
 
+  /// The terms and the privacy notice, each with its own version, for the same
+  /// reason and by the same route. Separate fields rather than one: they are
+  /// two documents and either can change without the other.
+  final String termsVersion;
+  final String privacyVersion;
+
   const RegisterEvent({
     required this.email,
     required this.password,
     required this.name,
     required this.phone,
     required this.healthConsentVersion,
+    required this.termsVersion,
+    required this.privacyVersion,
     this.birthDate,
     this.gender,
   });

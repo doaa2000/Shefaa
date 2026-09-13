@@ -49,10 +49,19 @@ class ConsentRemoteDatasourceImpl implements ConsentRemoteDatasource {
     // The row is written with the patient's own id because the policy accepts
     // no other, and because a consent recorded on somebody's behalf is worth
     // less than none.
-    await supabase.from('consents').insert({
-      'user_id': userId,
-      'kind': kind,
-      'version': version,
-    });
+    //
+    // upsert on the table's own unique key rather than insert: a tap that
+    // timed out on the way back has already written the row, and the retry
+    // must not fail on it. Accepting twice is the same fact, not an error.
+    //
+    // ignoreDuplicates, so the conflict does nothing instead of overwriting.
+    // The table has no update policy on purpose -- a consent record that can
+    // be rewritten afterwards is not a record -- and an upsert that tried to
+    // update would be refused by it.
+    await supabase.from('consents').upsert(
+      {'user_id': userId, 'kind': kind, 'version': version},
+      onConflict: 'user_id,kind,version',
+      ignoreDuplicates: true,
+    );
   }
 }

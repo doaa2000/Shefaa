@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shefaa_app/core/services/secure_storage_service.dart';
-import 'package:shefaa_app/core/services/service_locator.dart';
-import 'package:shefaa_app/core/utils/app_consent.dart';
+import 'package:shefaa_app/core/services/consent_gate.dart';
 import 'package:shefaa_app/core/utils/app_router.dart';
-import 'package:shefaa_app/features/consent/domain/usecases/consent_usecases.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -82,28 +80,10 @@ class _SplashScreenState extends State<SplashScreen> {
       );
     }
 
-    // Patients who registered before the app asked, and anyone whose
-    // agreement is to older wording, are asked before they reach anything
-    // that would store health data about them.
-    if (!await _hasHealthConsent()) return AppRoutes.healthConsent;
-
-    return AppRoutes.home;
-  }
-
-  /// Whether this account has accepted the current health-data wording.
-  ///
-  /// A failure is treated as "yes", for the same reason the account check
-  /// above is: a patient offline should not be stopped at a gate by a round
-  /// trip that did not come back. They are asked again on the next launch that
-  /// does reach the server.
-  Future<bool> _hasHealthConsent() async {
-    final result = await getIt<HasAcceptedConsentUseCase>()(
-      const ConsentParams(
-        kind: 'health_data',
-        version: AppConsent.healthDataVersion,
-      ),
-    );
-    return result.fold((_) => true, (accepted) => accepted);
+    // Patients who registered before the app asked for an agreement, and
+    // anyone whose agreement is to older wording, are asked for it before they
+    // reach anything that would store data about them.
+    return ConsentGate.nextRoute();
   }
 
   /// Whether the restored session belongs to one of this app's own accounts.

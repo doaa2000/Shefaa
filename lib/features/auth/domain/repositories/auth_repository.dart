@@ -16,6 +16,8 @@ abstract class AuthRepository {
    required String name,
   required  String phone,
    required String healthConsentVersion,
+   required String termsVersion,
+   required String privacyVersion,
   });
 
 Future<Either<Failure, Unit>> logout();
