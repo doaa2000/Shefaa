@@ -240,6 +240,96 @@ class PaymentScreenBody extends StatelessWidget {
   }
 }
 
+class _Card extends StatelessWidget {
+  const _Card({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+}
+
+class _Row extends StatelessWidget {
+  const _Row({required this.icon, required this.title, required this.subtitle});
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppColors.primaryColor.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, size: 20, color: AppColors.primaryColor),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(subtitle,
+                  style: TextStyles.meduim12.copyWith(color: Colors.grey.shade600)),
+              const SizedBox(height: 2),
+              Text(title, style: TextStyles.bold14.copyWith(color: Colors.black)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _AmountRow extends StatelessWidget {
+  const _AmountRow({required this.label, required this.value, this.bold = false});
+
+  final String label;
+  final String value;
+  final bool bold;
+
+  @override
+  Widget build(BuildContext context) {
+    final valueStyle = bold
+        ? TextStyles.bold16.copyWith(color: AppColors.primaryColor)
+        : TextStyles.meduim14.copyWith(color: Colors.black);
+    final labelStyle = bold
+        ? TextStyles.bold16.copyWith(color: Colors.black)
+        : TextStyles.meduim14.copyWith(color: Colors.grey.shade700);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: labelStyle),
+          Text(value, style: valueStyle),
+        ],
+      ),
+    );
+  }
+}
+
 class _QueueCard extends StatelessWidget {
   const _QueueCard({required this.args});
   final PaymentArgsModel args;

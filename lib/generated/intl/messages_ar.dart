@@ -55,7 +55,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "email_invalid_error": MessageLookupByLibrary.simpleMessage(
       "أدخل بريد إلكتروني صحيح",
     ),
-    "email_locked_note": MessageLookupByLibrary.simpleMessage("البريد الإلكتروني مرتبط بحسابك ولا يمكن تعديله من هنا"),
+    "email_locked_note": MessageLookupByLibrary.simpleMessage(
+      "البريد الإلكتروني مرتبط بحسابك ولا يمكن تعديله من هنا",
+    ),
     "email_required_error": MessageLookupByLibrary.simpleMessage(
       "البريد الإلكتروني مطلوب",
     ),
@@ -93,7 +95,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "رقم الهاتف مطلوب",
     ),
     "profile": MessageLookupByLibrary.simpleMessage("الملف الشخصي"),
-    "profile_updated_success": MessageLookupByLibrary.simpleMessage("تم حفظ التعديلات بنجاح"),
+    "profile_updated_success": MessageLookupByLibrary.simpleMessage(
+      "تم حفظ التعديلات بنجاح",
+    ),
     "save_changes": MessageLookupByLibrary.simpleMessage("حفظ التغييرات"),
     "search": MessageLookupByLibrary.simpleMessage("ابحث"),
     "select_appointment": MessageLookupByLibrary.simpleMessage("اختر الموعد"),

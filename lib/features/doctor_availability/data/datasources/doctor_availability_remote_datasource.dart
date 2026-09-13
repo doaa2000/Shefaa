@@ -23,7 +23,7 @@ class DoctorAvailabilityRemoteDatasourceImpl
     // Availability is no longer rows to be read: it is computed from the
     // doctor's weekly schedule, minus bookings already taken, minus any
     // exception for this date. Hence two calls rather than one nested select.
-    final results = await Future.wait([
+    final results = await Future.wait<dynamic>([
       supabase
           .from('Doctors')
           .select(

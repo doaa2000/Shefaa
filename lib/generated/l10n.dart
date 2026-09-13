@@ -575,7 +575,7 @@ class S {
     );
   }
 
-  /// `Your email is tied to your account and can\'t be changed here`
+  /// `Your email is tied to your account and can't be changed here`
   String get email_locked_note {
     return Intl.message(
       'Your email is tied to your account and can\'t be changed here',
