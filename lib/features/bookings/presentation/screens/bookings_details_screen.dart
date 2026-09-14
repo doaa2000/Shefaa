@@ -16,6 +16,28 @@ class BookingsDetailsScreen extends StatelessWidget {
 
   final BookingEntity booking;
 
+  static const List<String> _monthNames = [
+    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
+  ];
+
+  /// "٤:٠٠ م" for today, and the date as well for any other day: a bare time
+  /// on a booking three days out says nothing about which day it runs out.
+  static String _formatDeadline(DateTime deadline) {
+    final hour12 = deadline.hour % 12 == 0 ? 12 : deadline.hour % 12;
+    final minute = deadline.minute.toString().padLeft(2, '0');
+    final period = deadline.hour < 12 ? 'ص' : 'م';
+    final time = '$hour12:$minute $period';
+
+    final now = DateTime.now();
+    final isToday = deadline.year == now.year &&
+        deadline.month == now.month &&
+        deadline.day == now.day;
+    if (isToday) return time;
+
+    return '$time يوم ${deadline.day} ${_monthNames[deadline.month - 1]}';
+  }
+
   /// Popping with true means "cancel this booking". The bookings list owns the
   /// BookingBloc, so it is the one that dispatches the cancel and reports the
   /// result -- this screen is gone by then.
@@ -121,12 +143,36 @@ class BookingsDetailsScreen extends StatelessWidget {
             ),
             // A booking that has already happened or was cancelled has nothing
             // left to cancel, so the button is simply not there.
-            if (booking.isUpcoming) ...[
-              const SizedBox(height: 12),
+            if (booking.canCancel) ...[
+              const SizedBox(height: 8),
+              Text(
+                'يمكن الإلغاء حتى ${_formatDeadline(booking.cancelDeadline)}',
+                style: TextStyles.meduim12.copyWith(color: Colors.grey.shade600),
+              ),
+              const SizedBox(height: 8),
               CustomButton(
                 title: S.of(context).cancel_booking,
                 backgroundColor: Colors.red.shade700,
                 onPressed: () => _confirmCancel(context),
+              ),
+            ] else if (booking.isUpcoming) ...[
+              // Said plainly rather than by leaving a gap where the button was.
+              // A patient who came looking for it deserves to know it closed
+              // and what to do instead.
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Text(
+                  'انتهت مهلة إلغاء هذا الحجز. إذا تعذّر عليك الحضور، '
+                  'يرجى التواصل مع العيادة.',
+                  style: TextStyles.meduim12
+                      .copyWith(color: Colors.grey.shade700, height: 1.7),
+                ),
               ),
             ],
           ],

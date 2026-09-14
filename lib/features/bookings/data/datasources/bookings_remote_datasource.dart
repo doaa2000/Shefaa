@@ -1,3 +1,4 @@
+import 'package:shefaa_app/core/services/booking_policy.dart';
 import 'package:shefaa_app/features/bookings/data/models/booking_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -56,6 +57,10 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
 
   @override
   Future<List<BookingModel>> getMyBookings() async {
+    // Refreshed with the list rather than at launch: the deadline shown next
+    // to a booking has to be the one the database will hold the patient to.
+    await BookingPolicy.instance.refresh(supabase);
+
     final rows = await supabase
         .from('bookings')
         .select('''

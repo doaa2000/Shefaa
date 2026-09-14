@@ -1,3 +1,4 @@
+import 'package:shefaa_app/core/services/booking_policy.dart';
 import 'package:shefaa_app/features/doctors/domain/entities/doctor.dart';
 import 'package:shefaa_app/features/payment/domain/entites/payment.dart';
 
@@ -35,4 +36,18 @@ class BookingEntity {
 
   bool get isUpcoming =>
       status == 'confirmed' || status == 'pending';
+
+  /// The last moment this can still be called off.
+  DateTime get cancelDeadline => BookingPolicy.instance
+      .deadlineFor(bookedDate: bookedDate, startTime: startTime);
+
+  /// Whether the patient can still cancel it themselves.
+  ///
+  /// The database decides this too, and refuses a late one. Asking here as
+  /// well is not a second opinion: it is so the button is gone before it is
+  /// pressed, rather than an error after.
+  bool get canCancel =>
+      isUpcoming &&
+      BookingPolicy.instance
+          .canCancel(bookedDate: bookedDate, startTime: startTime);
 }
