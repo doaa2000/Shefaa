@@ -67,6 +67,8 @@ class BookingRepositoryImpl implements BookingRepository {
     'not_signed_in': 'يرجى تسجيل الدخول أولاً',
     'booking_immutable': 'لا يمكن نقل الحجز. يرجى إلغاؤه والحجز من جديد',
     'cancel_only': 'إلغاء الحجز هو التغيير الوحيد المتاح',
+    'cancellation_closed':
+        'انتهت مهلة الإلغاء لهذا الحجز. يرجى التواصل مع العيادة',
   };
 
   static String _message(Object error) {
