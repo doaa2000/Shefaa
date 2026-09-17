@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shefaa_app/core/enums/request_state.dart';
+import 'package:shefaa_app/core/services/booking_policy.dart';
 import 'package:shefaa_app/core/services/service_locator.dart';
 import 'package:shefaa_app/core/utils/app_colors.dart';
 import 'package:shefaa_app/core/utils/app_router.dart';
@@ -26,10 +27,6 @@ class DoctorAvailabilityScreen extends StatelessWidget {
 
   static const String routeName = AppRoutes.doctorAvailability;
 
-  /// How far ahead a patient may book. Long enough to plan around, short enough
-  /// that the doctor's schedule is unlikely to have changed underneath it.
-  static const int _bookingHorizonDays = 30;
-
   static const List<String> _dayNames = [
     'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت',
   ];
@@ -42,8 +39,11 @@ class DoctorAvailabilityScreen extends StatelessWidget {
   List<DateTime> get _days {
     final today = DateTime.now();
     final start = DateTime(today.year, today.month, today.day);
+    // The clinic's rule, not this screen's. Read rather than written here so
+    // that the strip never offers a date create_booking would refuse, and so
+    // that changing the rule does not need a new release of the app.
     return List.generate(
-      _bookingHorizonDays,
+      BookingPolicy.instance.bookingHorizonDays,
       (i) => start.add(Duration(days: i)),
     );
   }

@@ -2,10 +2,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// The clinic-wide rules a booking is held to, as the database states them.
 ///
-/// Only one so far: how long before their window a patient may still cancel.
-/// It is read from platform_settings rather than written here, because the
-/// database is what enforces it -- a copy in the app that drifted would show a
-/// deadline the server does not honour, which is worse than showing none.
+/// Two of them: how long before their window a patient may still cancel, and
+/// how far ahead they may book at all. Both are read from platform_settings
+/// rather than written here, because the database is what enforces them -- a
+/// copy in the app that drifted would offer a date the server then refuses,
+/// which is worse than offering fewer.
 ///
 /// The default stands in until the first read comes back, and after one that
 /// fails. Getting it slightly wrong offline costs a button shown a few minutes
@@ -17,7 +18,15 @@ class BookingPolicy {
 
   Duration _cancellationNotice = const Duration(hours: 1);
 
+  /// Matches the database's own default. Standing in with the right answer
+  /// means the date strip is correct before the first read comes back, not
+  /// merely harmless.
+  int _bookingHorizonDays = 7;
+
   Duration get cancellationNotice => _cancellationNotice;
+
+  /// How many days the date strip should offer, today included.
+  int get bookingHorizonDays => _bookingHorizonDays;
 
   /// The last moment this booking can still be called off.
   ///
@@ -59,6 +68,13 @@ class BookingPolicy {
         final parsed = _parseInterval(raw);
         if (parsed != null) _cancellationNotice = parsed;
       }
+
+      // Through the function rather than reading the interval column: a
+      // horizon of days renders as '7 days', which _parseInterval is not for,
+      // and the database is a better place to do the arithmetic than a regular
+      // expression here would be.
+      final days = await supabase.rpc('booking_horizon_days');
+      if (days is int && days > 0) _bookingHorizonDays = days;
     } catch (_) {
       // Keep the default. A patient with no signal should still see a booking
       // list, and the server is the one that enforces this anyway.

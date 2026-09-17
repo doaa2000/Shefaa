@@ -69,6 +69,8 @@ class BookingRepositoryImpl implements BookingRepository {
     'cancel_only': 'إلغاء الحجز هو التغيير الوحيد المتاح',
     'cancellation_closed':
         'انتهت مهلة الإلغاء لهذا الحجز. يرجى التواصل مع العيادة',
+    'date_in_past': 'لا يمكن الحجز في تاريخ مضى',
+    'beyond_horizon': 'هذا التاريخ أبعد من المدة المتاحة للحجز',
   };
 
   static String _message(Object error) {

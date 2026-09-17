@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shefaa_app/core/helper_functions/on_generate_route.dart';
+import 'package:shefaa_app/core/services/booking_policy.dart';
 import 'package:shefaa_app/core/services/custom_bloc_observer.dart';
 import 'package:shefaa_app/core/services/secure_storage_service.dart';
 import 'package:shefaa_app/core/services/selected_city_service.dart';
@@ -58,6 +59,11 @@ void main() async {
   await selectedCityService.load();
 
   setupServiceLocator(selectedCityService);
+
+  // Not awaited: the rules have sane defaults, and nobody should watch a
+  // splash screen for a number that only matters once they have chosen a
+  // doctor. The bookings list refreshes them again when it loads.
+  unawaited(BookingPolicy.instance.refresh(Supabase.instance.client));
   _registerFontLicence();
   runApp(const MyApp());
 }
