@@ -56,6 +56,14 @@ dependencies:
   equatable: ^2.0.7
   supabase_flutter: ^2.12.0
 
+  # Firebase. firebase_core is what firebase_options.dart imports, and it was
+  # only resolving because firebase_analytics happened to bring it along --
+  # a package imported by lib/ belongs here in its own right, or the day
+  # analytics is dropped the build breaks for a reason nobody will connect
+  # to it. firebase_messaging is the one that actually delivers a
+  # notification; analytics only counts things.
+  firebase_core: ^4.15.0
+  firebase_messaging: ^16.7.0
   firebase_analytics: ^12.0.2
   flutter:
     sdk: flutter
@@ -90,8 +98,6 @@ dependencies:
 dev_dependencies:
   device_user_agent: ^0.1.2
   dio: ^5.7.0
-  firebase_core: ^4.1.0
-  firebase_messaging: ^16.0.1
   flutter_dotenv: ^6.0.0
   flutter_launcher_icons: ^0.14.3
   flutter_lints: ^6.0.0

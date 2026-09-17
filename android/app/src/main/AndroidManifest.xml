@@ -1,4 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Android 13 and later will not show a notification until the patient
+         has been asked. Declared here rather than left to the messaging
+         library's own manifest so that reading this file tells you what the
+         app asks for. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application
         android:label="Shefaa"
         android:name="${applicationName}"

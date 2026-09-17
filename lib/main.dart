@@ -1,17 +1,20 @@
 import 'dart:async';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shefaa_app/core/helper_functions/on_generate_route.dart';
 import 'package:shefaa_app/core/services/custom_bloc_observer.dart';
 import 'package:shefaa_app/core/services/secure_storage_service.dart';
 import 'package:shefaa_app/core/services/selected_city_service.dart';
+import 'package:shefaa_app/core/services/push_notifications_service.dart';
 import 'package:shefaa_app/core/services/service_locator.dart';
 import 'package:shefaa_app/core/utils/app_router.dart';
 import 'package:shefaa_app/core/utils/app_colors.dart';
 import 'package:shefaa_app/core/utils/app_config.dart';
 import 'package:shefaa_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:shefaa_app/features/splash/presentation/screens/splash_screen.dart';
+import 'package:shefaa_app/firebase_options.dart';
 import 'package:shefaa_app/generated/l10n.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -38,6 +41,12 @@ void main() async {
     Bloc.observer = CustomBlocObserver();
 
   AppConfig.assertConfigured();
+
+  // Before Supabase, because the first thing a restored session does is ask
+  // this app for a notification token.
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   await Supabase.initialize(
     url: AppConfig.supabaseUrl,
@@ -82,6 +91,13 @@ class _MyAppState extends State<MyApp> {
     // patient stare at a home screen with no doctors on it.
     _authSubscription =
         Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+      // Decided before the guard below, which is only about not navigating on
+      // the startup event. A session is a session wherever it came from:
+      // restored at launch, or signed into a moment ago.
+      if (data.session != null) {
+        unawaited(getIt<PushNotificationsService>().start());
+      }
+
       if (!_sawStartupEvent) {
         _sawStartupEvent = true;
         return;

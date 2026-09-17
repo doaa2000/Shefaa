@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:shefaa_app/core/services/push_notifications_service.dart';
 import 'package:shefaa_app/features/auth/data/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -33,7 +34,13 @@ abstract class AuthRemoteDataSource {
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final SupabaseClient supabase;
 
-  AuthRemoteDataSourceImpl(this.supabase);
+  /// Held here rather than reached for through the service locator because
+  /// every sign-out in this class has to withdraw the notification token
+  /// first, and a dependency that is easy to forget is one that gets
+  /// forgotten.
+  final PushNotificationsService pushNotifications;
+
+  AuthRemoteDataSourceImpl(this.supabase, this.pushNotifications);
 
   @override
   Future<UserModel> login({
@@ -152,12 +159,20 @@ Future<UserModel> register({
     final allowed = await supabase.rpc('is_patient_account');
     if (allowed == true) return;
 
+    // This account was signed in for as long as it took to read its role,
+    // and that was long enough for the session listener to hand it this
+    // phone's token. Take it back, or a doctor who mistyped their password
+    // into the patient app goes on receiving a stranger's appointments.
+    await pushNotifications.stop();
     await supabase.auth.signOut();
     throw const NotAPatientAccountException();
   }
 
   @override
   Future<Unit> logout() async {
+    // Before the sign-out, never after: the database drops the row belonging
+    // to the caller, and a moment later there is no caller.
+    await pushNotifications.stop();
     await supabase.auth.signOut();
     return unit;
   }
@@ -167,6 +182,12 @@ Future<UserModel> register({
     // The function takes no arguments on purpose: it acts on auth.uid() and
     // there is no account it could be pointed at but the caller's own.
     await supabase.rpc('delete_my_account');
+
+    // The rows went with the account -- device_tokens cascades from
+    // auth.users. This is for what is left in this process: the token
+    // refresh listener, which would otherwise register the next token it
+    // sees against an account that no longer exists.
+    await pushNotifications.stop();
 
     // The session outlives the account it belonged to -- the token is still in
     // memory and still looks valid until it expires. Signing out here means the

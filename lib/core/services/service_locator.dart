@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:shefaa_app/core/services/push_notifications_service.dart';
 import 'package:shefaa_app/core/services/secure_storage_service.dart';
 import 'package:shefaa_app/core/services/selected_city_service.dart';
 import 'package:shefaa_app/features/auth/data/datasources/auth_remote_datasource.dart';
@@ -60,9 +61,16 @@ void setupServiceLocator(SelectedCityService selectedCityService) {
   // 1️⃣ SupabaseClient
   getIt.registerLazySingleton<SupabaseClient>(() => Supabase.instance.client);
 
+  // A singleton because it owns one subscription and one token for the whole
+  // process. A second instance would keep its own idea of what the server
+  // holds and undo the first one's work.
+  getIt.registerLazySingleton<PushNotificationsService>(
+    () => PushNotificationsService(getIt()),
+  );
+
   // 2️⃣ Remote Data Source
   getIt.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(getIt()),
+    () => AuthRemoteDataSourceImpl(getIt(), getIt()),
   );
 getIt.registerLazySingleton<ProfileRemoteDataSource>(
     () => ProfileRemoteDataSourceImpl(getIt()),
