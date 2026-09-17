@@ -130,18 +130,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                     ),
                     const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: const [
-                        Text("كلمة المرور"),
-                        Text(
-                          "هل نسيتها؟",
-                          style: TextStyle(
-                            color: AppColors.primaryColor,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
+                    // "هل نسيتها؟" used to sit on the right of this row,
+                    // coloured like a link and wired to nothing: tapping it did
+                    // not open anything, and somebody who had genuinely
+                    // forgotten their password was left pressing it. Resetting
+                    // one needs an email that actually arrives and a link back
+                    // into the app, and neither exists yet, so the row says only
+                    // what it can do.
+                    const Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text("كلمة المرور"),
                     ),
                     const SizedBox(height: 8),
                     AppTextField(

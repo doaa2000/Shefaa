@@ -90,6 +90,7 @@ class HomeDoctorsList extends StatelessWidget {
                 name: doctor.name,
                 specialty: doctor.title ?? doctor.specialaization,
                 imageUrl: doctor.image,
+                rating: doctor.rating,
                 consultationFee: doctor.consultationFee ?? 0,
                 location: doctor.location ?? 'غير محدد',
                 waitingTime: doctor.waitingTime != null
