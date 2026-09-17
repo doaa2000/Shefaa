@@ -1,0 +1,19 @@
+# Only the settings this repository needs to state. Everything else is left to
+# the CLI's defaults, and to the project's own dashboard settings.
+
+project_id = "shefaa"
+
+[functions.send-notifications]
+# The platform's own check demands a JWT, and the scheduler does not have one:
+# it presents CRON_SECRET, which is a random string this project invented and
+# nothing issued. Left on, the gateway answers every sweep with
+# UNAUTHORIZED_INVALID_JWT_FORMAT and the function is never reached.
+#
+# The endpoint is then reachable without a JWT, so the function's own guard is
+# the only gate -- which is why that guard refuses everything when no secret is
+# configured rather than falling open.
+#
+# Set here rather than passed as --no-verify-jwt on the command line, because a
+# flag has to be remembered on every deploy and a forgotten one stops the
+# notifications silently.
+verify_jwt = false

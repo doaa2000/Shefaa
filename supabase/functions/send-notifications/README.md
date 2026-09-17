@@ -57,6 +57,11 @@ they do not need setting.
 supabase functions deploy send-notifications
 ```
 
+`supabase/config.toml` turns off the platform's JWT check for this function.
+It has to be off: the schedule presents `CRON_SECRET`, which is not a JWT, and
+with the check on the gateway answers `UNAUTHORIZED_INVALID_JWT_FORMAT` before
+the function runs. The function's own guard is what protects it.
+
 ### 5. The schedule
 
 Run once in the SQL editor, with the project ref and the same `CRON_SECRET`
