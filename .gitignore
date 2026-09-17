@@ -55,3 +55,9 @@ app.*.map.json
 # shape. Run with: flutter run --dart-define-from-file=env/dev.json
 /env/*.json
 !/env/*.example.json
+
+# Edge Function secrets, fed to `supabase secrets set --env-file`. Holds the
+# Firebase service-account key, which is a credential for the whole Firebase
+# project -- not a per-environment setting that could be checked in as an
+# example.
+/supabase/.env
