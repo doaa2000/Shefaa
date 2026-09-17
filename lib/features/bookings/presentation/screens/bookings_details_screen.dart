@@ -9,6 +9,13 @@ import 'package:shefaa_app/features/bookings/presentation/widgets/appointment_ca
 import 'package:shefaa_app/features/bookings/presentation/widgets/payment_summary_card.dart';
 import 'package:shefaa_app/generated/l10n.dart';
 
+/// What the details screen asks the list to do on its way out.
+///
+/// It has no bloc of its own and the list has, so it decides and the list
+/// acts. Two values rather than a bool, because there are now two things it
+/// can decide.
+enum BookingAction { cancel, reportAbsence }
+
 class BookingsDetailsScreen extends StatelessWidget {
   const BookingsDetailsScreen({super.key, required this.booking});
 
@@ -65,7 +72,37 @@ class BookingsDetailsScreen extends StatelessWidget {
     );
 
     if (confirmed == true && context.mounted) {
-      Navigator.pop(context, true);
+      Navigator.pop(context, BookingAction.cancel);
+    }
+  }
+
+  /// Deliberately worded as telling the clinic rather than cancelling, and
+  /// says the booking stands. A patient who presses this expecting a refund
+  /// or a freed place has been misled by the button, not by the clinic.
+  Future<void> _confirmAbsence(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('إبلاغ العيادة'),
+        content: Text(
+          'سنُبلِغ الدكتور ${booking.doctor.name} بتعذّر الحضور.\n'
+          'مهلة الإلغاء انتهت، فالحجز يبقى قائماً.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('تراجع'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('إبلاغ'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      Navigator.pop(context, BookingAction.reportAbsence);
     }
   }
 
@@ -155,10 +192,11 @@ class BookingsDetailsScreen extends StatelessWidget {
                 backgroundColor: Colors.red.shade700,
                 onPressed: () => _confirmCancel(context),
               ),
-            ] else if (booking.isUpcoming) ...[
-              // Said plainly rather than by leaving a gap where the button was.
-              // A patient who came looking for it deserves to know it closed
-              // and what to do instead.
+            ] else if (booking.canReportAbsence) ...[
+              // This used to say "please contact the clinic" and stop there,
+              // which is a dead end: there is no number on this screen and
+              // there is not going to be one. The button does the one useful
+              // thing that telephone call would have done.
               const SizedBox(height: 12),
               Container(
                 width: double.infinity,
@@ -168,8 +206,31 @@ class BookingsDetailsScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Text(
-                  'انتهت مهلة إلغاء هذا الحجز. إذا تعذّر عليك الحضور، '
-                  'يرجى التواصل مع العيادة.',
+                  'انتهت مهلة إلغاء هذا الحجز. إذا تعذّر الحضور، '
+                  'يمكن إبلاغ العيادة ليتاح المكان لغيرك.',
+                  style: TextStyles.meduim12
+                      .copyWith(color: Colors.grey.shade700, height: 1.7),
+                ),
+              ),
+              const SizedBox(height: 12),
+              CustomButton(
+                title: 'لن أتمكّن من الحضور',
+                backgroundColor: Colors.grey.shade700,
+                onPressed: () => _confirmAbsence(context),
+              ),
+            ] else if (booking.isUpcoming && booking.absenceReported) ...[
+              // Said once and then stated, so the patient is not left
+              // wondering whether the first press did anything.
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Text(
+                  'تم إبلاغ العيادة بتعذّر الحضور. الحجز ما زال قائماً.',
                   style: TextStyles.meduim12
                       .copyWith(color: Colors.grey.shade700, height: 1.7),
                 ),

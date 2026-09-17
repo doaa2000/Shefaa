@@ -174,6 +174,9 @@ getIt.registerLazySingleton<LogoutUseCase>(() => LogoutUseCase(getIt()));
   getIt.registerLazySingleton<CancelBookingUsecase>(
     () => CancelBookingUsecase(getIt()),
   );
+  getIt.registerLazySingleton<ReportAbsenceUsecase>(
+    () => ReportAbsenceUsecase(getIt()),
+  );
   getIt.registerLazySingleton<GetBannersUseCase>(
     () => GetBannersUseCase(getIt()),
   );
@@ -246,6 +249,7 @@ getIt.registerFactory<DoctorAvailabilityBloc>(
       createBookingUsecase: getIt(),
       getMyBookingsUsecase: getIt(),
       cancelBookingUsecase: getIt(),
+      reportAbsenceUsecase: getIt(),
     ),
   );
   getIt.registerFactory<BannersBloc>(

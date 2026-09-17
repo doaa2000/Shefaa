@@ -47,3 +47,13 @@ class CancelBookingUsecase extends BaseUsecase<void, int> {
     return repository.cancelBooking(bookingId);
   }
 }
+
+class ReportAbsenceUsecase extends BaseUsecase<void, int> {
+  final BookingRepository repository;
+  ReportAbsenceUsecase(this.repository);
+
+  @override
+  Future<Either<Failure, void>> call(int bookingId) {
+    return repository.reportAbsence(bookingId);
+  }
+}

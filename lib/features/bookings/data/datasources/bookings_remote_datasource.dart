@@ -16,6 +16,11 @@ abstract class BookingRemoteDatasource {
   Future<List<BookingModel>> getMyBookings();
 
   Future<void> cancelBooking(int bookingId);
+
+  /// Tells the doctor the patient will not be coming, once cancelling has
+  /// closed. It does not cancel: the deadline has passed, and letting it
+  /// would make the deadline mean nothing.
+  Future<void> reportAbsence(int bookingId);
 }
 
 class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
@@ -77,6 +82,7 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
           start_time,
           end_time,
           doctor_id,
+          absence_reported_at,
           payments (
             id,
             amount,
@@ -123,6 +129,14 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
         .from('bookings')
         .update({'status': 'cancelled'})
         .eq('id', bookingId);
+  }
+
+  @override
+  Future<void> reportAbsence(int bookingId) async {
+    // A function rather than a column write: it has to check the window,
+    // drop the reminders and tell the doctor, and none of that is the
+    // patient's to be trusted with.
+    await supabase.rpc('report_absence', params: {'p_booking': bookingId});
   }
 
   static String _dateOnly(DateTime date) {

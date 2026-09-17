@@ -40,3 +40,12 @@ class CancelBookingEvent extends BookingEvent {
   @override
   List<Object?> get props => [bookingId];
 }
+
+/// After the cancellation deadline: the booking stands, the doctor is told.
+class ReportAbsenceEvent extends BookingEvent {
+  final int bookingId;
+  const ReportAbsenceEvent(this.bookingId);
+
+  @override
+  List<Object?> get props => [bookingId];
+}

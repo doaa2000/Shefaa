@@ -22,6 +22,11 @@ class BookingEntity {
   final PaymentEntity payment;
   final DoctorEntity doctor;
 
+  /// When the patient said they would not be coming, after cancelling had
+  /// closed. Null for almost every booking, and the reason the button that
+  /// says it is not offered twice.
+  final DateTime? absenceReportedAt;
+
   const BookingEntity({
     required this.id,
     required this.status,
@@ -32,6 +37,7 @@ class BookingEntity {
     required this.endTime,
     required this.payment,
     required this.doctor,
+    this.absenceReportedAt,
   });
 
   bool get isUpcoming =>
@@ -50,4 +56,29 @@ class BookingEntity {
       isUpcoming &&
       BookingPolicy.instance
           .canCancel(bookedDate: bookedDate, startTime: startTime);
+
+  bool get absenceReported => absenceReportedAt != null;
+
+  /// The window where cancelling has closed but the appointment has not
+  /// started: too late to give the place back, still early enough for the
+  /// doctor to do something about an empty chair.
+  ///
+  /// Asked here so the button is gone before it is pressed rather than an
+  /// error after. The database decides it again, and refuses a late one.
+  bool get canReportAbsence {
+    if (!isUpcoming || canCancel || absenceReported) return false;
+
+    final parts = startTime.split(':');
+    final hour = parts.isNotEmpty ? int.tryParse(parts[0]) ?? 0 : 0;
+    final minute = parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0;
+    final starts = DateTime(
+      bookedDate.year,
+      bookedDate.month,
+      bookedDate.day,
+      hour,
+      minute,
+    );
+
+    return DateTime.now().isBefore(starts);
+  }
 }

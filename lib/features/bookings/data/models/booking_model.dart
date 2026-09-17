@@ -14,6 +14,7 @@ class BookingModel extends BookingEntity {
     required super.endTime,
     required super.payment,
     required super.doctor,
+    super.absenceReportedAt,
   });
 
   factory BookingModel.fromMap(Map<String, dynamic> map) {
@@ -34,6 +35,9 @@ class BookingModel extends BookingEntity {
               id: 0, amount: 0, paymentMethod: 'cash', status: 'pending')
           : PaymentModel.fromMap(payment as Map<String, dynamic>),
       doctor: DoctorModel.fromMap(map['doctor'] as Map<String, dynamic>),
+      absenceReportedAt: map['absence_reported_at'] == null
+          ? null
+          : DateTime.tryParse(map['absence_reported_at'] as String),
     );
   }
 }

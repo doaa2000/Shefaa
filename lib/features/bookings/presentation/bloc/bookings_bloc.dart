@@ -12,15 +12,18 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
   final CreateBookingUsecase createBookingUsecase;
   final GetMyBookingsUsecase getMyBookingsUsecase;
   final CancelBookingUsecase cancelBookingUsecase;
+  final ReportAbsenceUsecase reportAbsenceUsecase;
 
   BookingBloc({
     required this.createBookingUsecase,
     required this.getMyBookingsUsecase,
     required this.cancelBookingUsecase,
+    required this.reportAbsenceUsecase,
   }) : super(const BookingState()) {
     on<CreateBookingEvent>(_onCreateBooking);
     on<GetMyBookingsEvent>(_onGetMyBookings);
     on<CancelBookingEvent>(_onCancelBooking);
+    on<ReportAbsenceEvent>(_onReportAbsence);
   }
 
   Future<void> _onCreateBooking(
@@ -86,6 +89,28 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         emit(state.copyWith(cancelBookingState: RequestState.loaded));
         // Cancelling moves everyone behind this patient up a place, so the
         // whole list is re-read rather than the one row patched locally.
+        add(const GetMyBookingsEvent());
+      },
+    );
+  }
+
+  Future<void> _onReportAbsence(
+    ReportAbsenceEvent event,
+    Emitter<BookingState> emit,
+  ) async {
+    emit(state.copyWith(reportAbsenceState: RequestState.loading));
+
+    final result = await reportAbsenceUsecase(event.bookingId);
+
+    await result.fold(
+      (failure) async => emit(state.copyWith(
+        reportAbsenceState: RequestState.error,
+        errorMessage: failure.message,
+      )),
+      (_) async {
+        emit(state.copyWith(reportAbsenceState: RequestState.loaded));
+        // The place is still the patient's -- nothing moves -- but the row
+        // now carries the report, and the list is what draws it.
         add(const GetMyBookingsEvent());
       },
     );

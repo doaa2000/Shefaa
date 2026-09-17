@@ -53,6 +53,16 @@ class BookingRepositoryImpl implements BookingRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, void>> reportAbsence(int bookingId) async {
+    try {
+      await remoteDatasource.reportAbsence(bookingId);
+      return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure(_message(e)));
+    }
+  }
+
   /// What the patient is actually shown when a booking is refused.
   ///
   /// The database raises in English and tags each refusal with a `hint`. The
@@ -71,6 +81,10 @@ class BookingRepositoryImpl implements BookingRepository {
         'انتهت مهلة الإلغاء لهذا الحجز. يرجى التواصل مع العيادة',
     'date_in_past': 'لا يمكن الحجز في تاريخ مضى',
     'beyond_horizon': 'هذا التاريخ أبعد من المدة المتاحة للحجز',
+    'booking_not_found': 'لم يعد هذا الحجز موجوداً',
+    'already_cancelled': 'هذا الحجز ملغى بالفعل',
+    'cancel_instead': 'ما زال بإمكانك إلغاء الحجز',
+    'appointment_passed': 'انتهى موعد هذا الحجز',
   };
 
   static String _message(Object error) {

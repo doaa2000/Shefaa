@@ -40,7 +40,9 @@ class _BookingsViewState extends State<_BookingsView> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<BookingBloc, BookingState>(
-      listenWhen: (p, c) => p.cancelBookingState != c.cancelBookingState,
+      listenWhen: (p, c) =>
+          p.cancelBookingState != c.cancelBookingState ||
+          p.reportAbsenceState != c.reportAbsenceState,
       listener: (context, state) {
         if (state.cancelBookingState == RequestState.loaded) {
           ScaffoldMessenger.of(context)
@@ -52,6 +54,21 @@ class _BookingsViewState extends State<_BookingsView> {
             ..hideCurrentSnackBar()
             ..showSnackBar(SnackBar(
               content: Text(state.errorMessage ?? 'تعذر إلغاء الحجز'),
+              backgroundColor: Colors.red.shade700,
+            ));
+        }
+        if (state.reportAbsenceState == RequestState.loaded) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(const SnackBar(
+              content: Text('تم إبلاغ العيادة. الحجز ما زال قائماً'),
+            ));
+        }
+        if (state.reportAbsenceState == RequestState.error) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(SnackBar(
+              content: Text(state.errorMessage ?? 'تعذر إرسال الإبلاغ'),
               backgroundColor: Colors.red.shade700,
             ));
         }
@@ -129,19 +146,21 @@ class _BookingsViewState extends State<_BookingsView> {
     );
   }
 
-  /// The details screen has no bloc of its own; it pops with true when the
-  /// patient confirms a cancel there, and the cancel runs here where the
-  /// BookingBloc and the result snackbar already live.
+  /// The details screen has no bloc of its own; it pops with what the patient
+  /// decided there, and the work runs here where the BookingBloc and the
+  /// result snackbar already live.
   Future<void> _openDetails(BuildContext context, BookingEntity booking) async {
     final bloc = context.read<BookingBloc>();
-    final cancelRequested = await Navigator.pushNamed(
+    final action = await Navigator.pushNamed(
       context,
       BookingsDetailsScreen.routeName,
       arguments: booking,
     );
 
-    if (cancelRequested == true) {
+    if (action == BookingAction.cancel) {
       bloc.add(CancelBookingEvent(booking.id));
+    } else if (action == BookingAction.reportAbsence) {
+      bloc.add(ReportAbsenceEvent(booking.id));
     }
   }
 

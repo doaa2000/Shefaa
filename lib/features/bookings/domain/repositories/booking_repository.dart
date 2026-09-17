@@ -16,4 +16,6 @@ abstract class BookingRepository {
   Future<Either<Failure, List<BookingEntity>>> getMyBookings();
 
   Future<Either<Failure, void>> cancelBooking(int bookingId);
+
+  Future<Either<Failure, void>> reportAbsence(int bookingId);
 }
