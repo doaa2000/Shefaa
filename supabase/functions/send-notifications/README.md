@@ -29,12 +29,24 @@ It is a credential for the whole Firebase project. Do not commit it.
 
 ### 3. Secrets
 
+Put them in `supabase/.env` -- one `NAME=VALUE` per line, no quotes -- and
+send them in one go. The path is gitignored; the service-account key opens the
+whole Firebase project and must not be committed.
+
 ```
-supabase secrets set \
-  FCM_PROJECT_ID="<project_id from the JSON>" \
-  FCM_CLIENT_EMAIL="<client_email from the JSON>" \
-  FCM_PRIVATE_KEY="<private_key from the JSON, newlines left as \n>"
+FCM_PROJECT_ID=<project_id from the JSON>
+FCM_CLIENT_EMAIL=<client_email from the JSON>
+FCM_PRIVATE_KEY=<private_key from the JSON, on one line, newlines left as \n>
+CRON_SECRET=<a long random string you invent>
 ```
+
+```
+supabase secrets set --env-file supabase/.env
+```
+
+`CRON_SECRET` is what the schedule presents to prove it is the schedule. It is
+not a Supabase key and is not issued by anything -- invent one, and change it
+by setting it here and in the schedule together.
 
 `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are injected by the platform;
 they do not need setting.
@@ -47,8 +59,8 @@ supabase functions deploy send-notifications
 
 ### 5. The schedule
 
-Run once in the SQL editor, with the two placeholders filled in. The project
-ref is in the function's URL; the service role key is under Settings -> API.
+Run once in the SQL editor, with the project ref and the same `CRON_SECRET`
+filled in. The ref is in the function's URL.
 
 ```sql
 select cron.schedule(
@@ -59,7 +71,7 @@ select cron.schedule(
     url     := 'https://<project-ref>.supabase.co/functions/v1/send-notifications',
     headers := jsonb_build_object(
       'Content-Type',  'application/json',
-      'Authorization', 'Bearer <service-role-key>'
+      'Authorization', 'Bearer <CRON_SECRET>'
     ),
     body    := '{}'::jsonb
   );
@@ -67,11 +79,26 @@ select cron.schedule(
 );
 ```
 
-That key ends up stored in `cron.job`, which only the database owner can read.
-Moving it into Supabase Vault and reading it back in the job body is the
-tidier arrangement once there is a reason to rotate it.
+To replace an existing schedule, unschedule it first -- `cron.schedule` on a
+name that already exists replaces it, but unscheduling makes the intent plain:
 
-To stop the sweep: `select cron.unschedule('send-notifications');`
+```sql
+select cron.unschedule('send-notifications');
+```
+
+`pg_net` sends the request and forgets it, so `cron.job_run_details` says
+`succeeded` whatever the function answered. The real reply is in
+`net._http_response`:
+
+```sql
+select status_code, content, created
+from net._http_response
+order by created desc
+limit 5;
+```
+
+`403 forbidden` there means the secret in the schedule is not the one the
+function holds.
 
 ## Checking on it
 

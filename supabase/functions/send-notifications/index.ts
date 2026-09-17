@@ -12,6 +12,17 @@ import * as jose from "npm:jose@5";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
+// What the scheduler presents to prove it is the scheduler. Its own secret
+// rather than the service role key, for two reasons: the key the platform
+// injects here is the legacy JWT one, and a project whose dashboard hands out
+// the newer `sb_secret_` format would never match it; and the schedule is
+// stored in cron.job, so whatever it carries is a credential sitting in a
+// table -- better that it be one that can do nothing but start a sweep.
+//
+// The service role key is still accepted so that an existing schedule keeps
+// working while it is being moved over.
+const CRON_SECRET = Deno.env.get("CRON_SECRET") ?? "";
+
 const FCM_PROJECT_ID = Deno.env.get("FCM_PROJECT_ID")!;
 const FCM_CLIENT_EMAIL = Deno.env.get("FCM_CLIENT_EMAIL")!;
 // Stored with the newlines escaped, because that is how it comes out of the
@@ -232,11 +243,29 @@ async function sweep(): Promise<Record<string, number>> {
   return { claimed: messages.length, sent, failed, pruned: dead.size };
 }
 
+/** Constant-time, so a wrong secret cannot be found one character at a time. */
+function presentedSecretIsValid(presented: string): boolean {
+  const accepted = [CRON_SECRET, SERVICE_ROLE_KEY].filter((value) =>
+    value.length > 0
+  );
+
+  let valid = false;
+  for (const expected of accepted) {
+    let difference = presented.length ^ expected.length;
+    for (let i = 0; i < presented.length; i++) {
+      difference |= presented.charCodeAt(i) ^ expected.charCodeAt(i % expected.length);
+    }
+    valid = valid || difference === 0;
+  }
+  return valid;
+}
+
 Deno.serve(async (request: Request) => {
-  // Only the scheduler. The default JWT check would also let any signed-in
-  // patient set a sweep running, which is not dangerous but is not theirs to
-  // do either.
-  if (request.headers.get("Authorization") !== `Bearer ${SERVICE_ROLE_KEY}`) {
+  // Only the scheduler. The platform's own JWT check would also let any
+  // signed-in patient set a sweep running, which is not dangerous but is not
+  // theirs to do either.
+  const header = request.headers.get("Authorization") ?? "";
+  if (!presentedSecretIsValid(header.replace(/^Bearer\s+/i, ""))) {
     return new Response("forbidden", { status: 403 });
   }
 
