@@ -12,6 +12,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shefaa_app/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:shefaa_app/features/profile/presentation/screens/profile_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shefaa_app/generated/l10n.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key, this.initialTab = homeTab});
@@ -26,6 +27,23 @@ class HomeScreen extends StatelessWidget {
   static const int profileTab = 2;
 
   static const String routeName = AppRoutes.home;
+
+  /// The bar on the two tabs that are not the home tab.
+  ///
+  /// It used to be an empty string, so those screens opened under a coloured
+  /// band with nothing written on it and no way to tell, on a screenshot or
+  /// mid-scroll, which one you were looking at. The wording is the same the
+  /// bottom bar uses, from the same strings, so the two cannot drift apart.
+  String _titleFor(BuildContext context, int index) {
+    switch (index) {
+      case bookingsTab:
+        return S.of(context).appointments;
+      case profileTab:
+        return S.of(context).profile;
+      default:
+        return '';
+    }
+  }
 
   List<Widget> _pages(BuildContext context) {
     return [
@@ -61,10 +79,9 @@ class HomeScreen extends StatelessWidget {
         builder: (context, state) {
           final pages = _pages(context);
           return Scaffold(
-            appBar:
-                state.currentIndex == 0
-                    ? HomeAppBar()
-                    : CustomAppBar(title: ''),
+            appBar: state.currentIndex == homeTab
+                ? HomeAppBar()
+                : CustomAppBar(title: _titleFor(context, state.currentIndex)),
             body: pages[state.currentIndex],
             bottomNavigationBar: CustomBottomNavBar(
               currentIndex: state.currentIndex,

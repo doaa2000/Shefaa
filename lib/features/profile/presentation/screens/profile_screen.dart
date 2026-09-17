@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shefaa_app/core/utils/app_router.dart';
 import 'package:shefaa_app/core/utils/constants.dart';
-import 'package:shefaa_app/features/profile/presentation/bloc/profile_bloc.dart';
-import 'package:shefaa_app/features/profile/presentation/screens/update_profile_screen.dart';
 import 'package:shefaa_app/features/profile/presentation/widgets/delete_account_button.dart';
 import 'package:shefaa_app/features/profile/presentation/widgets/logout_button.dart';
-import 'package:shefaa_app/features/profile/presentation/widgets/profile_header_card.dart';
 import 'package:shefaa_app/features/profile/presentation/widgets/settings_card.dart';
 import 'package:shefaa_app/features/profile/presentation/widgets/support_card.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -35,20 +31,10 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            GestureDetector(
-              onTap: () async {
-                await Navigator.pushNamed(
-                  context,
-                  UpdateProfileScreen.routeName,
-                );
-                if (!context.mounted) return;
-                context
-                    .read<ProfileBloc>()
-                    .add(GetProfileEvent(userId: userId));
-              },
-              child: const ProfileHeaderCard(),
-            ),
-            const SizedBox(height: 20),
+            // The header card that used to sit here showed the photograph, the
+            // name and the email -- all of which the home bar already shows on
+            // every screen. It was also the only way into the edit screen,
+            // which is why it went after "إعدادات الحساب" started opening it.
             const SettingsCard(),
             const SizedBox(height: 20),
             const SupportCard(),
