@@ -17,7 +17,13 @@ class DoctorCard extends StatelessWidget {
   final String location;
   final dynamic consultationFee;
   final String waitingTime;
-  final double rating;
+  /// Null, or zero, means nobody has rated this doctor -- and the card shows
+  /// no stars at all rather than a number.
+  ///
+  /// It used to default to 4.5. The doctors list never passed one, so every
+  /// doctor in it carried four and a half stars that came from this line and
+  /// not from anything anybody had said about them.
+  final double? rating;
 
   /// Opens the doctor's page. The card body itself does nothing -- the two
   /// buttons are the only way out of it, so neither can be hit by accident
@@ -34,7 +40,7 @@ class DoctorCard extends StatelessWidget {
     required this.name,
     required this.specialty,
     this.imageUrl,
-    this.rating = 4.5,
+    this.rating,
     required this.onDetailsTap, required this.location, required this.consultationFee, required this.waitingTime,
     required this.onBookTap,
   });
@@ -102,18 +108,21 @@ class DoctorCard extends StatelessWidget {
                           color: Colors.grey.shade600,
                         ),
                       ),
-                      const SizedBox(height: 6),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.star, color: Colors.amber, size: 16),
-                          const SizedBox(width: 4),
-                          Text(
-                            rating.toString(),
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                        ],
-                      ),
+                      if (rating != null && rating! > 0) ...[
+                        const SizedBox(height: 6),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.star,
+                                color: Colors.amber, size: 16),
+                            const SizedBox(width: 4),
+                            Text(
+                              rating!.toStringAsFixed(1),
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ],
                     ],
                   ),
                 ),
