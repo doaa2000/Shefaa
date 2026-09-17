@@ -2,7 +2,25 @@ import 'dart:async';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+/// The channel every notification from this app goes through.
+///
+/// Android groups notifications by channel and lets the patient silence a
+/// channel rather than the whole app, so the name is something they will read
+/// in the system settings -- which is why it is written the way the rest of
+/// the app speaks.
+///
+/// The id is repeated in AndroidManifest.xml as Firebase's default channel, so
+/// that a notification the system draws while the app is closed lands in the
+/// same place, with the same importance, as one the app draws itself.
+const _channel = AndroidNotificationChannel(
+  'appointments',
+  'المواعيد',
+  description: 'تأكيد الحجز، وإلغاؤه، والتذكير بالموعد',
+  importance: Importance.high,
+);
 
 /// Keeps this installation's Firebase token in step with whoever is signed in.
 ///
@@ -21,6 +39,14 @@ class PushNotificationsService {
   final SupabaseClient _supabase;
 
   StreamSubscription<String>? _tokenRefreshSubscription;
+  StreamSubscription<RemoteMessage>? _foregroundSubscription;
+
+  final _localNotifications = FlutterLocalNotificationsPlugin();
+
+  /// Only used for a message that arrived without an id of its own; masked
+  /// into a positive 32-bit integer because that is all Android accepts, and
+  /// a millisecond timestamp is far too large for it.
+  int _nextFallbackId = 0;
 
   /// The token the server is known to hold for this account. Kept so a repeat
   /// call costs nothing, and so signing out knows what to withdraw.
@@ -77,8 +103,69 @@ class PushNotificationsService {
 
       _tokenRefreshSubscription ??=
           FirebaseMessaging.instance.onTokenRefresh.listen(_register);
+
+      await _startDrawingWhileOpen();
     } catch (error) {
       debugPrint('push: could not start notifications: $error');
+    }
+  }
+
+  /// Android does not show a notification while the app it belongs to is in
+  /// the foreground. It delivers the message to the app instead and leaves the
+  /// showing to it -- so a patient who books an appointment and stays on the
+  /// screen sees nothing at all, and reasonably concludes that notifications
+  /// do not work.
+  ///
+  /// iOS is not included: it was already told to present notifications in the
+  /// foreground itself, and drawing a second one here would show every message
+  /// twice.
+  Future<void> _startDrawingWhileOpen() async {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
+    if (_foregroundSubscription != null) return;
+
+    await _localNotifications.initialize(
+      settings: const InitializationSettings(
+        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      ),
+    );
+
+    await _localNotifications
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(_channel);
+
+    _foregroundSubscription =
+        FirebaseMessaging.onMessage.listen(_drawWhileOpen);
+  }
+
+  Future<void> _drawWhileOpen(RemoteMessage message) async {
+    final notification = message.notification;
+
+    // A message carrying only data is one the app is meant to act on, not to
+    // show. Nothing sends those yet, and showing an empty notification would
+    // be worse than showing none.
+    if (notification == null) return;
+
+    try {
+      await _localNotifications.show(
+        // Derived from the message so that the same message arriving twice
+        // replaces itself rather than stacking.
+        id: (message.messageId?.hashCode ?? _nextFallbackId++) & 0x7fffffff,
+        title: notification.title,
+        body: notification.body,
+        notificationDetails: NotificationDetails(
+          android: AndroidNotificationDetails(
+            _channel.id,
+            _channel.name,
+            channelDescription: _channel.description,
+            importance: Importance.high,
+            priority: Priority.high,
+            icon: '@mipmap/ic_launcher',
+          ),
+        ),
+      );
+    } catch (error) {
+      debugPrint('push: could not draw the notification: $error');
     }
   }
 
