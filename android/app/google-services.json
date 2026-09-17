@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1095458291175",
+    "project_id": "shefaa-717db",
+    "storage_bucket": "shefaa-717db.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1095458291175:android:3c903155648e59fc25d142",
+        "android_client_info": {
+          "package_name": "eg.shefaa.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4XmvGoF68hART1cBe9PX841gluczHA_Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
