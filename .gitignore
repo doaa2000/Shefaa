@@ -55,3 +55,6 @@ app.*.map.json
 # shape. Run with: flutter run --dart-define-from-file=env/dev.json
 /env/*.json
 !/env/*.example.json
+
+# generated fonts cache
+.fonts/
