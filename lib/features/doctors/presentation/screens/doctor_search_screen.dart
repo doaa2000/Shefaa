@@ -137,7 +137,7 @@ class _SearchViewState extends State<_SearchView> {
           location: doctor.location ?? 'غير محدد',
           waitingTime:
               doctor.waitingTime != null ? '${doctor.waitingTime}' : '—',
-          rating: doctor.rating ?? 0,
+          rating: doctor.rating,
           onDetailsTap: () => Navigator.pushNamed(
             context,
             DoctorDetailsScreen.routeName,

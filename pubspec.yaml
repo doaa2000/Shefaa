@@ -1,5 +1,5 @@
 name: shefaa_app
-description: "A new Flutter project."
+description: "Shefaa - book an appointment with a doctor."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -44,6 +44,11 @@ dependencies:
   # Picking a profile photograph. It was in dev_dependencies, which is not
   # where a release build looks -- the same trap as the five packages in 0020.
   image_picker: ^1.1.2
+  # Reads the version for the About dialog. Here and not in dev_dependencies
+  # for the same reason image_picker is: a plugin declared there has no native
+  # side registered in a release build, so it throws in release and nowhere
+  # else -- the one place it is hardest to notice.
+  package_info_plus: ^9.0.0
   carousel_slider: ^5.0.0
   country_code_picker: ^3.1.0
   cupertino_icons: ^1.0.8
@@ -102,7 +107,6 @@ dev_dependencies:
   location: ^8.0.0
   logger: ^2.5.0
   myfatoorah_flutter: ^3.2.4
-  package_info_plus: ^9.0.0
   permission_handler: ^11.3.1
   sentry_dart_plugin: ^3.1.1
   sentry_flutter: ^9.6.0
@@ -114,10 +118,6 @@ dev_dependencies:
   url_launcher: ^6.3.1
   uuid: ^4.5.1
 
-flutter_icons:
-  android: true
-  ios: true
-  image_path: "assets/images/logo.png"
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 # The following section is specific to Flutter packages.
@@ -135,6 +135,28 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
+    # The licence ships with the font because the licence says it must, and
+    # because main.dart reads it to put Tajawal on the app's licences page.
+    - assets/fonts/OFL.txt
+  # Bundled rather than fetched: every TextStyle in the app already named
+  # Tajawal, and nothing shipped it -- so the font fell back to whatever the
+  # phone happened to have and the app looked like a different app on every
+  # handset. Shipping the files also means it renders with no connection at
+  # all, which a font served from the network does not.
+  #
+  # w600 has no file of its own: Tajawal has no SemiBold, and Flutter picks the
+  # nearest weight it does have.
+  fonts:
+    - family: Tajawal
+      fonts:
+        - asset: assets/fonts/Tajawal-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Tajawal-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Tajawal-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Tajawal-ExtraBold.ttf
+          weight: 800
 flutter_assets:
   assets_path: assets/images
   output_path: lib/core/utils
@@ -202,3 +224,38 @@ flutter_intl:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# The launcher icon, generated from one source image for every size Android and
+# iOS ask for. Run after changing the source:
+#
+#   flutter pub get
+#   dart run flutter_launcher_icons
+#
+# Two images, not one, and the difference matters:
+#
+#   image_path               is used as-is for iOS and for older Android. The
+#                            mark should fill most of the square -- iOS rounds
+#                            the corners itself and adds no padding, so wide
+#                            margins baked into the file make the logo look
+#                            small beside every other app on the home screen.
+#
+#   adaptive_icon_foreground is cropped by the launcher into whatever shape the
+#                            handset uses -- circle, squircle, teardrop. Only
+#                            the middle 66% is guaranteed to survive, so this
+#                            one wants the generous margin the other does not.
+#
+# The background is the white the logo was drawn on.
+flutter_launcher_icons:
+  image_path: assets/icon/app_icon.png
+  android: true
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: assets/icon/app_icon_foreground.png
+  ios: true
+  # iOS rejects an icon with an alpha channel, so it is flattened onto white
+  # here rather than left to fail at submission.
+  remove_alpha_ios: true
+  background_color_ios: "#FFFFFF"
+  web:
+    generate: true
+    background_color: "#FFFFFF"
+    theme_color: "#67B2D8"

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shefaa_app/core/utils/app_legal.dart';
 import 'package:shefaa_app/core/utils/app_router.dart';
 import 'package:shefaa_app/features/legal/presentation/screens/legal_document_screen.dart';
+import 'package:shefaa_app/features/profile/presentation/widgets/about_app_dialog.dart';
 import 'package:shefaa_app/features/profile/presentation/widgets/settings_tile.dart';
 
 class SupportCard extends StatelessWidget {
@@ -19,8 +20,14 @@ class SupportCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const SettingsTile(title: "المساعدة والدعم", icon: Icons.help_outline),
-          const SettingsTile(title: "عن التطبيق", icon: Icons.info_outline),
+          // "المساعدة والدعم" and "عن المطور" used to be here and led nowhere.
+          // There is no support channel to send anybody to yet; a row that does
+          // nothing when a patient needs help is worse than no row.
+          SettingsTile(
+            title: "عن التطبيق",
+            icon: Icons.info_outline,
+            onTap: () => showAboutAppDialog(context),
+          ),
           // Readable after signing up, not only during it. Both stores require
           // the documents to be reachable from inside the app, and a patient
           // who wants to check what they agreed to has nowhere else to look.

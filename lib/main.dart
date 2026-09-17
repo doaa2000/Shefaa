@@ -15,8 +15,24 @@ import 'package:shefaa_app/features/splash/presentation/screens/splash_screen.da
 import 'package:shefaa_app/generated/l10n.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shefaa_app/core/utils/constants.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 
   
+/// Puts Tajawal's licence on the app's own licences page.
+///
+/// The Open Font Licence requires the licence to travel with the font, and a
+/// font bundled into an app binary is a font being distributed. Registering it
+/// here is what makes it appear beside Flutter's and everything else's, rather
+/// than sitting unread in the repository.
+void _registerFontLicence() {
+  LicenseRegistry.addLicense(() async* {
+    final licence = await rootBundle.loadString('assets/fonts/OFL.txt');
+    yield LicenseEntryWithLineBreaks(const ['Tajawal'], licence);
+  });
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
     Bloc.observer = CustomBlocObserver();
@@ -33,6 +49,7 @@ void main() async {
   await selectedCityService.load();
 
   setupServiceLocator(selectedCityService);
+  _registerFontLicence();
   runApp(const MyApp());
 }
 
@@ -108,7 +125,7 @@ class _MyAppState extends State<MyApp> {
       create: (context) => getIt<AuthBloc>(),
       child: MaterialApp(
         navigatorKey: _navigatorKey,
-        title: 'Shefaa App',
+        title: 'Shefaa',
         debugShowCheckedModeBanner: false,
         localizationsDelegates: const [
           S.delegate,
@@ -121,6 +138,11 @@ class _MyAppState extends State<MyApp> {
 
         locale: const Locale('ar'),
         theme: ThemeData(
+          // Set once here as well as on every TextStyle: the styles cover the
+          // text this app writes, and this covers the text Material writes --
+          // dialog buttons, snackbars, date pickers, form errors. Without it
+          // those stayed in the system font and sat next to Tajawal.
+          fontFamily: Constants.fontFamily,
           appBarTheme: const AppBarTheme(
             backgroundColor: Colors.white,
             elevation: 0,
