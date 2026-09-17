@@ -1,6 +1,6 @@
 {
-    "name": "shefaa_app",
-    "short_name": "shefaa_app",
+    "name": "Shefaa",
+    "short_name": "Shefaa",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
