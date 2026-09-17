@@ -61,9 +61,14 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
     // to a booking has to be the one the database will hold the patient to.
     await BookingPolicy.instance.refresh(supabase);
 
-    final rows = await supabase
-        .from('bookings')
-        .select('''
+    // The doctor used to be an embedded select on the Doctors table. It is
+    // not embedded any more because that table is no longer readable by a
+    // patient -- it carries contact details -- and an embed the policy
+    // refuses comes back null rather than failing, which would have emptied
+    // every booking in this list of the doctor it is with.
+    final rows = (await supabase
+            .from('bookings')
+            .select('''
           id,
           status,
           created_at,
@@ -71,15 +76,7 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
           session,
           start_time,
           end_time,
-          doctor:doctor_id (
-            id,
-            name,
-            image,
-            specialization,
-            location,
-            waiting_time,
-            consultation_fee
-          ),
+          doctor_id,
           payments (
             id,
             amount,
@@ -87,11 +84,36 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
             status
           )
         ''')
-        .order('booked_date', ascending: false);
+            .order('booked_date', ascending: false) as List)
+        .cast<Map<String, dynamic>>();
 
-    return (rows as List)
-        .cast<Map<String, dynamic>>()
-        .map(BookingModel.fromMap)
+    if (rows.isEmpty) return const [];
+
+    // One more round trip, not one per booking: a patient with a year of
+    // history has seen a handful of doctors, so this is a short list.
+    final doctorIds = rows
+        .map((row) => row['doctor_id'])
+        .whereType<Object>()
+        .toSet()
+        .toList();
+
+    final doctors = (await supabase
+            .from('doctors_public')
+            .select(
+              'id, name, image, specialization, location, waiting_time, '
+              'consultation_fee',
+            )
+            .inFilter('id', doctorIds) as List)
+        .cast<Map<String, dynamic>>();
+
+    final byId = {for (final doctor in doctors) doctor['id']: doctor};
+
+    return rows
+        .where((row) => byId.containsKey(row['doctor_id']))
+        .map((row) => BookingModel.fromMap({
+              ...row,
+              'doctor': byId[row['doctor_id']],
+            }))
         .toList();
   }
 

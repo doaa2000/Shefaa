@@ -25,7 +25,7 @@ class DoctorAvailabilityRemoteDatasourceImpl
     // exception for this date. Hence two calls rather than one nested select.
     final results = await Future.wait<dynamic>([
       supabase
-          .from('Doctors')
+          .from('doctors_public')
           .select(
             'id, name, specialization, image, consultation_fee, rating, '
             'specialty_id, clinic_id, waiting_time, location, title',

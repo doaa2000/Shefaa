@@ -21,9 +21,11 @@ abstract class DoctorsRemoteDatasource {
 /// screen, so nobody would have found it by looking at the app -- it sat in
 /// the response, readable by anyone watching the traffic.
 ///
-/// Naming the columns is the app being careful. It is not a lock: a request
-/// written by hand can still ask for the others, and only the database can
-/// refuse that.
+/// The lock is doctors_public, which is a view holding these columns and no
+/// others -- the table itself is no longer readable by a patient at all, so
+/// there is nothing left for a hand-written request to ask for. Naming them
+/// here as well keeps the two in step: a column added to the view is not
+/// fetched until somebody decides it should be.
 const String _publicDoctorColumns =
     'id, name, title, specialization, specialty_id, clinic_id, image, '
     'location, rating, consultation_fee, waiting_time, bio';
@@ -60,7 +62,7 @@ class DoctorsRemoteDatasourceImpl implements DoctorsRemoteDatasource {
     }
 
     var query = supabase
-        .from('Doctors')
+        .from('doctors_public')
         .select(_publicDoctorColumns)
         .eq('specialty_id', specialtyId)
         // A doctor the admin deactivated must not be bookable.
@@ -90,7 +92,7 @@ class DoctorsRemoteDatasourceImpl implements DoctorsRemoteDatasource {
     }
 
     var request = supabase
-        .from('Doctors')
+        .from('doctors_public')
         .select(_publicDoctorColumns)
         .eq('status', 'active')
         .or('name.ilike.%$term%,specialization.ilike.%$term%');
