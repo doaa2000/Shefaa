@@ -13,6 +13,21 @@ abstract class DoctorsRemoteDatasource {
   Future<List<DoctorScheduleModel>> getWeeklySchedule(int doctorId);
 }
 
+/// What the patient app shows about a doctor, and nothing else.
+///
+/// select() with no arguments asks for every column, which sent every
+/// patient's phone the doctors' own phone numbers, e-mail addresses, licence
+/// numbers and account ids on every search. None of it was ever drawn on a
+/// screen, so nobody would have found it by looking at the app -- it sat in
+/// the response, readable by anyone watching the traffic.
+///
+/// Naming the columns is the app being careful. It is not a lock: a request
+/// written by hand can still ask for the others, and only the database can
+/// refuse that.
+const String _publicDoctorColumns =
+    'id, name, title, specialization, specialty_id, clinic_id, image, '
+    'location, rating, consultation_fee, waiting_time, bio';
+
 class DoctorsRemoteDatasourceImpl implements DoctorsRemoteDatasource {
   final SupabaseClient supabase;
 
@@ -46,7 +61,7 @@ class DoctorsRemoteDatasourceImpl implements DoctorsRemoteDatasource {
 
     var query = supabase
         .from('Doctors')
-        .select()
+        .select(_publicDoctorColumns)
         .eq('specialty_id', specialtyId)
         // A doctor the admin deactivated must not be bookable.
         .eq('status', 'active');
@@ -76,7 +91,7 @@ class DoctorsRemoteDatasourceImpl implements DoctorsRemoteDatasource {
 
     var request = supabase
         .from('Doctors')
-        .select()
+        .select(_publicDoctorColumns)
         .eq('status', 'active')
         .or('name.ilike.%$term%,specialization.ilike.%$term%');
 
