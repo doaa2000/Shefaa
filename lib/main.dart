@@ -125,7 +125,7 @@ class _MyAppState extends State<MyApp> {
       create: (context) => getIt<AuthBloc>(),
       child: MaterialApp(
         navigatorKey: _navigatorKey,
-        title: 'Shefaa App',
+        title: 'Shefaa',
         debugShowCheckedModeBanner: false,
         localizationsDelegates: const [
           S.delegate,
