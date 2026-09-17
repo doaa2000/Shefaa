@@ -4,8 +4,15 @@ Drains `public.notifications` into Firebase Cloud Messaging. Runs once a
 minute; each sweep claims what is due, sends it to every device registered to
 the recipient, and marks the row.
 
-Nothing here holds message text or decides who to tell. Producers write rows
-(see `0031_notification_outbox.sql`); this only delivers them.
+Each sweep also calls `queue_appointment_reminders()` first, which writes the
+day-before and hour-before reminders for appointments coming up. They are due
+long before they are sent, so a minute's latency in writing them is nothing --
+and a schedule of their own would be a second thing to configure and to find
+broken later.
+
+Apart from that, nothing here holds message text or decides who to tell.
+Producers write rows (see `0031_notification_outbox.sql` and
+`0032_appointment_reminders.sql`); this only delivers them.
 
 ## Setting it up
 
@@ -124,5 +131,15 @@ limit 10;
 ```
 
 `last_error = 'no_device'` is not a fault: that person has no phone registered
--- never opened the app, or refused notifications. The row ages out of the
-queue after five sweeps.
+-- never opened the app, or refused notifications. Every message to a doctor
+reads this way today, because the dashboard is a web page and only the patient
+app registers devices. The row ages out of the queue after five sweeps.
+
+```sql
+-- Reminders waiting to go out, and when.
+select kind, send_after, body
+from notifications
+where sent_at is null and kind like 'reminder%'
+order by send_after
+limit 20;
+```

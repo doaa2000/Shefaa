@@ -169,13 +169,31 @@ async function sendToDevice(
 // -----------------------------------------------------------------------------
 
 async function sweep(): Promise<Record<string, number>> {
+  // Reminders are written here rather than on a schedule of their own. They
+  // are due long before they are sent -- a day, an hour -- so a minute's
+  // latency in writing them is nothing, and a second schedule would be a
+  // second thing to configure, to forget, and to find broken later.
+  //
+  // Idempotent: each reminder carries a dedupe key made from its booking, so
+  // this writes nothing on the sweeps in between.
+  const { data: queued, error: queueError } = await supabase
+    .rpc("queue_appointment_reminders");
+
+  // Not fatal. Whatever is already in the queue should still go out, and the
+  // next sweep is a minute away.
+  if (queueError) console.error("queue reminders:", queueError.message);
+
   const { data: claimed, error: claimError } = await supabase
     .rpc("claim_due_notifications", { p_limit: BATCH });
 
   if (claimError) throw new Error(`claim: ${claimError.message}`);
 
+  const reminders = typeof queued === "number" ? queued : 0;
+
   const messages = (claimed ?? []) as QueuedNotification[];
-  if (messages.length === 0) return { claimed: 0, sent: 0, failed: 0, pruned: 0 };
+  if (messages.length === 0) {
+    return { reminders, claimed: 0, sent: 0, failed: 0, pruned: 0 };
+  }
 
   const recipients = [...new Set(messages.map((m) => m.user_id))];
 
@@ -240,7 +258,7 @@ async function sweep(): Promise<Record<string, number>> {
     await supabase.from("device_tokens").delete().in("token", [...dead]);
   }
 
-  return { claimed: messages.length, sent, failed, pruned: dead.size };
+  return { reminders, claimed: messages.length, sent, failed, pruned: dead.size };
 }
 
 /** Constant-time, so a wrong secret cannot be found one character at a time. */
