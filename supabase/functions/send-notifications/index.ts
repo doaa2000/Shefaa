@@ -148,6 +148,13 @@ async function sendToDevice(
           notification: { sound: "default" },
         },
         apns: { payload: { aps: { sound: "default" } } },
+        webpush: {
+          // The doctor's dashboard is a web page, so their device token is a
+          // browser subscription. Four hours: an appointment notification that
+          // arrives after a laptop has been shut for a day is not a
+          // notification, it is a puzzle. Firebase drops it instead.
+          headers: { TTL: "14400", Urgency: "high" },
+        },
       },
     }),
   });
