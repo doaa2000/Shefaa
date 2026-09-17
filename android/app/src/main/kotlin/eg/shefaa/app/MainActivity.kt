@@ -1,4 +1,4 @@
-package com.shefaa.app
+package eg.shefaa.app
 
 import io.flutter.embedding.android.FlutterActivity
 

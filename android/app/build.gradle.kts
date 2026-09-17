@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.shefaa.app"
+    namespace = "eg.shefaa.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -28,7 +28,7 @@ android {
         // Permanent: Google Play refuses anything under com.example, and an
         // application id cannot be changed after the first release -- a new one
         // is a new listing, with none of the installs or reviews.
-        applicationId = "com.shefaa.app"
+        applicationId = "eg.shefaa.app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 26
