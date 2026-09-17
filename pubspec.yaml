@@ -135,6 +135,28 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
+    # The licence ships with the font because the licence says it must, and
+    # because main.dart reads it to put Tajawal on the app's licences page.
+    - assets/fonts/OFL.txt
+  # Bundled rather than fetched: every TextStyle in the app already named
+  # Tajawal, and nothing shipped it -- so the font fell back to whatever the
+  # phone happened to have and the app looked like a different app on every
+  # handset. Shipping the files also means it renders with no connection at
+  # all, which a font served from the network does not.
+  #
+  # w600 has no file of its own: Tajawal has no SemiBold, and Flutter picks the
+  # nearest weight it does have.
+  fonts:
+    - family: Tajawal
+      fonts:
+        - asset: assets/fonts/Tajawal-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Tajawal-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Tajawal-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Tajawal-ExtraBold.ttf
+          weight: 800
 flutter_assets:
   assets_path: assets/images
   output_path: lib/core/utils
