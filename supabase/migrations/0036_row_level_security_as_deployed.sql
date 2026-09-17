@@ -1,11 +1,11 @@
 -- =============================================================================
 -- Writing down the protection that is already there.
 --
--- Row level security is switched on for Doctors, profiles, bookings and
--- payments in the live database, with fifteen policies between them. Not one of
--- those four tables is switched on by any migration in this repository, and
--- eleven of the policies are not written down anywhere either -- payments has
--- four and this repository described none of them.
+-- Row level security is switched on for seven tables in the live database,
+-- with twenty-three policies between them. Not one of those tables is switched
+-- on by any migration in this repository, and most of the policies are not
+-- written down anywhere either -- payments has four and this repository
+-- described none of them.
 --
 -- The live database is not at risk. What is at risk is the second copy of it:
 -- a staging project, a restore, a developer running the migrations on a fresh
@@ -20,10 +20,13 @@
 -- Safe to re-run.
 -- =============================================================================
 
-alter table public."Doctors" enable row level security;
-alter table public.profiles  enable row level security;
-alter table public.bookings  enable row level security;
-alter table public.payments  enable row level security;
+alter table public."Doctors"            enable row level security;
+alter table public.profiles             enable row level security;
+alter table public.bookings             enable row level security;
+alter table public.payments             enable row level security;
+alter table public.admins               enable row level security;
+alter table public.doctor_availability  enable row level security;
+alter table public.specialties          enable row level security;
 
 -- -----------------------------------------------------------------------------
 -- Doctors
@@ -148,3 +151,43 @@ drop policy if exists payments_delete_admin on public.payments;
 create policy payments_delete_admin on public.payments
   for delete to authenticated
   using (is_admin());
+
+-- -----------------------------------------------------------------------------
+-- admins
+--
+-- An administrator may confirm they are one, and learn nothing else. Deliberately
+-- no insert or update policy: an administrator is made in the SQL editor or by
+-- the service role, never by anything holding a session -- which is what stops
+-- an account promoting itself.
+-- -----------------------------------------------------------------------------
+drop policy if exists admins_self_read on public.admins;
+create policy admins_self_read on public.admins
+  for select to authenticated
+  using (id = auth.uid());
+
+-- -----------------------------------------------------------------------------
+-- Reference data: specialties, and the availability the app draws its slots
+-- from. Read by anyone signed in because every patient needs it, written by the
+-- owner alone.
+-- -----------------------------------------------------------------------------
+drop policy if exists ref_read_all on public.specialties;
+create policy ref_read_all on public.specialties
+  for select to authenticated
+  using (true);
+
+drop policy if exists ref_admin_write on public.specialties;
+create policy ref_admin_write on public.specialties
+  for all to authenticated
+  using (is_admin())
+  with check (is_admin());
+
+drop policy if exists ref_read_all on public.doctor_availability;
+create policy ref_read_all on public.doctor_availability
+  for select to authenticated
+  using (true);
+
+drop policy if exists ref_admin_write on public.doctor_availability;
+create policy ref_admin_write on public.doctor_availability
+  for all to authenticated
+  using (is_admin())
+  with check (is_admin());
