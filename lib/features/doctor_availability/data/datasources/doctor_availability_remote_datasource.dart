@@ -34,7 +34,16 @@ class DoctorAvailabilityRemoteDatasourceImpl
           .single(),
       supabase.rpc(
         'doctor_sessions_on',
-        params: {'p_doctor': doctorId, 'p_date': formattedDate},
+        params: {
+          'p_doctor': doctorId,
+          'p_date': formattedDate,
+          // Asked for, not assumed. The same function answers the capacity
+          // check behind every booking -- including the doctor marking this
+          // morning's appointment finished -- and that one needs the day as
+          // the schedule describes it, hours gone included. This screen is
+          // offering places, so it asks for the ones still to come.
+          'p_from_now': true,
+        },
       ),
     ]);
 

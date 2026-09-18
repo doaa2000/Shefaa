@@ -113,6 +113,7 @@ class BookingRepositoryImpl implements BookingRepository {
     // True whether cancelling closes at the appointment, as it does now, or
     // some period before it, which is one settings row away.
     'cancellation_closed': 'انتهى وقت إلغاء هذا الحجز',
+    'time_has_passed': 'انتهى وقت هذا الموعد. يرجى اختيار موعد آخر',
     'date_in_past': 'لا يمكن الحجز في تاريخ مضى',
     'beyond_horizon': 'هذا التاريخ أبعد من المدة المتاحة للحجز',
     'booking_not_found': 'لم يعد هذا الحجز موجوداً',
