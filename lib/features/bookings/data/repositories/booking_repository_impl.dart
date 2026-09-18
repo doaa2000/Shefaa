@@ -77,8 +77,9 @@ class BookingRepositoryImpl implements BookingRepository {
     'not_signed_in': 'يرجى تسجيل الدخول أولاً',
     'booking_immutable': 'لا يمكن نقل الحجز. يرجى إلغاؤه والحجز من جديد',
     'cancel_only': 'إلغاء الحجز هو التغيير الوحيد المتاح',
-    'cancellation_closed':
-        'انتهت مهلة الإلغاء لهذا الحجز. يرجى التواصل مع العيادة',
+    // True whether cancelling closes at the appointment, as it does now, or
+    // some period before it, which is one settings row away.
+    'cancellation_closed': 'انتهى وقت إلغاء هذا الحجز',
     'date_in_past': 'لا يمكن الحجز في تاريخ مضى',
     'beyond_horizon': 'هذا التاريخ أبعد من المدة المتاحة للحجز',
     'booking_not_found': 'لم يعد هذا الحجز موجوداً',

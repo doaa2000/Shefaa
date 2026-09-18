@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shefaa_app/core/services/booking_policy.dart';
 import 'package:shefaa_app/core/utils/app_colors.dart';
 import 'package:shefaa_app/core/utils/app_text_styles.dart';
 import 'package:shefaa_app/core/utils/constants.dart';
@@ -181,11 +182,18 @@ class BookingsDetailsScreen extends StatelessWidget {
             // A booking that has already happened or was cancelled has nothing
             // left to cancel, so the button is simply not there.
             if (booking.canCancel) ...[
-              const SizedBox(height: 8),
-              Text(
-                'يمكن الإلغاء حتى ${_formatDeadline(booking.cancelDeadline)}',
-                style: TextStyles.meduim12.copyWith(color: Colors.grey.shade600),
-              ),
+              // Only when cancelling closes before the appointment does. With
+              // no notice period the deadline is the appointment itself, and
+              // "cancellable until five" above an appointment at five is a
+              // line that reads like a rule and states nothing.
+              if (BookingPolicy.instance.cancellationNotice > Duration.zero) ...[
+                const SizedBox(height: 8),
+                Text(
+                  'يمكن الإلغاء حتى ${_formatDeadline(booking.cancelDeadline)}',
+                  style:
+                      TextStyles.meduim12.copyWith(color: Colors.grey.shade600),
+                ),
+              ],
               const SizedBox(height: 8),
               CustomButton(
                 title: S.of(context).cancel_booking,
