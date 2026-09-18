@@ -3,6 +3,10 @@ import 'dart:async';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter/widgets.dart';
+import 'package:shefaa_app/core/utils/app_router.dart';
+import 'package:shefaa_app/features/bookings/presentation/screens/bookings_screen.dart';
+import 'package:shefaa_app/features/home/presentation/screens/home_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// The channel every notification from this app goes through.
@@ -38,8 +42,15 @@ class PushNotificationsService {
 
   final SupabaseClient _supabase;
 
+  /// The app's one navigator, so a tapped notification can open the screen it
+  /// is about. Held here rather than handed over after construction: this is
+  /// the only thing in the app that has to navigate from outside a widget.
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
+
   StreamSubscription<String>? _tokenRefreshSubscription;
   StreamSubscription<RemoteMessage>? _foregroundSubscription;
+  StreamSubscription<RemoteMessage>? _tapSubscription;
 
   final _localNotifications = FlutterLocalNotificationsPlugin();
 
@@ -105,6 +116,7 @@ class PushNotificationsService {
           FirebaseMessaging.instance.onTokenRefresh.listen(_register);
 
       await _startDrawingWhileOpen();
+      await _startListeningForTaps();
     } catch (error) {
       debugPrint('push: could not start notifications: $error');
     }
@@ -167,6 +179,47 @@ class PushNotificationsService {
     } catch (error) {
       debugPrint('push: could not draw the notification: $error');
     }
+  }
+
+  /// Where a tapped notification goes.
+  ///
+  /// Two ways in: the app was in the background and the tap brought it
+  /// forward, or the app was not running at all and the tap started it. The
+  /// second one is not a stream -- the message is waiting to be asked for.
+  ///
+  /// A notification tapped while the app is already open is not handled: the
+  /// patient is in the app, and yanking them off the screen they are on is
+  /// worse than doing nothing.
+  Future<void> _startListeningForTaps() async {
+    _tapSubscription ??=
+        FirebaseMessaging.onMessageOpenedApp.listen(_openWhatItIsAbout);
+
+    final launchedBy = await FirebaseMessaging.instance.getInitialMessage();
+    if (launchedBy != null) _openWhatItIsAbout(launchedBy);
+  }
+
+  void _openWhatItIsAbout(RemoteMessage message) {
+    // Everything this app sends is about a booking. A message without one is
+    // either from somewhere else or from a version of this that does not
+    // exist yet, and either way the app opens where it always does.
+    if (message.data['booking_id'] == null) return;
+
+    final navigator = navigatorKey.currentState;
+    if (navigator == null) return;
+
+    // A request to rate is about a visit that has happened; everything else --
+    // a confirmation, a cancellation, a reminder -- is about one that has not.
+    final past = message.data['action'] == 'review';
+
+    navigator.pushNamedAndRemoveUntil(
+      AppRoutes.home,
+      (route) => false,
+      arguments: HomeArgs(
+        tab: HomeScreen.bookingsTab,
+        bookingsTab:
+            past ? BookingsScreen.pastTab : BookingsScreen.upcomingTab,
+      ),
+    );
   }
 
   /// Must run *before* signing out, never after.

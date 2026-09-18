@@ -5,6 +5,7 @@ import 'package:shefaa_app/features/doctor_availability/data/models/doctor_avail
 import 'package:shefaa_app/features/doctor_availability/presentation/screens/doctor_availability_screen.dart';
 import 'package:shefaa_app/features/bookings/domain/entites/booking.dart';
 import 'package:shefaa_app/features/bookings/presentation/screens/bookings_details_screen.dart';
+import 'package:shefaa_app/features/bookings/presentation/screens/bookings_screen.dart';
 import 'package:shefaa_app/features/doctors/data/models/doctors_args_model.dart';
 import 'package:shefaa_app/features/doctors/domain/entities/doctor.dart';
 import 'package:shefaa_app/features/doctors/presentation/screens/doctor_details_screen.dart';
@@ -70,11 +71,21 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case HomeScreen.routeName:
       // An int argument selects the tab to land on, so a flow that ends
       // somewhere specific can say where.
-      final tab = settings.arguments is int
-          ? settings.arguments as int
-          : HomeScreen.homeTab;
+      // Still an int, for every caller that only has one thing to say.
+      // HomeArgs is for the one that has two: the tab, and which bookings
+      // list inside it.
+      final homeArgs = settings.arguments;
+      final tab = homeArgs is HomeArgs
+          ? homeArgs.tab
+          : homeArgs is int
+              ? homeArgs
+              : HomeScreen.homeTab;
+      final bookingsTab = homeArgs is HomeArgs
+          ? homeArgs.bookingsTab
+          : BookingsScreen.upcomingTab;
       return MaterialPageRoute(
-        builder: (context) => HomeScreen(initialTab: tab),
+        builder: (context) =>
+            HomeScreen(initialTab: tab, initialBookingsTab: bookingsTab),
         settings: settings,
       );
 

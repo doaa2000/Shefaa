@@ -14,13 +14,35 @@ import 'package:shefaa_app/features/profile/presentation/screens/profile_screen.
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shefaa_app/generated/l10n.dart';
 
+/// Where to open the home shell.
+///
+/// The route used to take a bare int, and still does. This carries the second
+/// answer as well -- which of the bookings lists -- for the one caller that
+/// needs to say: a notification about a visit that has already happened.
+class HomeArgs {
+  final int tab;
+  final int bookingsTab;
+
+  const HomeArgs({
+    this.tab = HomeScreen.homeTab,
+    this.bookingsTab = BookingsScreen.upcomingTab,
+  });
+}
+
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key, this.initialTab = homeTab});
+  const HomeScreen({
+    super.key,
+    this.initialTab = homeTab,
+    this.initialBookingsTab = BookingsScreen.upcomingTab,
+  });
 
   /// Which tab to open on. Confirming a booking sends the patient straight to
   /// [bookingsTab]; without this the screen always opened on the home tab and
   /// the "حجوزاتي" button appeared to do nothing.
   final int initialTab;
+
+  /// Only read when [initialTab] is [bookingsTab].
+  final int initialBookingsTab;
 
   static const int homeTab = 0;
   static const int bookingsTab = 1;
@@ -48,7 +70,7 @@ class HomeScreen extends StatelessWidget {
   List<Widget> _pages(BuildContext context) {
     return [
       HomePageWidget(),
-      BookingsScreen(),
+      BookingsScreen(initialTab: initialBookingsTab),
      ProfileScreen(),
     ];
   }

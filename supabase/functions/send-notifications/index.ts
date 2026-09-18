@@ -190,16 +190,24 @@ async function sweep(): Promise<Record<string, number>> {
   // next sweep is a minute away.
   if (queueError) console.error("queue reminders:", queueError.message);
 
+  // The request to rate a visit, three hours after it ended. Same reasoning
+  // and the same idempotence: one row per booking, written once.
+  const { data: asked, error: askError } = await supabase
+    .rpc("queue_review_requests");
+
+  if (askError) console.error("queue review requests:", askError.message);
+
   const { data: claimed, error: claimError } = await supabase
     .rpc("claim_due_notifications", { p_limit: BATCH });
 
   if (claimError) throw new Error(`claim: ${claimError.message}`);
 
   const reminders = typeof queued === "number" ? queued : 0;
+  const reviewRequests = typeof asked === "number" ? asked : 0;
 
   const messages = (claimed ?? []) as QueuedNotification[];
   if (messages.length === 0) {
-    return { reminders, claimed: 0, sent: 0, failed: 0, pruned: 0 };
+    return { reminders, reviewRequests, claimed: 0, sent: 0, failed: 0, pruned: 0 };
   }
 
   const recipients = [...new Set(messages.map((m) => m.user_id))];
@@ -265,7 +273,14 @@ async function sweep(): Promise<Record<string, number>> {
     await supabase.from("device_tokens").delete().in("token", [...dead]);
   }
 
-  return { reminders, claimed: messages.length, sent, failed, pruned: dead.size };
+  return {
+    reminders,
+    reviewRequests,
+    claimed: messages.length,
+    sent,
+    failed,
+    pruned: dead.size,
+  };
 }
 
 /** Constant-time, so a wrong secret cannot be found one character at a time. */

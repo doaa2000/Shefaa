@@ -76,7 +76,10 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final _navigatorKey = GlobalKey<NavigatorState>();
+  /// Shared with the push service, which has to navigate from outside any
+  /// widget when a notification is tapped. Two keys would mean one of them was
+  /// attached to nothing.
+  final _navigatorKey = PushNotificationsService.navigatorKey;
   StreamSubscription<dynamic>? _authSubscription;
 
   /// The auth stream replays its last event to a new listener, so the first

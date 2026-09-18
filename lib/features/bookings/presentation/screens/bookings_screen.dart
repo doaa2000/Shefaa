@@ -13,27 +13,38 @@ import 'package:shefaa_app/features/bookings/presentation/screens/bookings_detai
 import 'package:shefaa_app/features/bookings/presentation/widgets/booking_card.dart';
 
 class BookingsScreen extends StatelessWidget {
-  const BookingsScreen({super.key});
+  const BookingsScreen({super.key, this.initialTab = upcomingTab});
+
+  /// Which of the three lists to open on. A notification asking for a review
+  /// is about a visit that has happened, and dropping the patient on "القادمة"
+  /// to hunt for it is most of the reason they would give up.
+  final int initialTab;
+
+  static const int upcomingTab = 0;
+  static const int pastTab = 1;
+  static const int cancelledTab = 2;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
           getIt<BookingBloc>()..add(const GetMyBookingsEvent()),
-      child: const _BookingsView(),
+      child: _BookingsView(initialTab: initialTab),
     );
   }
 }
 
 class _BookingsView extends StatefulWidget {
-  const _BookingsView();
+  const _BookingsView({required this.initialTab});
+
+  final int initialTab;
 
   @override
   State<_BookingsView> createState() => _BookingsViewState();
 }
 
 class _BookingsViewState extends State<_BookingsView> {
-  int _tab = 0;
+  late int _tab = widget.initialTab;
 
   static const _tabs = ['القادمة', 'السابقة', 'الملغاة'];
 
