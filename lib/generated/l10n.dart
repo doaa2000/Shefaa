@@ -594,6 +594,246 @@ class S {
       args: [],
     );
   }
+
+  /// `Thank you for the rating`
+  String get review_thanks {
+    return Intl.message(
+      'Thank you for the rating',
+      name: 'review_thanks',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You do not have permission to do that`
+  String get booking_error_not_allowed {
+    return Intl.message(
+      'You do not have permission to do that',
+      name: 'booking_error_not_allowed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Something stopped this`
+  String get booking_error_title {
+    return Intl.message(
+      'Something stopped this',
+      name: 'booking_error_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `OK`
+  String get booking_error_close {
+    return Intl.message(
+      'OK',
+      name: 'booking_error_close',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The booking could not be completed. Please try again`
+  String get booking_error_generic {
+    return Intl.message(
+      'The booking could not be completed. Please try again',
+      name: 'booking_error_generic',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `A rating is one to five stars`
+  String get booking_error_invalid_stars {
+    return Intl.message(
+      'A rating is one to five stars',
+      name: 'booking_error_invalid_stars',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `That note is too long. Please shorten it`
+  String get booking_error_comment_too_long {
+    return Intl.message(
+      'That note is too long. Please shorten it',
+      name: 'booking_error_comment_too_long',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `A cancelled appointment cannot be rated`
+  String get booking_error_cancelled_not_rateable {
+    return Intl.message(
+      'A cancelled appointment cannot be rated',
+      name: 'booking_error_cancelled_not_rateable',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `An appointment you did not attend cannot be rated`
+  String get booking_error_absent_not_rateable {
+    return Intl.message(
+      'An appointment you did not attend cannot be rated',
+      name: 'booking_error_absent_not_rateable',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You can rate this once the appointment has started`
+  String get booking_error_appointment_not_yet {
+    return Intl.message(
+      'You can rate this once the appointment has started',
+      name: 'booking_error_appointment_not_yet',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This session is full. Please choose another`
+  String get booking_error_session_full {
+    return Intl.message(
+      'This session is full. Please choose another',
+      name: 'booking_error_session_full',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The doctor does not hold this session on that day`
+  String get booking_error_session_not_offered {
+    return Intl.message(
+      'The doctor does not hold this session on that day',
+      name: 'booking_error_session_not_offered',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You already hold a place in this session`
+  String get booking_error_already_booked {
+    return Intl.message(
+      'You already hold a place in this session',
+      name: 'booking_error_already_booked',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please sign in first`
+  String get booking_error_not_signed_in {
+    return Intl.message(
+      'Please sign in first',
+      name: 'booking_error_not_signed_in',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `A booking cannot be moved. Please cancel it and book again`
+  String get booking_error_booking_immutable {
+    return Intl.message(
+      'A booking cannot be moved. Please cancel it and book again',
+      name: 'booking_error_booking_immutable',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cancelling is the only change available`
+  String get booking_error_cancel_only {
+    return Intl.message(
+      'Cancelling is the only change available',
+      name: 'booking_error_cancel_only',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The time to cancel this booking has passed`
+  String get booking_error_cancellation_closed {
+    return Intl.message(
+      'The time to cancel this booking has passed',
+      name: 'booking_error_cancellation_closed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `That appointment time has passed. Please choose another`
+  String get booking_error_time_has_passed {
+    return Intl.message(
+      'That appointment time has passed. Please choose another',
+      name: 'booking_error_time_has_passed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `That date has passed`
+  String get booking_error_date_in_past {
+    return Intl.message(
+      'That date has passed',
+      name: 'booking_error_date_in_past',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `That date is further ahead than bookings are open`
+  String get booking_error_beyond_horizon {
+    return Intl.message(
+      'That date is further ahead than bookings are open',
+      name: 'booking_error_beyond_horizon',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `That booking no longer exists`
+  String get booking_error_booking_not_found {
+    return Intl.message(
+      'That booking no longer exists',
+      name: 'booking_error_booking_not_found',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `That booking is already cancelled`
+  String get booking_error_already_cancelled {
+    return Intl.message(
+      'That booking is already cancelled',
+      name: 'booking_error_already_cancelled',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You can still cancel this booking`
+  String get booking_error_cancel_instead {
+    return Intl.message(
+      'You can still cancel this booking',
+      name: 'booking_error_cancel_instead',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `That appointment has passed`
+  String get booking_error_appointment_passed {
+    return Intl.message(
+      'That appointment has passed',
+      name: 'booking_error_appointment_passed',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -22,6 +22,78 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+    "review_thanks": MessageLookupByLibrary.simpleMessage(
+      "شكراً لتقييمك",
+    ),
+    "booking_error_not_allowed": MessageLookupByLibrary.simpleMessage(
+      "لا تملك صلاحية تنفيذ هذا الإجراء",
+    ),
+    "booking_error_title": MessageLookupByLibrary.simpleMessage(
+      "تعذّر إتمام الطلب",
+    ),
+    "booking_error_close": MessageLookupByLibrary.simpleMessage(
+      "حسناً",
+    ),
+    "booking_error_generic": MessageLookupByLibrary.simpleMessage(
+      "تعذر إتمام الحجز. يرجى المحاولة مرة أخرى",
+    ),
+    "booking_error_invalid_stars": MessageLookupByLibrary.simpleMessage(
+      "التقييم من نجمة إلى خمس نجوم",
+    ),
+    "booking_error_comment_too_long": MessageLookupByLibrary.simpleMessage(
+      "الملاحظة طويلة. يرجى اختصارها",
+    ),
+    "booking_error_cancelled_not_rateable": MessageLookupByLibrary.simpleMessage(
+      "لا يمكن تقييم موعد ملغى",
+    ),
+    "booking_error_absent_not_rateable": MessageLookupByLibrary.simpleMessage(
+      "لا يمكن تقييم موعد لم يحضره المريض",
+    ),
+    "booking_error_appointment_not_yet": MessageLookupByLibrary.simpleMessage(
+      "يمكن التقييم بعد بدء الموعد",
+    ),
+    "booking_error_session_full": MessageLookupByLibrary.simpleMessage(
+      "اكتمل عدد هذه الفترة. يرجى اختيار فترة أخرى",
+    ),
+    "booking_error_session_not_offered": MessageLookupByLibrary.simpleMessage(
+      "الطبيب لا يعمل في هذه الفترة في هذا اليوم",
+    ),
+    "booking_error_already_booked": MessageLookupByLibrary.simpleMessage(
+      "لديك حجز بالفعل في هذه الفترة",
+    ),
+    "booking_error_not_signed_in": MessageLookupByLibrary.simpleMessage(
+      "يرجى تسجيل الدخول أولاً",
+    ),
+    "booking_error_booking_immutable": MessageLookupByLibrary.simpleMessage(
+      "لا يمكن نقل الحجز. يرجى إلغاؤه والحجز من جديد",
+    ),
+    "booking_error_cancel_only": MessageLookupByLibrary.simpleMessage(
+      "إلغاء الحجز هو التغيير الوحيد المتاح",
+    ),
+    "booking_error_cancellation_closed": MessageLookupByLibrary.simpleMessage(
+      "انتهى وقت إلغاء هذا الحجز",
+    ),
+    "booking_error_time_has_passed": MessageLookupByLibrary.simpleMessage(
+      "انتهى وقت هذا الموعد. يرجى اختيار موعد آخر",
+    ),
+    "booking_error_date_in_past": MessageLookupByLibrary.simpleMessage(
+      "لا يمكن الحجز في تاريخ مضى",
+    ),
+    "booking_error_beyond_horizon": MessageLookupByLibrary.simpleMessage(
+      "هذا التاريخ أبعد من المدة المتاحة للحجز",
+    ),
+    "booking_error_booking_not_found": MessageLookupByLibrary.simpleMessage(
+      "لم يعد هذا الحجز موجوداً",
+    ),
+    "booking_error_already_cancelled": MessageLookupByLibrary.simpleMessage(
+      "هذا الحجز ملغى بالفعل",
+    ),
+    "booking_error_cancel_instead": MessageLookupByLibrary.simpleMessage(
+      "ما زال بإمكانك إلغاء الحجز",
+    ),
+    "booking_error_appointment_passed": MessageLookupByLibrary.simpleMessage(
+      "انتهى موعد هذا الحجز",
+    ),
     "account_info": MessageLookupByLibrary.simpleMessage("معلومات الحساب"),
     "appointments": MessageLookupByLibrary.simpleMessage("المواعيد"),
     "available_days": MessageLookupByLibrary.simpleMessage("الأيام المتاحة"),

@@ -12,6 +12,7 @@ import 'package:shefaa_app/features/bookings/presentation/bloc/bookings_state.da
 import 'package:shefaa_app/features/doctor_availability/data/models/doctor_availability_model.dart';
 import 'package:shefaa_app/features/home/presentation/screens/home_screen.dart';
 import 'package:shefaa_app/features/payment/data/models/payment_args_model.dart';
+import 'package:shefaa_app/core/widgets/error_sheet.dart';
 import 'package:shefaa_app/generated/l10n.dart';
 
 class PaymentScreenBody extends StatelessWidget {
@@ -131,12 +132,13 @@ class PaymentScreenBody extends StatelessWidget {
                 _showSuccess(context, args);
               }
               if (state.createBookingState == RequestState.error) {
-                ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(SnackBar(
-                    content: Text(state.errorMessage ?? 'تعذر إتمام الحجز'),
-                    backgroundColor: Colors.red.shade700,
-                  ));
+                // A sheet, not a snackbar. This is the screen where the
+                // patient pressed confirm and nothing happened, and the reason
+                // is the only thing that tells them what to try instead.
+                showErrorSheet(
+                  context,
+                  state.errorMessage ?? S.of(context).booking_error_generic,
+                );
               }
             },
             builder: (context, state) {

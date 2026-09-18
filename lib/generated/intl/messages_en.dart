@@ -22,6 +22,78 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+    "review_thanks": MessageLookupByLibrary.simpleMessage(
+      "Thank you for the rating",
+    ),
+    "booking_error_not_allowed": MessageLookupByLibrary.simpleMessage(
+      "You do not have permission to do that",
+    ),
+    "booking_error_title": MessageLookupByLibrary.simpleMessage(
+      "Something stopped this",
+    ),
+    "booking_error_close": MessageLookupByLibrary.simpleMessage(
+      "OK",
+    ),
+    "booking_error_generic": MessageLookupByLibrary.simpleMessage(
+      "The booking could not be completed. Please try again",
+    ),
+    "booking_error_invalid_stars": MessageLookupByLibrary.simpleMessage(
+      "A rating is one to five stars",
+    ),
+    "booking_error_comment_too_long": MessageLookupByLibrary.simpleMessage(
+      "That note is too long. Please shorten it",
+    ),
+    "booking_error_cancelled_not_rateable": MessageLookupByLibrary.simpleMessage(
+      "A cancelled appointment cannot be rated",
+    ),
+    "booking_error_absent_not_rateable": MessageLookupByLibrary.simpleMessage(
+      "An appointment you did not attend cannot be rated",
+    ),
+    "booking_error_appointment_not_yet": MessageLookupByLibrary.simpleMessage(
+      "You can rate this once the appointment has started",
+    ),
+    "booking_error_session_full": MessageLookupByLibrary.simpleMessage(
+      "This session is full. Please choose another",
+    ),
+    "booking_error_session_not_offered": MessageLookupByLibrary.simpleMessage(
+      "The doctor does not hold this session on that day",
+    ),
+    "booking_error_already_booked": MessageLookupByLibrary.simpleMessage(
+      "You already hold a place in this session",
+    ),
+    "booking_error_not_signed_in": MessageLookupByLibrary.simpleMessage(
+      "Please sign in first",
+    ),
+    "booking_error_booking_immutable": MessageLookupByLibrary.simpleMessage(
+      "A booking cannot be moved. Please cancel it and book again",
+    ),
+    "booking_error_cancel_only": MessageLookupByLibrary.simpleMessage(
+      "Cancelling is the only change available",
+    ),
+    "booking_error_cancellation_closed": MessageLookupByLibrary.simpleMessage(
+      "The time to cancel this booking has passed",
+    ),
+    "booking_error_time_has_passed": MessageLookupByLibrary.simpleMessage(
+      "That appointment time has passed. Please choose another",
+    ),
+    "booking_error_date_in_past": MessageLookupByLibrary.simpleMessage(
+      "That date has passed",
+    ),
+    "booking_error_beyond_horizon": MessageLookupByLibrary.simpleMessage(
+      "That date is further ahead than bookings are open",
+    ),
+    "booking_error_booking_not_found": MessageLookupByLibrary.simpleMessage(
+      "That booking no longer exists",
+    ),
+    "booking_error_already_cancelled": MessageLookupByLibrary.simpleMessage(
+      "That booking is already cancelled",
+    ),
+    "booking_error_cancel_instead": MessageLookupByLibrary.simpleMessage(
+      "You can still cancel this booking",
+    ),
+    "booking_error_appointment_passed": MessageLookupByLibrary.simpleMessage(
+      "That appointment has passed",
+    ),
     "account_info": MessageLookupByLibrary.simpleMessage("Account Info"),
     "appointments": MessageLookupByLibrary.simpleMessage("Appointments"),
     "available_days": MessageLookupByLibrary.simpleMessage("Available Days"),

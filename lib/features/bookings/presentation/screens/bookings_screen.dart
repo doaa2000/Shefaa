@@ -5,12 +5,14 @@ import 'package:shefaa_app/core/services/service_locator.dart';
 import 'package:shefaa_app/core/utils/app_colors.dart';
 import 'package:shefaa_app/core/utils/app_text_styles.dart';
 import 'package:shefaa_app/core/utils/constants.dart';
+import 'package:shefaa_app/core/widgets/error_sheet.dart';
 import 'package:shefaa_app/features/bookings/domain/entites/booking.dart';
 import 'package:shefaa_app/features/bookings/presentation/bloc/bookings_bloc.dart';
 import 'package:shefaa_app/features/bookings/presentation/bloc/bookings_event.dart';
 import 'package:shefaa_app/features/bookings/presentation/bloc/bookings_state.dart';
 import 'package:shefaa_app/features/bookings/presentation/screens/bookings_details_screen.dart';
 import 'package:shefaa_app/features/bookings/presentation/widgets/booking_card.dart';
+import 'package:shefaa_app/generated/l10n.dart';
 
 class BookingsScreen extends StatelessWidget {
   const BookingsScreen({super.key, this.initialTab = upcomingTab});
@@ -62,25 +64,22 @@ class _BookingsViewState extends State<_BookingsView> {
             ..showSnackBar(const SnackBar(content: Text('تم إلغاء الحجز')));
         }
         if (state.cancelBookingState == RequestState.error) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(SnackBar(
-              content: Text(state.errorMessage ?? 'تعذر إلغاء الحجز'),
-              backgroundColor: Colors.red.shade700,
-            ));
+          showErrorSheet(
+            context,
+            state.errorMessage ?? S.of(context).booking_error_generic,
+          );
         }
         if (state.rateBookingState == RequestState.loaded) {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
-            ..showSnackBar(const SnackBar(content: Text('شكراً لتقييمك')));
+            ..showSnackBar(
+                SnackBar(content: Text(S.of(context).review_thanks)));
         }
         if (state.rateBookingState == RequestState.error) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(SnackBar(
-              content: Text(state.errorMessage ?? 'تعذر إرسال التقييم'),
-              backgroundColor: Colors.red.shade700,
-            ));
+          showErrorSheet(
+            context,
+            state.errorMessage ?? S.of(context).booking_error_generic,
+          );
         }
         if (state.reportAbsenceState == RequestState.loaded) {
           ScaffoldMessenger.of(context)
@@ -90,12 +89,10 @@ class _BookingsViewState extends State<_BookingsView> {
             ));
         }
         if (state.reportAbsenceState == RequestState.error) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(SnackBar(
-              content: Text(state.errorMessage ?? 'تعذر إرسال الإبلاغ'),
-              backgroundColor: Colors.red.shade700,
-            ));
+          showErrorSheet(
+            context,
+            state.errorMessage ?? S.of(context).booking_error_generic,
+          );
         }
       },
       builder: (context, state) {

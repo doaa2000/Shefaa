@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:shefaa_app/core/domain/use_cases.dart';
 import 'package:shefaa_app/core/services/service_locator.dart';
 import 'package:shefaa_app/core/utils/cache_helper.dart';
+import 'package:shefaa_app/core/widgets/error_sheet.dart';
 import 'package:shefaa_app/features/bookings/domain/entites/pending_review.dart';
 import 'package:shefaa_app/features/bookings/domain/usecases/create_booking_usecase.dart';
 import 'package:shefaa_app/features/bookings/presentation/screens/bookings_details_screen.dart';
+import 'package:shefaa_app/generated/l10n.dart';
 
 /// Asks the patient to rate a visit, once, the next time they open the app.
 ///
@@ -89,16 +91,11 @@ class _ReviewPromptState extends State<ReviewPrompt> {
 
     if (!mounted) return;
 
-    result.fold(
-      (failure) => ScaffoldMessenger.of(context)
+    await result.fold(
+      (failure) => showErrorSheet(context, failure.message),
+      (_) async => ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(
-          content: Text(failure.message),
-          backgroundColor: Colors.red.shade700,
-        )),
-      (_) => ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(const SnackBar(content: Text('شكراً لتقييمك'))),
+        ..showSnackBar(SnackBar(content: Text(S.of(context).review_thanks))),
     );
   }
 
