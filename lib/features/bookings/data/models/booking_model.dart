@@ -15,6 +15,8 @@ class BookingModel extends BookingEntity {
     required super.payment,
     required super.doctor,
     super.absenceReportedAt,
+    super.reviewStars,
+    super.reviewComment,
   });
 
   factory BookingModel.fromMap(Map<String, dynamic> map) {
@@ -38,6 +40,10 @@ class BookingModel extends BookingEntity {
       absenceReportedAt: map['absence_reported_at'] == null
           ? null
           : DateTime.tryParse(map['absence_reported_at'] as String),
+      // Spliced in beside the booking rather than embedded: doctor_reviews is
+      // a separate read for the same reason the doctor is.
+      reviewStars: (map['review_stars'] as num?)?.toInt(),
+      reviewComment: map['review_comment'] as String?,
     );
   }
 }

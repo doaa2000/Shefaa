@@ -42,7 +42,8 @@ class _BookingsViewState extends State<_BookingsView> {
     return BlocConsumer<BookingBloc, BookingState>(
       listenWhen: (p, c) =>
           p.cancelBookingState != c.cancelBookingState ||
-          p.reportAbsenceState != c.reportAbsenceState,
+          p.reportAbsenceState != c.reportAbsenceState ||
+          p.rateBookingState != c.rateBookingState,
       listener: (context, state) {
         if (state.cancelBookingState == RequestState.loaded) {
           ScaffoldMessenger.of(context)
@@ -54,6 +55,19 @@ class _BookingsViewState extends State<_BookingsView> {
             ..hideCurrentSnackBar()
             ..showSnackBar(SnackBar(
               content: Text(state.errorMessage ?? 'تعذر إلغاء الحجز'),
+              backgroundColor: Colors.red.shade700,
+            ));
+        }
+        if (state.rateBookingState == RequestState.loaded) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(const SnackBar(content: Text('شكراً لتقييمك')));
+        }
+        if (state.rateBookingState == RequestState.error) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(SnackBar(
+              content: Text(state.errorMessage ?? 'تعذر إرسال التقييم'),
               backgroundColor: Colors.red.shade700,
             ));
         }
@@ -161,6 +175,14 @@ class _BookingsViewState extends State<_BookingsView> {
       bloc.add(CancelBookingEvent(booking.id));
     } else if (action == BookingAction.reportAbsence) {
       bloc.add(ReportAbsenceEvent(booking.id));
+    } else if (action is BookingRated) {
+      // A type rather than an enum value, because this one arrives carrying
+      // what the patient said.
+      bloc.add(RateBookingEvent(
+        bookingId: booking.id,
+        stars: action.stars,
+        comment: action.comment,
+      ));
     }
   }
 

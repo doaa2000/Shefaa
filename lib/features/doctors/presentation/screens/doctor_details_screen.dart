@@ -121,6 +121,15 @@ class _Header extends StatelessWidget {
                       doctor.rating!.toStringAsFixed(1),
                       style: TextStyles.meduim14,
                     ),
+                    if (doctor.ratingsCount != null &&
+                        doctor.ratingsCount! > 0) ...[
+                      const SizedBox(width: 6),
+                      Text(
+                        'من ${doctor.ratingsCount} تقييم',
+                        style: TextStyles.meduim14
+                            .copyWith(color: Colors.grey.shade600),
+                      ),
+                    ],
                   ],
                 ),
               ],

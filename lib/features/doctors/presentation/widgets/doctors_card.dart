@@ -25,6 +25,10 @@ class DoctorCard extends StatelessWidget {
   /// not from anything anybody had said about them.
   final double? rating;
 
+  /// How many reviews that average came from. Printed beside it, because a
+  /// lone 5.0 reads as a reputation and is usually one patient.
+  final int? ratingsCount;
+
   /// Opens the doctor's page. The card body itself does nothing -- the two
   /// buttons are the only way out of it, so neither can be hit by accident
   /// while scrolling.
@@ -41,6 +45,7 @@ class DoctorCard extends StatelessWidget {
     required this.specialty,
     this.imageUrl,
     this.rating,
+    this.ratingsCount,
     required this.onDetailsTap, required this.location, required this.consultationFee, required this.waitingTime,
     required this.onBookTap,
   });
@@ -120,6 +125,16 @@ class DoctorCard extends StatelessWidget {
                               rating!.toStringAsFixed(1),
                               style: const TextStyle(fontSize: 12),
                             ),
+                            if (ratingsCount != null && ratingsCount! > 0) ...[
+                              const SizedBox(width: 4),
+                              Text(
+                                '($ratingsCount)',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ],

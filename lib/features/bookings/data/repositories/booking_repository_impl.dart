@@ -63,6 +63,24 @@ class BookingRepositoryImpl implements BookingRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, void>> rateBooking({
+    required int bookingId,
+    required int stars,
+    String? comment,
+  }) async {
+    try {
+      await remoteDatasource.rateBooking(
+        bookingId: bookingId,
+        stars: stars,
+        comment: comment,
+      );
+      return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure(_message(e)));
+    }
+  }
+
   /// What the patient is actually shown when a booking is refused.
   ///
   /// The database raises in English and tags each refusal with a `hint`. The
@@ -71,6 +89,11 @@ class BookingRepositoryImpl implements BookingRepository {
   /// held one app's wording would be wrong for the dashboard, which is in
   /// English, and wrong again for the next language either of them gains.
   static const Map<String, String> _byHint = {
+    'invalid_stars': 'التقييم من نجمة إلى خمس نجوم',
+    'comment_too_long': 'الملاحظة طويلة. يرجى اختصارها',
+    'cancelled_not_rateable': 'لا يمكن تقييم موعد ملغى',
+    'absent_not_rateable': 'لا يمكن تقييم موعد لم يحضره المريض',
+    'appointment_not_yet': 'يمكن التقييم بعد بدء الموعد',
     'session_full': 'اكتمل عدد هذه الفترة. يرجى اختيار فترة أخرى',
     'session_not_offered': 'الطبيب لا يعمل في هذه الفترة في هذا اليوم',
     'already_booked': 'لديك حجز بالفعل في هذه الفترة',

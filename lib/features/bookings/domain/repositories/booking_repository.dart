@@ -18,4 +18,10 @@ abstract class BookingRepository {
   Future<Either<Failure, void>> cancelBooking(int bookingId);
 
   Future<Either<Failure, void>> reportAbsence(int bookingId);
+
+  Future<Either<Failure, void>> rateBooking({
+    required int bookingId,
+    required int stars,
+    String? comment,
+  });
 }

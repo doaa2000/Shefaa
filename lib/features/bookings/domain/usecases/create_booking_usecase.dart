@@ -48,6 +48,32 @@ class CancelBookingUsecase extends BaseUsecase<void, int> {
   }
 }
 
+class RateBookingUsecase extends BaseUsecase<void, RateBookingParams> {
+  final BookingRepository repository;
+  RateBookingUsecase(this.repository);
+
+  @override
+  Future<Either<Failure, void>> call(RateBookingParams params) {
+    return repository.rateBooking(
+      bookingId: params.bookingId,
+      stars: params.stars,
+      comment: params.comment,
+    );
+  }
+}
+
+class RateBookingParams {
+  final int bookingId;
+  final int stars;
+  final String? comment;
+
+  const RateBookingParams({
+    required this.bookingId,
+    required this.stars,
+    this.comment,
+  });
+}
+
 class ReportAbsenceUsecase extends BaseUsecase<void, int> {
   final BookingRepository repository;
   ReportAbsenceUsecase(this.repository);

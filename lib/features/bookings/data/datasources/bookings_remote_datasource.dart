@@ -21,6 +21,14 @@ abstract class BookingRemoteDatasource {
   /// closed. It does not cancel: the deadline has passed, and letting it
   /// would make the deadline mean nothing.
   Future<void> reportAbsence(int bookingId);
+
+  /// Rates a visit, or replaces the rating already on it. One review per
+  /// booking, so there is no separate "edit".
+  Future<void> rateBooking({
+    required int bookingId,
+    required int stars,
+    String? comment,
+  });
 }
 
 class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
@@ -114,11 +122,28 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
 
     final byId = {for (final doctor in doctors) doctor['id']: doctor};
 
+    // The patient's own reviews for these bookings. A separate read for the
+    // same reason the doctor is one: doctor_reviews has its own policy, and an
+    // embed a policy refuses comes back null rather than failing.
+    final bookingIds = rows.map((row) => row['id']).whereType<Object>().toList();
+
+    final reviews = (await supabase
+            .from('doctor_reviews')
+            .select('booking_id, stars, comment')
+            .inFilter('booking_id', bookingIds) as List)
+        .cast<Map<String, dynamic>>();
+
+    final reviewByBooking = {
+      for (final review in reviews) review['booking_id']: review,
+    };
+
     return rows
         .where((row) => byId.containsKey(row['doctor_id']))
         .map((row) => BookingModel.fromMap({
               ...row,
               'doctor': byId[row['doctor_id']],
+              'review_stars': reviewByBooking[row['id']]?['stars'],
+              'review_comment': reviewByBooking[row['id']]?['comment'],
             }))
         .toList();
   }
@@ -137,6 +162,22 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
     // drop the reminders and tell the doctor, and none of that is the
     // patient's to be trusted with.
     await supabase.rpc('report_absence', params: {'p_booking': bookingId});
+  }
+
+  @override
+  Future<void> rateBooking({
+    required int bookingId,
+    required int stars,
+    String? comment,
+  }) async {
+    // A function rather than an insert: it has to prove the appointment
+    // belongs to this patient and actually happened, and neither is the
+    // client's to assert.
+    await supabase.rpc('rate_booking', params: {
+      'p_booking': bookingId,
+      'p_stars': stars,
+      'p_comment': comment,
+    });
   }
 
   static String _dateOnly(DateTime date) {

@@ -138,6 +138,7 @@ class _SearchViewState extends State<_SearchView> {
           waitingTime:
               doctor.waitingTime != null ? '${doctor.waitingTime}' : '—',
           rating: doctor.rating,
+          ratingsCount: doctor.ratingsCount,
           onDetailsTap: () => Navigator.pushNamed(
             context,
             DoctorDetailsScreen.routeName,

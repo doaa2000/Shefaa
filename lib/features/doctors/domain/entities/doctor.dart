@@ -9,6 +9,11 @@ class DoctorEntity extends Equatable {
   final String? image;
   final String? title;
   final double? rating;
+
+  /// How many reviews the average is drawn from. 4.9 from two people and 4.4
+  /// from three hundred are not the same claim, and a rating shown without its
+  /// count invites the reader to assume the second.
+  final int? ratingsCount;
   final dynamic consultationFee;
   final int ? waitingTime;
   final String? location;
@@ -25,7 +30,7 @@ class DoctorEntity extends Equatable {
      this.clinicId,
     this.image,
     this.title,
-    this.rating, required this.specialaization, this.consultationFee, this.waitingTime,required this.location,
+    this.rating, this.ratingsCount, required this.specialaization, this.consultationFee, this.waitingTime,required this.location,
     this.bio,
   });
 
@@ -38,6 +43,7 @@ class DoctorEntity extends Equatable {
     image,
     title,
     rating,
+    ratingsCount,
     specialaization,
     consultationFee,
     waitingTime,

@@ -28,7 +28,7 @@ abstract class DoctorsRemoteDatasource {
 /// fetched until somebody decides it should be.
 const String _publicDoctorColumns =
     'id, name, title, specialization, specialty_id, clinic_id, image, '
-    'location, rating, consultation_fee, waiting_time, bio';
+    'location, rating, ratings_count, consultation_fee, waiting_time, bio';
 
 class DoctorsRemoteDatasourceImpl implements DoctorsRemoteDatasource {
   final SupabaseClient supabase;

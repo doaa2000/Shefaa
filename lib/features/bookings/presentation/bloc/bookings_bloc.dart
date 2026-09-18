@@ -13,17 +13,20 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
   final GetMyBookingsUsecase getMyBookingsUsecase;
   final CancelBookingUsecase cancelBookingUsecase;
   final ReportAbsenceUsecase reportAbsenceUsecase;
+  final RateBookingUsecase rateBookingUsecase;
 
   BookingBloc({
     required this.createBookingUsecase,
     required this.getMyBookingsUsecase,
     required this.cancelBookingUsecase,
     required this.reportAbsenceUsecase,
+    required this.rateBookingUsecase,
   }) : super(const BookingState()) {
     on<CreateBookingEvent>(_onCreateBooking);
     on<GetMyBookingsEvent>(_onGetMyBookings);
     on<CancelBookingEvent>(_onCancelBooking);
     on<ReportAbsenceEvent>(_onReportAbsence);
+    on<RateBookingEvent>(_onRateBooking);
   }
 
   Future<void> _onCreateBooking(
@@ -89,6 +92,32 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         emit(state.copyWith(cancelBookingState: RequestState.loaded));
         // Cancelling moves everyone behind this patient up a place, so the
         // whole list is re-read rather than the one row patched locally.
+        add(const GetMyBookingsEvent());
+      },
+    );
+  }
+
+  Future<void> _onRateBooking(
+    RateBookingEvent event,
+    Emitter<BookingState> emit,
+  ) async {
+    emit(state.copyWith(rateBookingState: RequestState.loading));
+
+    final result = await rateBookingUsecase(RateBookingParams(
+      bookingId: event.bookingId,
+      stars: event.stars,
+      comment: event.comment,
+    ));
+
+    await result.fold(
+      (failure) async => emit(state.copyWith(
+        rateBookingState: RequestState.error,
+        errorMessage: failure.message,
+      )),
+      (_) async {
+        emit(state.copyWith(rateBookingState: RequestState.loaded));
+        // Re-read rather than patched: the review changes the doctor's average
+        // too, and that number is on the same screens as this list.
         add(const GetMyBookingsEvent());
       },
     );

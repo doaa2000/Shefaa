@@ -27,6 +27,12 @@ class BookingEntity {
   /// says it is not offered twice.
   final DateTime? absenceReportedAt;
 
+  /// What this patient gave this visit, if they have rated it. One review per
+  /// booking, so this is a single value rather than a list, and re-rating
+  /// replaces it.
+  final int? reviewStars;
+  final String? reviewComment;
+
   const BookingEntity({
     required this.id,
     required this.status,
@@ -38,6 +44,8 @@ class BookingEntity {
     required this.payment,
     required this.doctor,
     this.absenceReportedAt,
+    this.reviewStars,
+    this.reviewComment,
   });
 
   bool get isUpcoming =>
@@ -59,6 +67,35 @@ class BookingEntity {
 
   bool get absenceReported => absenceReportedAt != null;
 
+  bool get reviewed => reviewStars != null;
+
+  /// Whether this visit can be rated.
+  ///
+  /// A visit that was called off or never attended cannot: there is nothing to
+  /// review. Before the appointment starts there is nothing to review either.
+  /// Asked here so the stars are not offered on a booking the database would
+  /// refuse -- it checks the same three things again and refuses a wrong one.
+  bool get canReview {
+    if (status == 'cancelled' || status == 'no_show') return false;
+    return !DateTime.now().isBefore(_startsAt);
+  }
+
+  /// The appointment's own moment, in the phone's clock. Both the rating and
+  /// the absence report ask "has it started yet", and they were not going to
+  /// go on parsing the same string apart.
+  DateTime get _startsAt {
+    final parts = startTime.split(':');
+    final hour = parts.isNotEmpty ? int.tryParse(parts[0]) ?? 0 : 0;
+    final minute = parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0;
+    return DateTime(
+      bookedDate.year,
+      bookedDate.month,
+      bookedDate.day,
+      hour,
+      minute,
+    );
+  }
+
   /// The window where cancelling has closed but the appointment has not
   /// started: too late to give the place back, still early enough for the
   /// doctor to do something about an empty chair.
@@ -68,17 +105,6 @@ class BookingEntity {
   bool get canReportAbsence {
     if (!isUpcoming || canCancel || absenceReported) return false;
 
-    final parts = startTime.split(':');
-    final hour = parts.isNotEmpty ? int.tryParse(parts[0]) ?? 0 : 0;
-    final minute = parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0;
-    final starts = DateTime(
-      bookedDate.year,
-      bookedDate.month,
-      bookedDate.day,
-      hour,
-      minute,
-    );
-
-    return DateTime.now().isBefore(starts);
+    return DateTime.now().isBefore(_startsAt);
   }
 }

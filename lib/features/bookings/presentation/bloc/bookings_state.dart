@@ -7,6 +7,7 @@ class BookingState extends Equatable {
   final RequestState getBookingsState;
   final RequestState cancelBookingState;
   final RequestState reportAbsenceState;
+  final RequestState rateBookingState;
   final List<BookingEntity> bookings;
   final String? errorMessage;
 
@@ -16,6 +17,7 @@ class BookingState extends Equatable {
     this.getBookingsState = RequestState.initial,
     this.cancelBookingState = RequestState.initial,
     this.reportAbsenceState = RequestState.initial,
+    this.rateBookingState = RequestState.initial,
     this.bookings = const [],
     this.errorMessage,
   });
@@ -52,6 +54,7 @@ class BookingState extends Equatable {
     RequestState? getBookingsState,
     RequestState? cancelBookingState,
     RequestState? reportAbsenceState,
+    RequestState? rateBookingState,
     List<BookingEntity>? bookings,
     String? errorMessage,
   }) {
@@ -60,6 +63,7 @@ class BookingState extends Equatable {
       getBookingsState: getBookingsState ?? this.getBookingsState,
       cancelBookingState: cancelBookingState ?? this.cancelBookingState,
       reportAbsenceState: reportAbsenceState ?? this.reportAbsenceState,
+      rateBookingState: rateBookingState ?? this.rateBookingState,
       bookings: bookings ?? this.bookings,
       errorMessage: errorMessage ?? this.errorMessage,
     );
@@ -71,6 +75,7 @@ class BookingState extends Equatable {
         getBookingsState,
         cancelBookingState,
         reportAbsenceState,
+        rateBookingState,
         bookings,
         errorMessage,
       ];

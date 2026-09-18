@@ -41,6 +41,23 @@ class CancelBookingEvent extends BookingEvent {
   List<Object?> get props => [bookingId];
 }
 
+/// Rating a visit that happened. Sending it again replaces what was said
+/// before rather than adding a second review.
+class RateBookingEvent extends BookingEvent {
+  final int bookingId;
+  final int stars;
+  final String? comment;
+
+  const RateBookingEvent({
+    required this.bookingId,
+    required this.stars,
+    this.comment,
+  });
+
+  @override
+  List<Object?> get props => [bookingId, stars, comment];
+}
+
 /// After the cancellation deadline: the booking stands, the doctor is told.
 class ReportAbsenceEvent extends BookingEvent {
   final int bookingId;

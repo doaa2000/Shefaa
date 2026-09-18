@@ -8,6 +8,7 @@ class DoctorModel extends DoctorEntity {
     super.image,
     super.title,
     super.rating,
+    super.ratingsCount,
      super.clinicId,
     required super.specialaization,
     super.consultationFee,
@@ -23,6 +24,7 @@ factory DoctorModel.fromMap(Map<String, dynamic> json) {
     title:           json['title'] as String?,
     consultationFee: (json['consultation_fee'] as num?)?.toDouble() ?? 0.0,
     rating:          (json['rating'] as num?)?.toDouble() ?? 0.0,
+    ratingsCount:    (json['ratings_count'] as num?)?.toInt() ?? 0,
     specialtyId:     (json['specialty_id'] as num?)?.toInt(),   // ✅
     clinicId:        (json['clinic_id'] as num?)?.toInt(),      // ✅
     waitingTime:     (json['waiting_time'] as num?)?.toInt(),   // ✅  
@@ -39,6 +41,7 @@ factory DoctorModel.fromMap(Map<String, dynamic> json) {
       'image': image,
       'title': title,
       'rating': rating,
+      'ratings_count': ratingsCount,
       'clinic_id': clinicId,
       'specialaization': specialaization,
       'consultation_fee': consultationFee,
