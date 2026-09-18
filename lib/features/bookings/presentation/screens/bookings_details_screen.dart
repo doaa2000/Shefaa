@@ -127,7 +127,11 @@ class BookingsDetailsScreen extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (sheetContext) => _RateSheet(booking: booking),
+      builder: (sheetContext) => RateSheet(
+        doctorName: booking.doctor.name,
+        initialStars: booking.reviewStars,
+        initialComment: booking.reviewComment,
+      ),
     );
 
     if (rated != null && context.mounted) {
@@ -356,22 +360,29 @@ class BookingsDetailsScreen extends StatelessWidget {
 
 /// The star picker.
 ///
-/// Its own widget because it is the one thing on this screen that holds state
-/// while the patient makes up their mind, and the screen around it is
-/// stateless on purpose.
-class _RateSheet extends StatefulWidget {
-  const _RateSheet({required this.booking});
+/// Takes a name and an id rather than a booking, because it is opened from two
+/// places: the details screen, where there is a whole booking to hand, and the
+/// prompt that appears a few hours after a visit, where there is not.
+class RateSheet extends StatefulWidget {
+  const RateSheet({
+    super.key,
+    required this.doctorName,
+    this.initialStars,
+    this.initialComment,
+  });
 
-  final BookingEntity booking;
+  final String doctorName;
+  final int? initialStars;
+  final String? initialComment;
 
   @override
-  State<_RateSheet> createState() => _RateSheetState();
+  State<RateSheet> createState() => _RateSheetState();
 }
 
-class _RateSheetState extends State<_RateSheet> {
-  late int _stars = widget.booking.reviewStars ?? 0;
+class _RateSheetState extends State<RateSheet> {
+  late int _stars = widget.initialStars ?? 0;
   late final TextEditingController _comment =
-      TextEditingController(text: widget.booking.reviewComment ?? '');
+      TextEditingController(text: widget.initialComment ?? '');
 
   @override
   void dispose() {
@@ -416,7 +427,7 @@ class _RateSheetState extends State<_RateSheet> {
           Text('كيف كانت زيارتك؟', style: TextStyles.bold18),
           const SizedBox(height: 4),
           Text(
-            widget.booking.doctor.name,
+            widget.doctorName,
             style: TextStyles.meduim14.copyWith(color: Colors.grey.shade600),
           ),
           const SizedBox(height: 16),

@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:shefaa_app/core/domain/use_cases.dart';
 import 'package:shefaa_app/core/errors/failure.dart';
+import 'package:shefaa_app/features/bookings/domain/entites/pending_review.dart';
 import 'package:shefaa_app/features/bookings/domain/repositories/booking_repository.dart';
 
 class CreateBookingUsecase extends BaseUsecase<int, CreateBookingParams> {
@@ -72,6 +73,17 @@ class RateBookingParams {
     required this.stars,
     this.comment,
   });
+}
+
+class PendingReviewUsecase
+    extends BaseUsecase<PendingReviewEntity?, NoParameters> {
+  final BookingRepository repository;
+  PendingReviewUsecase(this.repository);
+
+  @override
+  Future<Either<Failure, PendingReviewEntity?>> call(NoParameters params) {
+    return repository.pendingReview();
+  }
 }
 
 class ReportAbsenceUsecase extends BaseUsecase<void, int> {

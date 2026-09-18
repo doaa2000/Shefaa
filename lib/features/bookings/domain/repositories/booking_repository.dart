@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:shefaa_app/core/errors/failure.dart';
 import 'package:shefaa_app/features/bookings/domain/entites/booking.dart';
+import 'package:shefaa_app/features/bookings/domain/entites/pending_review.dart';
 
 abstract class BookingRepository {
   /// Returns the place in the queue the booking got.
@@ -24,4 +25,6 @@ abstract class BookingRepository {
     required int stars,
     String? comment,
   });
+
+  Future<Either<Failure, PendingReviewEntity?>> pendingReview();
 }

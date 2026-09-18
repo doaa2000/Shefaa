@@ -177,6 +177,9 @@ getIt.registerLazySingleton<LogoutUseCase>(() => LogoutUseCase(getIt()));
   getIt.registerLazySingleton<RateBookingUsecase>(
     () => RateBookingUsecase(getIt()),
   );
+  getIt.registerLazySingleton<PendingReviewUsecase>(
+    () => PendingReviewUsecase(getIt()),
+  );
   getIt.registerLazySingleton<ReportAbsenceUsecase>(
     () => ReportAbsenceUsecase(getIt()),
   );

@@ -207,17 +207,14 @@ class PushNotificationsService {
     final navigator = navigatorKey.currentState;
     if (navigator == null) return;
 
-    // A request to rate is about a visit that has happened; everything else --
-    // a confirmation, a cancellation, a reminder -- is about one that has not.
-    final past = message.data['action'] == 'review';
-
+    // Everything this app sends a notification about -- a confirmation, a
+    // cancellation, a reminder -- is an appointment that has not happened yet.
     navigator.pushNamedAndRemoveUntil(
       AppRoutes.home,
       (route) => false,
-      arguments: HomeArgs(
+      arguments: const HomeArgs(
         tab: HomeScreen.bookingsTab,
-        bookingsTab:
-            past ? BookingsScreen.pastTab : BookingsScreen.upcomingTab,
+        bookingsTab: BookingsScreen.upcomingTab,
       ),
     );
   }

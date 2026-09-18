@@ -3,6 +3,7 @@ import 'package:shefaa_app/core/services/service_locator.dart';
 import 'package:shefaa_app/core/utils/app_router.dart';
 import 'package:shefaa_app/core/widgets/custom_app_bar.dart';
 import 'package:shefaa_app/features/bookings/presentation/screens/bookings_screen.dart';
+import 'package:shefaa_app/features/bookings/presentation/widgets/review_prompt.dart';
 import 'package:shefaa_app/features/home/presentation/bloc/home_bloc.dart';
 import 'package:shefaa_app/features/home/presentation/widgets/home_app_bar.dart';
 import 'package:shefaa_app/features/home/presentation/widgets/home_page_widget.dart';
@@ -104,7 +105,19 @@ class HomeScreen extends StatelessWidget {
             appBar: state.currentIndex == homeTab
                 ? HomeAppBar()
                 : CustomAppBar(title: _titleFor(context, state.currentIndex)),
-            body: pages[state.currentIndex],
+            // The prompt draws nothing. It sits here, above the tabs, so that
+            // it runs once when the app opens rather than again on every trip
+            // back to a tab.
+            body: Stack(
+              // Expand, so the page underneath is given the same constraints
+              // it had when it was the body itself. A loose stack would size
+              // to its largest child and quietly change every tab's layout.
+              fit: StackFit.expand,
+              children: [
+                pages[state.currentIndex],
+                const ReviewPrompt(),
+              ],
+            ),
             bottomNavigationBar: CustomBottomNavBar(
               currentIndex: state.currentIndex,
               onTap: (index) {

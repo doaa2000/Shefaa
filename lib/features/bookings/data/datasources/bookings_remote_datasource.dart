@@ -1,5 +1,6 @@
 import 'package:shefaa_app/core/services/booking_policy.dart';
 import 'package:shefaa_app/features/bookings/data/models/booking_model.dart';
+import 'package:shefaa_app/features/bookings/domain/entites/pending_review.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class BookingRemoteDatasource {
@@ -29,6 +30,9 @@ abstract class BookingRemoteDatasource {
     required int stars,
     String? comment,
   });
+
+  /// The one visit worth asking about, or null. Null is the ordinary answer.
+  Future<PendingReviewEntity?> pendingReview();
 }
 
 class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
@@ -178,6 +182,13 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
       'p_stars': stars,
       'p_comment': comment,
     });
+  }
+
+  @override
+  Future<PendingReviewEntity?> pendingReview() async {
+    final row = await supabase.rpc('pending_review');
+    if (row == null) return null;
+    return PendingReviewEntity.fromMap(row as Map<String, dynamic>);
   }
 
   static String _dateOnly(DateTime date) {

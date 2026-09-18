@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:shefaa_app/core/errors/failure.dart';
 import 'package:shefaa_app/features/bookings/data/datasources/bookings_remote_datasource.dart';
 import 'package:shefaa_app/features/bookings/domain/entites/booking.dart';
+import 'package:shefaa_app/features/bookings/domain/entites/pending_review.dart';
 import 'package:shefaa_app/features/bookings/domain/repositories/booking_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -76,6 +77,15 @@ class BookingRepositoryImpl implements BookingRepository {
         comment: comment,
       );
       return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure(_message(e)));
+    }
+  }
+
+  @override
+  Future<Either<Failure, PendingReviewEntity?>> pendingReview() async {
+    try {
+      return Right(await remoteDatasource.pendingReview());
     } catch (e) {
       return Left(ServerFailure(_message(e)));
     }
